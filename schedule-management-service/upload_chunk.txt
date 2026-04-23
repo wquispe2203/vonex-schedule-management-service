@@ -1,0 +1,24 @@
+
+                let currentHistoryPage = 1;
+
+                async function loadUploadHistory(page = 1) {
+                    currentHistoryPage = page;
+                    const tbody = document.getElementById('upload-history-body');
+                    const prevBtn = document.getElementById('prev-page-btn');
+                    const nextBtn = document.getElementById('next-page-btn');
+                    const pageIndicator = document.getElementById('page-indicator');
+                    const totalCount = document.getElementById('history-total');
+
+                    try {
+                        const res = await authFetch(`${window.CONFIG.BASE_URL}/api/schedule/xml-uploads?page=${page}&limit=5`);
+                        const data = await res.json();
+                        if (data.success) {
+                            tbody.innerHTML = '';
+                            if (data.data.length === 0) {
+                                tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-slate-400">No hay registros de subida aún.</td></tr>';
+                                pageIndicator.innerText = `Página 1 de 1`;
+                                totalCount.innerText = "0";
+                                return;
+                            }
+
+                            

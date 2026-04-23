@@ -1,0 +1,15 @@
+function updateBD() {
+  let url = "https://encuestas.vonex.edu.pe/sheet?";
+  let token = "token=6KUfrl8ODLkY99VZO5bFj5N1SkUd4PhoWxzSEA0buPwkb0K5xmzOwelIjhcHoGh3ACSrfc53QW36lgWhtP3YIt3KmKJxVUpwifxFQQQNWbC4DZ74yyRV5B2MEZFeWLGM";
+  let response = UrlFetchApp.fetch(url + token, { muteHttpExceptions: true });
+  let responseBody = response.getContentText();
+  if (response.getResponseCode() == 404) {
+    Logger.log("Web page not found");
+  } else {
+   let responseParse = JSON.parse(responseBody);
+    if (responseParse.response != "") {
+      Logger.log(responseParse);
+      Logger.log("BD updated");
+    }
+  }
+}

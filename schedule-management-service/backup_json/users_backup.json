@@ -1,0 +1,28 @@
+[
+  {
+    "id": 2,
+    "username": "daacademica@vonex.edu.pe",
+    "password_hash": "$2b$12$lzuyqblAci.O0goiCJo3RujbuBbUNoid5IjkViR2WENq2JdnsjEce",
+    "role": "sistemas",
+    "nombres": "Dirección",
+    "apellidos": "Académica",
+    "area": "Dirección Académica",
+    "is_active": true,
+    "created_at": "2026-04-07T19:21:17.857338-05:00",
+    "updated_at": null,
+    "uid": "97ea32a7-1dfa-4dcc-bfbe-dedfe22fdddd"
+  },
+  {
+    "id": 1,
+    "username": "admin@vonex.edu.pe",
+    "password_hash": "$2b$12$CtVFeI0QWQm6PvowHlvjQ.jMiNl0Mze7G04kUejfhegWIWiybcVS2",
+    "role": "admin",
+    "nombres": "Administrador",
+    "apellidos": "Sistema",
+    "area": "Sistemas",
+    "is_active": true,
+    "created_at": "2026-04-06T19:06:52.118334-05:00",
+    "updated_at": "2026-04-07T18:01:01.370918-05:00",
+    "uid": "63502026-f86f-42a7-af17-ec46b88e8505"
+  }
+]

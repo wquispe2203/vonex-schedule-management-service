@@ -1,0 +1,93 @@
+function modifyHour() {
+    // Modify Horary
+  let horarySurvey = [...newHorary];
+  horarySurvey.forEach(element => {
+    let textOperator = element[mainColSubject];
+    let textOperatorTemp = textOperator.slice(-3);
+    let operator = textOperatorTemp.slice(0,-2);
+    let operatorNum = textOperatorTemp.slice(-2);
+    let timeSubject = element[mainColHourEnd];    
+    let timeNew;
+
+    if (symbols.includes(operator)) { 
+      let target = new Date("2023-01-01 " + timeSubject);
+      if(operator == '+'){
+        target.setTime(target.getTime() + (operatorNum * 60 * 1000));
+      }else{
+        target.setTime(target.getTime() - (operatorNum * 60 * 1000));
+      }
+      
+      let timeTemp = new Date(target);
+        timeNew = getTime_(timeTemp)
+      
+      element[mainColHourEnd] = timeNew;
+      element[mainColSubject] = textOperator.slice(0,-3);
+    }
+  })
+}
+
+function test() {
+  let spanText;
+  let array = [
+    "MATERIA",
+    "MATERIA(E0)",
+    "MATERIA(I-10)",
+    "MATERIA(F+20)",
+    "MATERIA(E0/I-10)",
+    "MATERIA(E0/F+20)",
+    "MATERIA(I-10/F+20)",
+    "MATERIA(E0/I-10/F+20)",
+    ];
+    array.forEach((cellData, i) => {
+      if(cellData.includes("(") && cellData != ""){ 
+        let subject = cellData.split("(")[0]; 
+        let data = cellData.split("(")[1].split(")")[0];
+        let stringCount = data.length;
+
+        if (stringCount == 2) {
+          cellData[i] = subject + "-"; 
+        }else if (stringCount == 4) {
+          cellData[i] = subject; 
+          let mode = data[data.length -4];
+          let operator = data.slice(-3, -2);
+          let num = data.slice(-2);
+          Logger.log(mode + " " + operator + " " + num); 
+        }else if (stringCount == 7) {
+          cellData[i] = subject + "-";
+          let mode = data[data.length -4];
+          let operator = data.slice(-3, -2);
+          let num = data.slice(-2);
+          Logger.log(mode + " " + operator + " " + num); 
+        }else if (stringCount == 9) {
+          cellData[i] = subject; 
+          let mode = data[data.length -9];
+          let operator = data.slice(-8, -7);
+          let num = data.slice(-7, -5);
+
+          let mode2 = data[data.length -4];
+          let operator2 = data.slice(-3, -2);
+          let num2 = data.slice(-2);
+          Logger.log(mode + " " + operator + " " + num + " / "  + mode2 + " " + operator2 + " " + num2);
+        }else if (stringCount == 12) {
+          cellData[i] = subject + "-"; 
+          let mode = data[data.length -9];
+          let operator = data.slice(-8, -7);
+          let num = data.slice(-7, -5);
+
+          let mode2 = data[data.length -4];
+          let operator2 = data.slice(-3, -2);
+          let num2 = data.slice(-2);
+          Logger.log(mode + " " + operator + " " + num + " / "  + mode2 + " " + operator2 + " " + num2);        
+        }
+
+        //getOptionGap(data)
+      }
+    });
+}
+
+
+function test2() {
+  let cadena = "s"
+  cadena = parseInt(cadena);
+  Logger.log(cadena)
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<timetable>
+<teachers>
+    <teacher id="T1" firstname="Nombre0" lastname="Apellid0" short="T1"/>
+    <teacher id="T2" firstname="Nombre1" lastname="Apellido 1" short="T2"/>
+    <teacher id="T3" firstname="Nombre9" lastname="ApellidX" short="T3"/>
+</teachers>
+<subjects>
+    <subject id="S1" name="Matemáticas" short="MAT"/>
+</subjects>
+<classrooms>
+    <classroom id="C1" name="Aula 101" short="101"/>
+</classrooms>
+<classes>
+    <class id="CL1" name="SMINT1025P1A (1)" short="1A"/>
+</classes>
+<lessons>
+    <lesson id="L1" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T1"/>
+    <lesson id="L2" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T2"/>
+    <lesson id="L3" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T3"/>
+</lessons>
+<cards>
+    <card lessonid="L1" classroomids="C1" period="1" days="10000" weeks=""/>
+    <card lessonid="L2" classroomids="C1" period="2" days="10000" weeks=""/>
+    <card lessonid="L3" classroomids="C1" period="3" days="10000" weeks=""/>
+</cards>
+<periods>
+    <period name="1" short="1" period="1" starttime="08:00" endtime="08:50"/>
+    <period name="2" short="2" period="2" starttime="08:50" endtime="09:40"/>
+    <period name="3" short="3" period="3" starttime="09:40" endtime="10:30"/>
+</periods>
+</timetable>

@@ -1,0 +1,1226 @@
+[
+  {
+    "legacy_id": 100,
+    "source_id": "F4887B755515FE9B",
+    "name": "IND-SM REP A (SMREP0126P3B)",
+    "grade_id": null,
+    "id": "0e3627d7-ca43-4bb2-8971-ebd07ccb5b84",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 101,
+    "source_id": "AC6490C56DB48DE7",
+    "name": "IND-SM ANU MAR V (SMANU0326V3A)",
+    "grade_id": null,
+    "id": "e68b5c34-4c79-437b-88ee-380171949578",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 102,
+    "source_id": "45B0FFE312DA4C43",
+    "name": "IND-SM SAN TARDE (SMSAT0326V3A)",
+    "grade_id": null,
+    "id": "48085a2d-0ddd-4503-a0a4-c4fa8d78cdec",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 103,
+    "source_id": "391AB599FE4460E0",
+    "name": "COM-SM ANU MAR (SMANU0326P9A)",
+    "grade_id": null,
+    "id": "5395cb31-9d04-44a0-8c6c-2b1e92d2306c",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 104,
+    "source_id": "158E85ED44A11FCB",
+    "name": "COM-SM SAN MAR (SMSAN0326P9A)",
+    "grade_id": null,
+    "id": "91377dc7-3758-480d-b1f2-bde1c74dda80",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 105,
+    "source_id": "8C907FF1BF50C2B9",
+    "name": "COM-SM REP A (SMREP0126P9A)",
+    "grade_id": null,
+    "id": "10e5fc72-34ed-4c1a-b5e1-994a5255a0f4",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 106,
+    "source_id": "731CCC0FAB024E0A",
+    "name": "COM-SM INT A (SMINT1025P9A)",
+    "grade_id": null,
+    "id": "829b9303-e95c-4acd-87fe-47800b5192cb",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 107,
+    "source_id": "A1EDF5560354A283",
+    "name": "COM-SM SAN MAR V (SMSAN0326V9A)",
+    "grade_id": null,
+    "id": "44afd5ed-af29-46cf-ae81-cf08ce2be5be",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 108,
+    "source_id": "73B723CC03E98ACA",
+    "name": "SAN-SM SEL A (SMSEL1025P8A)",
+    "grade_id": null,
+    "id": "abaa2060-7bf3-4a70-8554-2e789a4c5d7f",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 109,
+    "source_id": "E3F1426C382AD423",
+    "name": "SAN-SM SAN MAR (SMSAN0326P8A)",
+    "grade_id": null,
+    "id": "06dbda66-64f2-459d-b81a-fce0b3430515",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 110,
+    "source_id": "CDEA581BC913079B",
+    "name": "SAN-SM ANU MAR (SMANU0326P8A)",
+    "grade_id": null,
+    "id": "e60ffcb4-efd4-4f93-b020-fa593acb8857",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 111,
+    "source_id": "D82190FB60BB42AF",
+    "name": "SAN-SM INT A (SMINT1025P8A)",
+    "grade_id": null,
+    "id": "9650f707-680e-47e7-942b-22b59305ce2c",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 112,
+    "source_id": "5FD6C285E5391D6D",
+    "name": "PPI-SM REP A (SMREP0126PZA)",
+    "grade_id": null,
+    "id": "709d0638-e5fd-4f0b-b10c-01924e4d39d0",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 113,
+    "source_id": "FC8998525825E212",
+    "name": "PPI-SM ANU MAR (SMANU0326PZA)",
+    "grade_id": null,
+    "id": "3ef90383-86db-4173-aed9-c4b74f3c292a",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 114,
+    "source_id": "82AFAAC9B73C086A",
+    "name": "PPI-SM SAN MAR (SMSAN0326PZA)",
+    "grade_id": null,
+    "id": "bf2d18a2-e67c-46c9-8518-22c0b00672dd",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 115,
+    "source_id": "D0C12B5782575709",
+    "name": "VMT-SM REP A (SMREP0126PXA)",
+    "grade_id": null,
+    "id": "d91eb4f0-be01-47b4-9b14-50fd63a3b85d",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 116,
+    "source_id": "C861DA8B2B89B92A",
+    "name": "VMT-SM SAN MAR (SMSAN0326PXA)",
+    "grade_id": null,
+    "id": "ba9c7734-3855-4481-9823-f7f634b33360",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 117,
+    "source_id": "4BBFAA2458128DA4",
+    "name": "LCE-SM SAN MAR1 (SMSAN0326P1A)",
+    "grade_id": null,
+    "id": "e79387f7-bd57-42fe-a070-df2efa7781b7",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 118,
+    "source_id": "F2B198C9CD444E05",
+    "name": "LCE-SM SAN MAR2 (SMSAN0326P1B)",
+    "grade_id": null,
+    "id": "ef38a8f4-f097-4054-bdbf-6208db1ef16a",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 119,
+    "source_id": "359410B6486DD6F5",
+    "name": "LCE-SM ANU MAR1 (SMANU0326P1A)",
+    "grade_id": null,
+    "id": "478b1764-893e-417d-a236-84c631d3f65f",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 120,
+    "source_id": "F11887DF343942A1",
+    "name": "LCE-SM ANU MAR2 (SMANU0326P1B)",
+    "grade_id": null,
+    "id": "4ecbc8f1-9852-4429-afc7-aaaedfb574ac",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 121,
+    "source_id": "F9EFE901B8063C4B",
+    "name": "LCE-SM INT DE (SMINT0326P1D)",
+    "grade_id": null,
+    "id": "6813eacb-ee6e-44d8-b794-0761eaa58bcf",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 122,
+    "source_id": "3D6E32700107D590",
+    "name": "LCE-SM INT ABC (SMINT0326P1A)",
+    "grade_id": null,
+    "id": "30e4640f-5fad-4be1-a87d-f2343aee118a",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 123,
+    "source_id": "F589EEF495C2401B",
+    "name": "SJL-SM SAN MAR1 (SMSAN0326P2A)",
+    "grade_id": null,
+    "id": "38a01093-d095-4ec0-975f-7d739d210799",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 124,
+    "source_id": "37126947A80FDDE7",
+    "name": "SJL-SM SAN MAR2 (SMSAN0326P2B)",
+    "grade_id": null,
+    "id": "221e05da-3922-463f-96e5-76e870f42469",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 125,
+    "source_id": "906A0A043A535AFB",
+    "name": "SJL-SM INT DE (SMINT0326P2C)",
+    "grade_id": null,
+    "id": "9213ff59-b0ce-4215-b0c7-94e2aeb7fc11",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 126,
+    "source_id": "2E4E961B7CBE3333",
+    "name": "SJL-SM INT ABC (SMINT0326P2B)",
+    "grade_id": null,
+    "id": "09f71539-337a-4f8b-8aea-8d577f80a12a",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 127,
+    "source_id": "6C317E5F96A598F3",
+    "name": "SJL-SM ANU MAR1 (SMANU0326P2A)",
+    "grade_id": null,
+    "id": "a3fd8df9-529f-443f-9a81-834966937d28",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 128,
+    "source_id": "0F04C091DC318B4B",
+    "name": "SJL-SM ANU MAR2 (SMANU0326P2B)",
+    "grade_id": null,
+    "id": "16bc6a51-aaf3-406e-8f21-4025d667e9d4",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 129,
+    "source_id": "246D65C088221F82",
+    "name": "SJJ-SM SAN MAR1 (SMSAN0326PYA)",
+    "grade_id": null,
+    "id": "866bbaa6-f243-4b80-a5c8-f137dfba124f",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 130,
+    "source_id": "BF7610CD44E18A29",
+    "name": "IND-SM INT ABC (SMINT0326P3A)",
+    "grade_id": null,
+    "id": "c85212eb-b153-480f-b538-2a08c10e4721",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 131,
+    "source_id": "DBB22878E7880646",
+    "name": "IND-SM INT DE (SMINT0326P3C)",
+    "grade_id": null,
+    "id": "b69c42d7-d173-49d3-81e3-2ee3bc7107d0",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 132,
+    "source_id": "C46C73F04CC9D9C9",
+    "name": "IND-SM SAN MAR1 (SMSAN0326P3A)",
+    "grade_id": null,
+    "id": "6abec998-97b5-44a0-ac19-698207079df1",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 133,
+    "source_id": "E410392C335E249B",
+    "name": "IND-SM SAN MAR2 (SMSAN0326P3B)",
+    "grade_id": null,
+    "id": "c1841b50-a5e3-425d-9a0d-8b35f1f06b80",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 134,
+    "source_id": "6E63BF27D3E6C475",
+    "name": "IND-SM ANU MAR1 (SMANU0326P3A)",
+    "grade_id": null,
+    "id": "6fd697c9-5b85-464b-aa62-51a6f52d7c5f",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 1,
+    "source_id": "7EA4D142E61CAE30",
+    "name": "CERCADO",
+    "grade_id": null,
+    "id": "f53eafbc-52e4-4504-a807-5c4a8d5bd190",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 2,
+    "source_id": "505DFA88C603B41D",
+    "name": "LCE-SM INT ABC (SMINT1025P1A)",
+    "grade_id": null,
+    "id": "7024a4a2-e10a-4664-92bd-cb62fc47c8cf",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 3,
+    "source_id": "D76E4943A2BA5EA4",
+    "name": "LCE-SM INT ABCDE (SMINT1025P1C)",
+    "grade_id": null,
+    "id": "49803c44-88b0-4797-8587-614810d349f6",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 4,
+    "source_id": "0273CC546330D98A",
+    "name": "LCE-SM REP A (SMREP0126P1A)",
+    "grade_id": null,
+    "id": "d863c462-5c50-4dff-bc69-e92590b6227e",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 5,
+    "source_id": "F7AB1C93A81B8D7B",
+    "name": "LCE-SM REP ABC (SMREP0126P1B)",
+    "grade_id": null,
+    "id": "2e8da9ad-53dd-4870-a4ee-9ee4c5544fc1",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 6,
+    "source_id": "4930F383CF057DC9",
+    "name": "LCE-SM REP DE (SMREP0126P1C)",
+    "grade_id": null,
+    "id": "9521e4b4-ac9c-47b7-b611-d1424d6b4d3e",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 7,
+    "source_id": "82FB311156BB8E37",
+    "name": "LCE-SEL ABC (SMSEL1025P1A)",
+    "grade_id": null,
+    "id": "dd53aa5e-a62a-4f97-82cb-373078a29625",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 8,
+    "source_id": "96E9E69368ACD4AA",
+    "name": "LCE-SEL DE (SMSEL1025P1B)",
+    "grade_id": null,
+    "id": "f4010877-f15d-4862-8f99-18c348e1a3a9",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 9,
+    "source_id": "67DA4FA395CB1510",
+    "name": "LCE-SM SAN OCT 1 (SMSAN1025P1A)",
+    "grade_id": null,
+    "id": "964bac04-f266-4bdd-b328-0d746eedad78",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 10,
+    "source_id": "02CF31CAF8C092C2",
+    "name": "LCE-SM SAN OCT 2 (SMSAN1025P1B)",
+    "grade_id": null,
+    "id": "c9143fc2-bfcd-4f34-bc9b-4027f531de22",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 11,
+    "source_id": "F302CB8FDE9F7B37",
+    "name": "LCE-SM SAN ENE (SMSAN0126P1A)",
+    "grade_id": null,
+    "id": "5ced1658-89e6-4dfb-b23c-f3a735ce52d7",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 12,
+    "source_id": "80ABEB2922EACEA9",
+    "name": "LCE-SM ANU ENE 1 (SMANU0126P1A)",
+    "grade_id": null,
+    "id": "a82796e3-e54c-4a6c-9d63-d3cd1ad26a80",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 13,
+    "source_id": "9CCDF486FB6B7CA4",
+    "name": "LCE-SM ANU ENE 2 (SMANU0126P1B)",
+    "grade_id": null,
+    "id": "abdc5110-51d1-42cb-890c-6fe1a75d3195",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 14,
+    "source_id": "0219C0E8B724760C",
+    "name": "LCE-SM INT OCT TAR (SMITV1025V1A)",
+    "grade_id": null,
+    "id": "54f7024a-2406-44cf-b409-083505d0f575",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 15,
+    "source_id": "DF15A3D1EDAA5F46",
+    "name": "LCE-SM SAN OCT TAR (SMSAT1025V1A)",
+    "grade_id": null,
+    "id": "4b83a66b-afb6-4556-a9e9-9b17c3337744",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 16,
+    "source_id": "346B989169747394",
+    "name": "SJL-BASADRE",
+    "grade_id": null,
+    "id": "f4725e25-4833-4bbd-80aa-1622c6e51356",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 17,
+    "source_id": "57F3130B49FEE89B",
+    "name": "SJL-SM ANU ENE (SMANU0126P2A)",
+    "grade_id": null,
+    "id": "f1c93b42-8746-47ad-a872-873727adc12a",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 18,
+    "source_id": "A3CC98DE36A51FC9",
+    "name": "SJL-SM SAN ENE (SMSAN0126P2A)",
+    "grade_id": null,
+    "id": "042f37c2-bcf9-4b72-91a7-d4366b97fd4f",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 19,
+    "source_id": "A0DADC190ECF47AD",
+    "name": "SJL-SM SAN OCT 2 (SMSAN1025P2B)",
+    "grade_id": null,
+    "id": "e46baaff-1b6c-44fe-9fb3-644247dba592",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 20,
+    "source_id": "3552A8F5DBF4C7F3",
+    "name": "SJL-SM SEL ABC (SMSEL1025P2A)",
+    "grade_id": null,
+    "id": "aa3a24de-e0e0-4e50-8e28-3ce34eac53fd",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 21,
+    "source_id": "D94E8E24DF0D9BB4",
+    "name": "SJL-SM SEL DE (SMSEL1025P2B)",
+    "grade_id": null,
+    "id": "08ca1b60-cbf4-411a-9006-ba4b36578092",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 22,
+    "source_id": "5EF8990C14A17061",
+    "name": "SJL-SM INT ABC (SMINT1025P2A)",
+    "grade_id": null,
+    "id": "bf71a5ae-3258-4d10-98c0-77a5f6d98735",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 23,
+    "source_id": "D8A25AFDDF76A44C",
+    "name": "SJL-SM INT ABCDE (SMINT1025P2B)",
+    "grade_id": null,
+    "id": "439a241c-0864-4d8e-bf4b-ec7d5c945b98",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 24,
+    "source_id": "820EC1AA64F10BCD",
+    "name": "SJL-SM REP DE (SMREP0126P2C)",
+    "grade_id": null,
+    "id": "d5dcf295-2a9f-4f91-8859-82d24679fa8a",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 25,
+    "source_id": "1F4555EBA1120450",
+    "name": "SJL-SM SAN OCT 1 (SMSAN1025P2A)",
+    "grade_id": null,
+    "id": "1941488a-28d1-4b87-a44e-6882194463ef",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 26,
+    "source_id": "4AE4FDD2C7A8B9F4",
+    "name": "SJL-SM REP A (SMREP0126P2A)",
+    "grade_id": null,
+    "id": "0ae58bb1-492a-458f-9e8e-06e27f106853",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 27,
+    "source_id": "26FC93963AE3CDCB",
+    "name": "SJL-SM REP ABC (SMREP0126P2B)",
+    "grade_id": null,
+    "id": "b9589cbb-8f16-4a37-885e-e0ca7de71ae6",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 28,
+    "source_id": "D0343F8971C79851",
+    "name": "SJL-LOS JARDINES",
+    "grade_id": null,
+    "id": "b22210b7-1c85-4802-9901-d7d2d39050bb",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 29,
+    "source_id": "80A165B36289D2F6",
+    "name": "SJJ-SM SAN ENE (SMSAN0126PYA)",
+    "grade_id": null,
+    "id": "303f8b81-e3c6-4adf-97cd-69ddfe64fb53",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 30,
+    "source_id": "578403C227E3798F",
+    "name": "SJJ-SM ANU ENE (SMANU0126PYA)",
+    "grade_id": null,
+    "id": "a37dc496-5d84-4f22-a1ab-4f07a7f080c1",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 31,
+    "source_id": "45754A3E63C33799",
+    "name": "SJJ-UNI SEMIANUAL (INSAN0326PYA)",
+    "grade_id": null,
+    "id": "8d5304bc-f4a3-4e52-8334-7b054c795bc5",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 32,
+    "source_id": "F947EBDE7FD9D770",
+    "name": "INDEPENDENCIA",
+    "grade_id": null,
+    "id": "21c636ae-28cd-443c-a61c-af111eba149f",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 33,
+    "source_id": "596E187987293E25",
+    "name": "IND-SM ANU ENE (SMANU0126P3A)",
+    "grade_id": null,
+    "id": "830c9632-ea90-4338-bd80-5f403e8859f3",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 34,
+    "source_id": "C24363FDBD17AEDC",
+    "name": "IND-SM SAN ENE 1 (SMSAN0126P3A)",
+    "grade_id": null,
+    "id": "e123d657-cf5d-47a8-8d4b-11200dd3e30e",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 35,
+    "source_id": "9F342963A80B934F",
+    "name": "IND-SM SAN ENE 2 (SMSAN0126P3B)",
+    "grade_id": null,
+    "id": "05804bcb-cdf6-4eb6-940c-ae37073f0ee8",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 36,
+    "source_id": "513EFD72D382F83A",
+    "name": "IND-SM REP DE (SMREP0126P3C)",
+    "grade_id": null,
+    "id": "52f5d089-b725-4e29-9631-6bf71ba824e4",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 37,
+    "source_id": "296FDC762243B1F3",
+    "name": "IND-SM SEL DE (SMSEL1025P3B)",
+    "grade_id": null,
+    "id": "597a4001-7318-4438-b889-75f4a25006c8",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 38,
+    "source_id": "BAA05390DE0BF864",
+    "name": "IND-SM SEL (SMSEL1025P3A)",
+    "grade_id": null,
+    "id": "9fc6ef52-c5e0-4073-9916-e7696c5da380",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 39,
+    "source_id": "B7819DF3B39913D1",
+    "name": "IND-SM SAN OCT 1 (SMSAN1025P3A)",
+    "grade_id": null,
+    "id": "41623c85-2fc9-45ba-bb76-41b0d0f2e436",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 40,
+    "source_id": "0A0927BED654C3DD",
+    "name": "IND-SM SAN OCT 2 (SMSAN1025P3B)",
+    "grade_id": null,
+    "id": "8fa13ceb-9ebe-4f03-8ed4-fa2ae6713c16",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 41,
+    "source_id": "DB9FA80FA6637DF6",
+    "name": "IND-SM INT ABC (SMINT1025P3A)",
+    "grade_id": null,
+    "id": "2c39144a-3a15-4561-afd8-9ea8356149c7",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 42,
+    "source_id": "B7AEA20297EBD0A1",
+    "name": "IND-SM INT ABCDE (SMINT1025P3B)",
+    "grade_id": null,
+    "id": "eb2f93e6-afa6-4c62-9c62-c40922803088",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 43,
+    "source_id": "E8691168EABFC262",
+    "name": "IND-SM INT V (SMINV1025V3A)",
+    "grade_id": null,
+    "id": "273685f8-5d3d-4709-b873-9f43764f8dfc",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 44,
+    "source_id": "1D65845AF46CD401",
+    "name": "IND-SM SAN OCT V (SMSAN1025V3A)",
+    "grade_id": null,
+    "id": "61ced5b0-5d28-4640-9d02-04cf1bed4e20",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 45,
+    "source_id": "87404920FF3BA249",
+    "name": "IND-ADMIN",
+    "grade_id": null,
+    "id": "ade65c5a-23ef-4447-a955-6b8029a538e3",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 46,
+    "source_id": "1BDB9E197E5E92D7",
+    "name": "IND2-SM REP ABC 1 (SMREP0126P3A)",
+    "grade_id": null,
+    "id": "2aa8d637-349c-4032-9a3b-8d0c392544bd",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 47,
+    "source_id": "DC989AAD7342CE2D",
+    "name": "IND2-SM REP ABC 3 (SMREP0126P3D)",
+    "grade_id": null,
+    "id": "5eacd175-ec08-43f7-b10d-135974a5dde9",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 48,
+    "source_id": "153F99104B27D631",
+    "name": "IND2-SM REP V (SMREV0126V3A)",
+    "grade_id": null,
+    "id": "edb502c9-5b60-4e1d-ac8b-07c5d27f77b3",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 49,
+    "source_id": "E90A015D35761C41",
+    "name": "IND2-SM REP ABC 2 (SMREP0126P3B)",
+    "grade_id": null,
+    "id": "b000e389-80f0-43ca-9b6f-297da1d4d1ef",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 50,
+    "source_id": "2A2E992C1F7B41AB",
+    "name": "IND-SM REP TAR (SMRET0126V3A)",
+    "grade_id": null,
+    "id": "de7328b9-8e4a-4f65-a7f7-f2bc36b7d4b9",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 51,
+    "source_id": "8C91EB78F7EF2351",
+    "name": "IND-UNI SEMIANUAL (INSAN0326P3A)",
+    "grade_id": null,
+    "id": "adf5c969-aab9-4bc8-a504-d3cd5f230554",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 52,
+    "source_id": "632666E86E557510",
+    "name": "IND-UNI SEM INTENSIVO (INSEI0326P3A)",
+    "grade_id": null,
+    "id": "7bbf9d08-3225-4b06-a588-5d5f0b175f73",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 53,
+    "source_id": "C47428053F1F8011",
+    "name": "UNI SEM TARDE V (INSAT0326V3A)",
+    "grade_id": null,
+    "id": "e449cc3d-291d-4398-abe4-9d96a5ae54bd",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 54,
+    "source_id": "DB88B1D3E01455A8",
+    "name": "COMAS",
+    "grade_id": null,
+    "id": "0d7364d7-6c40-4fc1-abdc-6cf4136318bc",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 55,
+    "source_id": "FED3F83A50B18ADB",
+    "name": "COM-SM ANU ENE (SMANU0126P9A)",
+    "grade_id": null,
+    "id": "5fb4cc48-d501-481e-b1f3-e14656d17c98",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 56,
+    "source_id": "32CBC71C9570361C",
+    "name": "COM-SM SAN ENE (SMSAN0126P9A)",
+    "grade_id": null,
+    "id": "bc64e27e-1afa-4293-85ec-95ef495fd1fd",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 57,
+    "source_id": "20546E475E0FE96F",
+    "name": "COM-SM REP ABCDE (SMREP0126P9B)",
+    "grade_id": null,
+    "id": "31c30fc4-4063-43bf-b9b2-d384e0732387",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 58,
+    "source_id": "5B2800EF1E3D9CF4",
+    "name": "COM-SM REP ABC (SMREP0126P9A)",
+    "grade_id": null,
+    "id": "ba0396f6-b927-4367-a984-b56f730c6bc4",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 59,
+    "source_id": "11EC14D1026506B8",
+    "name": "COM-SM SAN OCT (SMSAN1025P9A)",
+    "grade_id": null,
+    "id": "0db3909c-bab7-45e4-b712-1d949094bce8",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 60,
+    "source_id": "2A7C77A38D6B819D",
+    "name": "COM-SM INT ABC (SMINT1025P9A)",
+    "grade_id": null,
+    "id": "497cd975-c24c-41f0-aca5-b9522052f993",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 61,
+    "source_id": "CAD86050B47B3947",
+    "name": "COM-SM INT ABCDE (SMINT1025P9B)",
+    "grade_id": null,
+    "id": "eefe7a7d-7584-40ff-824a-c147e3de4c94",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 62,
+    "source_id": "85F694C1BDE7BCBC",
+    "name": "SANTA ANITA-PUENTE",
+    "grade_id": null,
+    "id": "e5264f24-85ad-4506-9985-8050196778ce",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 63,
+    "source_id": "3CD7FB1C9610D821",
+    "name": "SAN-SM ANU ENE 1 (SMANU0126P8A)",
+    "grade_id": null,
+    "id": "5efd02a9-02d2-4ba3-8aa8-4570dac89d6c",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 64,
+    "source_id": "DFEAE3D2DE1A7A78",
+    "name": "SAN-SM SEL V (SMSEL1025V8A)",
+    "grade_id": null,
+    "id": "edbb6340-49e3-4f62-a271-b5e554310595",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 65,
+    "source_id": "F7911065ACD5D09E",
+    "name": "SAN-SM ANU ENE 2 (SMANU0126P8B)",
+    "grade_id": null,
+    "id": "30e87257-5c47-44dd-b1c6-df85dabce4ab",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 66,
+    "source_id": "CC1E1A7E3BE1ABEF",
+    "name": "SAN-SM SAN ENE (SMSAN0126P8A)",
+    "grade_id": null,
+    "id": "0b10e56e-44b2-4e3b-b5b7-033aae2cef32",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 67,
+    "source_id": "6F0DBCB3BB4FF044",
+    "name": "SAN-SM INT ABCDE (SMINT1025P8B)",
+    "grade_id": null,
+    "id": "7eedc670-afdb-41fc-b325-d9f5581ac0b5",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 68,
+    "source_id": "1D0CF842983B2E86",
+    "name": "SAN-SM SEL ABC (SMSEL1025P8A)",
+    "grade_id": null,
+    "id": "b50164d4-4b91-4d7f-9284-3645cb7182d6",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 69,
+    "source_id": "F02F7319B982176A",
+    "name": "SAN-SM REP A (SMREP0126P8A)",
+    "grade_id": null,
+    "id": "6386c1a2-36b6-493e-ab78-e2737ae6adfd",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 70,
+    "source_id": "E37F277320510748",
+    "name": "SAN-SM REP ABC (SMREP0126P8B)",
+    "grade_id": null,
+    "id": "bf755121-d2e2-4fe5-bf88-1476414813c0",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 71,
+    "source_id": "E00E5BC74153BFBB",
+    "name": "SAN-SM INT ABC (SMINT1025P8A)",
+    "grade_id": null,
+    "id": "d43b1247-0799-47b2-a191-b0b7bef636d4",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 72,
+    "source_id": "3E3BEA04BE80486D",
+    "name": "SAN-SM REP DE (SMREP0126P8C)",
+    "grade_id": null,
+    "id": "b7574db2-214c-4134-b1ce-578c0cfe4c86",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 73,
+    "source_id": "197A75F1F96D5B8D",
+    "name": "SAN-SM SAN OCT (SMSAN1025P8A)",
+    "grade_id": null,
+    "id": "4abe9aac-0d18-4c3f-b481-77237002906a",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 74,
+    "source_id": "7AE848B1C39FC54A",
+    "name": "PUENTE PIEDRA",
+    "grade_id": null,
+    "id": "37d5e1e1-fc8a-4809-9cc6-3cdc5a72727e",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 75,
+    "source_id": "F33FEAC9879973B9",
+    "name": "PPI-SM ANU ENE (SMANU0126PZA)",
+    "grade_id": null,
+    "id": "d51b21db-1be6-4c12-9ce2-6f2807b1fbbd",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 76,
+    "source_id": "25AE3355B76315A0",
+    "name": "PPI-SM SAN ENE (SMSAN0126PZA)",
+    "grade_id": null,
+    "id": "cd8b3819-20e6-4f43-b045-e26b184631c9",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 77,
+    "source_id": "C9EDB835173DEF39",
+    "name": "PPI-SM ANU ENE V (SMANU0126VZA)",
+    "grade_id": null,
+    "id": "5b0dc549-60d1-4113-bc01-082b439d6b8c",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 78,
+    "source_id": "5881222DDFF69BA6",
+    "name": "PPI-SM SAN ENE V (SMSAN0126VZA)",
+    "grade_id": null,
+    "id": "eb06ba16-03f4-4a19-8c1d-5fb5cfe48752",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 79,
+    "source_id": "F3A0B4F4AE249DAB",
+    "name": "PPI-SM REP ABC (SMREP0126PZA)",
+    "grade_id": null,
+    "id": "aef6e325-5671-4d57-8db2-30ffe4048b3b",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 80,
+    "source_id": "30CB48F353A8D193",
+    "name": "PPI-SM REP DE (SMREP0126PZB)",
+    "grade_id": null,
+    "id": "f290ab9c-9da8-4cf3-9920-c848e20c6aef",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 81,
+    "source_id": "39495B4EDAB97699",
+    "name": "VMT",
+    "grade_id": null,
+    "id": "6cb331aa-401e-4f93-afbf-93cceec4328a",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 82,
+    "source_id": "8D5400851C5E0B86",
+    "name": "VMT-SM ANU ENE (SMANU0126PXA)",
+    "grade_id": null,
+    "id": "c216b18d-fdea-4ede-bf2c-9808416f3843",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 83,
+    "source_id": "DEC3F7D59839689C",
+    "name": "VMT-SM SAN ENE (SMSAN0126PXA)",
+    "grade_id": null,
+    "id": "f8ef45b5-4b73-4564-a219-4193de37da42",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 84,
+    "source_id": "12800A7CDD15C9C6",
+    "name": "VMT-SM REP ABC (SMREP0126PXA)",
+    "grade_id": null,
+    "id": "e319f42f-d466-46a9-b465-ee6539681078",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 85,
+    "source_id": "F213AC432EF16D92",
+    "name": "VMT-SM REP DE (SMREP0126PXB)",
+    "grade_id": null,
+    "id": "36177e0d-fd20-4d45-a08b-9dba685b54c8",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 86,
+    "source_id": "8397F60372578202",
+    "name": "LCE-SM INT A (SMINT1025P1A)",
+    "grade_id": null,
+    "id": "39489891-ae5a-452f-b9ff-21817c68601a",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 87,
+    "source_id": "3EDEFAFE3C20E7DE",
+    "name": "LCE-SM SAN MAR (SMSAN0326P1A)",
+    "grade_id": null,
+    "id": "c7c3e324-98c7-4cf6-b7a0-a8cb27bfe1fd",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 88,
+    "source_id": "0F9723F4B4FDA3E5",
+    "name": "LCE-SM ANU MAR (SMANU0326P1A)",
+    "grade_id": null,
+    "id": "c2967657-6481-46b3-9b73-67eaa16cdb8c",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 89,
+    "source_id": "C708A39E26DDFBE2",
+    "name": "LCE-SEL A (SMSEL1025P1A)",
+    "grade_id": null,
+    "id": "1a7626b4-f959-47ec-b51b-4da5f7e3547b",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 90,
+    "source_id": "76352F98829A4CC0",
+    "name": "LCE-SM SAN OCT A (SMSAN1025P1A)",
+    "grade_id": null,
+    "id": "9509759b-e3a0-4f47-8ac1-40e8acc8f78e",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 91,
+    "source_id": "DDDE961048957DFF",
+    "name": "SJL-SM ANU MAR (SMANU0326P2A)",
+    "grade_id": null,
+    "id": "39249b4a-ee6b-410c-b67a-77ed290b07c8",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 92,
+    "source_id": "E548D12727343A83",
+    "name": "SJL-SM SAN MAR (SMSAN0326P2A)",
+    "grade_id": null,
+    "id": "ebc7539c-2159-49b0-89a1-0ab919df71cd",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 93,
+    "source_id": "8A81D0C0C9F82D73",
+    "name": "SJL-SM SEL A (SMSEL1025P2A)",
+    "grade_id": null,
+    "id": "70dc3474-2063-4b15-a064-56e418e8b103",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 94,
+    "source_id": "516F5C41DF6504D7",
+    "name": "SJL-SM INT A (SMINT1025P2A)",
+    "grade_id": null,
+    "id": "b85cd67f-7b2e-4552-a3c9-886e15062a60",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 95,
+    "source_id": "5B117521B53B7CF7",
+    "name": "SJJ-SM SAN MAR (SMSAN0326PYA)",
+    "grade_id": null,
+    "id": "5dd14ec1-5e8c-41ef-808c-0d9bd1e352c8",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 96,
+    "source_id": "5D8874FE38657F13",
+    "name": "IND-SM SAN OCT A (SMSAN1025P3A)",
+    "grade_id": null,
+    "id": "941528ed-5fab-413a-94e7-00584253a525",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 97,
+    "source_id": "F7D8CC0B51468E5D",
+    "name": "IND-SM ANU MAR (SMANU0326P3A)",
+    "grade_id": null,
+    "id": "f82c7136-b971-48e2-82c0-a10625367678",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 98,
+    "source_id": "CF3D2AE294E19C9B",
+    "name": "IND-SM SAN MAR (SMSAN0326P3A)",
+    "grade_id": null,
+    "id": "7ccafa88-c79c-46a2-b91d-0789bcec5ac5",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 99,
+    "source_id": "4E9286450E02714E",
+    "name": "IND-SM INT A (SMINT1025P3A)",
+    "grade_id": null,
+    "id": "a95f171a-0b06-4907-92d9-2a1a13710d35",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 135,
+    "source_id": "D4A8ED0063883489",
+    "name": "IND-SM SAN MAR TAR (SMSAT0326V3A)",
+    "grade_id": null,
+    "id": "df6e2681-de39-42ca-8c27-b6039f77eeb2",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 136,
+    "source_id": "1F94D3BA8C16399E",
+    "name": "IND-SM INT MAR TAR (SMITV0326V3A)",
+    "grade_id": null,
+    "id": "33d8b96a-47d3-4313-bae8-1eb1b6c1db62",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 137,
+    "source_id": "5854FFF30C88420E",
+    "name": "COM-SM ANU MAR1 (SMANU0326P9A)",
+    "grade_id": null,
+    "id": "dcfe46c1-1b08-4969-94fa-6fc6e51e050e",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 138,
+    "source_id": "B6334A20D0E0BF1A",
+    "name": "COM-SM ANU ENE V (SMANU0126V9A)",
+    "grade_id": null,
+    "id": "9d26afc7-e54a-47ac-9a24-b4e97e1d3fa6",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 139,
+    "source_id": "53D475E8AC61A7ED",
+    "name": "COM-SM INT MAR V (SMINV0326V9A)",
+    "grade_id": null,
+    "id": "37473a9b-6db3-4744-917d-a0029caaed08",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 140,
+    "source_id": "D23EB0A0C048AA79",
+    "name": "COM-SM ANU MAR V (SMANU0326V9A)",
+    "grade_id": null,
+    "id": "2f898dbe-392a-42e2-b63e-603a20d1123a",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 141,
+    "source_id": "1DAB8A177026EE83",
+    "name": "COM-SM INT ABC (SMINT0326P9A)",
+    "grade_id": null,
+    "id": "043fbe02-a2ac-49e0-905c-3331083f9a73",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 142,
+    "source_id": "0C62039E35844153",
+    "name": "COM-SM INT DE (SMINT0326P9B)",
+    "grade_id": null,
+    "id": "7018ca01-f1f9-495b-88c8-373fbd8869cd",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 143,
+    "source_id": "7FFB3806565EED71",
+    "name": "COM-SM SAN MAR1 (SMSAN0326P9A)",
+    "grade_id": null,
+    "id": "f55d0cc7-6a1f-4434-ba39-7811d2e84575",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 144,
+    "source_id": "47B32D06DFD36E4F",
+    "name": "SANTA ANITA",
+    "grade_id": null,
+    "id": "f700ee98-8592-410b-aed3-5dac5133de02",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 145,
+    "source_id": "C1A69C4078B74792",
+    "name": "SAN-SM INT A (SMINT0326P8A)",
+    "grade_id": null,
+    "id": "ad6b3f5e-b6b3-445c-82b3-9e94231bc3fb",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 146,
+    "source_id": "72703535DCA2DE87",
+    "name": "SAN-SM INT DE (SMINT0326P8C)",
+    "grade_id": null,
+    "id": "cb874d8f-0890-4b83-ba5b-b68bb13689a6",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 147,
+    "source_id": "37AE1E95EA491310",
+    "name": "SAN-SM ANU MAR1 (SMANU0326P8A)",
+    "grade_id": null,
+    "id": "13412f44-ee43-40d8-a153-3a59f818a6e1",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 148,
+    "source_id": "3B74071F6AFD8C04",
+    "name": "SAN-SM SAN MAR1 (SMSAN0326P8A)",
+    "grade_id": null,
+    "id": "aa0d6a63-c3c3-4af5-9b09-fec0ff4963d8",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 149,
+    "source_id": "F56E521ECA5501DC",
+    "name": "SAN-SM SAN MAR2 (SMSAN0326P8B)",
+    "grade_id": null,
+    "id": "cb705078-b5bb-48a6-a574-6a8b86e43348",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 150,
+    "source_id": "CAE226521C53B532",
+    "name": "PPI-SM INT ABC (SMINT0326PZA)",
+    "grade_id": null,
+    "id": "eb21a702-f3a2-4776-89d3-aa31a967ee61",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 151,
+    "source_id": "D76DBF20AA69C2D8",
+    "name": "PPI-SM INT DE (SMINT0326PZB)",
+    "grade_id": null,
+    "id": "9f7eaa08-e5b5-4562-a6fe-e7567fc04d75",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 152,
+    "source_id": "6F0468DF28FDE56B",
+    "name": "PPI-SM ANU MAR1 (SMANU0326PZA)",
+    "grade_id": null,
+    "id": "2aef596b-1181-4d1f-9e94-d8b338ac2350",
+    "grade_uid": null
+  },
+  {
+    "legacy_id": 153,
+    "source_id": "4918D91018F0D799",
+    "name": "VMT-SM INT MAR (SMINT0326PXA)",
+    "grade_id": null,
+    "id": "f537768f-377a-4e87-b4aa-3d392768aae7",
+    "grade_uid": null
+  }
+]

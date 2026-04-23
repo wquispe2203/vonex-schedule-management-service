@@ -1,0 +1,107 @@
+function getDataFile() {
+  // Get Files ID
+  while (contents.hasNext()) {
+    file = contents.next();
+
+    if (file.getName() == fileTypesToExtract[0]) {
+      fileId = file.getId()
+    }
+  }
+
+  // Type of File
+  if (fileTypesToExtract[0].includes('xml')) {
+    // Parsing Xml
+    let rawXml = DriveApp.getFileById(fileId).getBlob().getDataAsString(charset);
+    let xml = XmlService.parse(rawXml);
+    let jsonStringify = JSON.stringify(xmlToJson_(xml));
+    jsonParse = JSON.parse(jsonStringify);
+    // Log
+    Logger.log("Convert Xml to Json Completed");
+  } else {
+    // Parsing Json
+    let url = "https://drive.google.com/uc?id=" + fileId + "&export=download";
+    let jsonFetch = UrlFetchApp.fetch(url);
+    jsonParse = JSON.parse(jsonFetch.getContentText());
+  }
+
+  // Dada File
+  jsonData = Object.values(jsonParse)[0];
+
+  // Json to Array
+  for (let i in jsonData) {
+    jsonArray.push(jsonData[i]);
+  }
+
+  // Validate and Filter
+  for (let i in jsonArray) {
+    // Validate if name sheet is included
+    if (!sheetNames.includes(Object.keys(jsonData)[i])) {
+
+      // Filter only items arrays
+      let itemArrays = Object.values(jsonArray[i]);
+      itemArrays.forEach((item) => {
+        if (Array.isArray(item) && item.length > 0) {
+          json.push(item);
+          sheetNames.push(Object.keys(jsonData)[i]);
+        }
+      });
+
+    }
+  }
+
+  // Log
+  Logger.log("Load Json Completed");
+}
+
+function xmlToJson_(xml) {
+  // Create the return object
+  let obj = {};
+
+  // get type
+  let type = "";
+  try {
+    type = xml.getType();
+  } catch (e) { }
+
+  if (type == "ELEMENT") {
+    // do attributes
+    let attributes = xml.getAttributes();
+    if (attributes.length >= 1) {
+      obj = {};
+      attributes.forEach(attribute => obj[attribute.getName()] = attribute.getValue());
+    }
+  } else if (type == "TEXT") {
+    obj = xml.getValue();
+  }
+
+  // get children
+  let elements = [];
+  try {
+    elements = xml.getAllContent();
+  } catch (e) { }
+
+  // do children
+  if (elements.length > 0) {
+    elements.forEach((item) => {
+      let nodeName = false;
+      try {
+        nodeName = item.getName();
+      } catch (e) { }
+
+      if (nodeName) {
+        if (typeof obj[nodeName] == "undefined") {
+          obj[nodeName] = xmlToJson_(item);
+        } else {
+          if (typeof obj[nodeName].push == "undefined") {
+            let old = obj[nodeName];
+            obj[nodeName] = [];
+            obj[nodeName].push(old);
+          }
+          obj[nodeName].push(xmlToJson_(item));
+        }
+      }
+    });
+  }
+
+  return obj;
+}

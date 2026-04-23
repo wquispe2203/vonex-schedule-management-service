@@ -1,0 +1,853 @@
+function configSheet_() {
+  let authorizedEmailVerifyLastRow = sheetConfig.getLastRow() - 1;
+  let authorizedEmailVerify = sheetConfig.getRange(2, 1, authorizedEmailVerifyLastRow).getDisplayValues();
+  let fileTypesToExtractVerify = sheetConfig.getRange(2, 2).getDisplayValue();
+  fileTypesToExtractVerify = fileTypesToExtractVerify.toLowerCase();
+
+  // Verify Email
+  if (authorizedEmailVerify != "") {
+    authorizedEmail = [];
+    for (let item of authorizedEmailVerify) {
+      authorizedEmail.push(item[0])
+    }
+  }
+
+  // Verify File Name
+  if (fileTypesToExtractVerify != "") {
+    fileTypesToExtract[0] = fileTypesToExtractVerify;
+  }
+}
+
+function logSheet_(date, emailFrom, emailCopy, subject, body) {
+  // Header
+  //let logHeader = ["DATE", "TIME", "EMAIL FROM", "CC", "SUBJECT"];
+
+  // Hour
+  let dateNow = new Date();
+  let currentHour = dateNow.getHours() + ':' + dateNow.getMinutes();
+
+  // Format
+  sheetLog.getRange("$A:A").setNumberFormat(formatDate)
+  sheetLog.getRange("$B:B").setNumberFormat(formatTime)
+  emailFrom = emailFrom.split("<")[1].split(">")[0];
+
+  //let logLastRow = sheetLog.getLastRow() + 1;
+  let logRow = [dateNow, currentHour, date, date, emailFrom, emailCopy, subject, body];
+  sheetLog.insertRowsBefore(2, 1);
+  sheetLog.getRange(2, 1, 1, logRow.length).setValues([logRow]);
+}
+
+function createLoadSheets() {
+  let totalSheets = ss.getNumSheets();
+  if (totalSheets > 1) ss.moveActiveSheet(totalSheets);
+
+  for (let i in json) {
+    const jsonItem = json[i];
+    let tableColumnNames = Object.keys(jsonItem[0]);
+    let rows = [];
+    let order = null;
+
+    // --- 🔧 Definición de orden por hoja ---
+    switch (sheetNames[i]) {
+      case "cards":
+        order = ["lessonid", "classroomids", "period", "weeks", "terms", "days", "lessons_per_day"];
+        break;
+      case "lessons":
+        order = ["id", "classids", "subjectid", "periodspercard", "periodsperweek", "teacherids", "classroomids", "groupids", "seminargroup", "termsdefid", "weeksdefid", "daysdefid", "capacity", "partner_id"];
+        break;
+      case "groups":
+        order = ["id", "name", "classid", "studentids", "entireclass", "divisiontag"];
+        break;
+      case "classes":
+        order = ["id", "name", "short", "teacherid", "classroomids", "grade", "partner_id"];
+        break;
+      case "grades":
+        order = ["name", "short", "grade"];
+        break;
+      case "subjects":
+        order = ["id", "name", "short", "partner_id"];
+        break;
+      case "teachers":
+        order = ["id", "firstname", "lastname", "name", "short", "gender", "color", "email", "mobile", "partner_id"];
+        break;
+      case "buildings":
+        order = ["id", "name"];
+        break;
+      case "periods":
+        order = ["name", "short", "period", "starttime", "endtime"];
+        break;
+      case "daysdefs":
+        order = ["days", "short", "name", "id"];
+        break;
+    }
+
+    // --- 🧩 Aplicar reordenamiento ---
+    if (order) {
+      const existingCols = order.filter(c => tableColumnNames.includes(c));
+      if (existingCols.length >= order.length - 1) {
+        rows = jsonItem.map(obj => order.map(k => obj[k] || ""));
+        tableColumnNames = order;
+        Logger.log(`[createLoadSheets] ${sheetNames[i]} reordenada correctamente.`);
+      } else {
+        Logger.log(`[createLoadSheets] Falta(n) columna(s) en ${sheetNames[i]}: ${order.filter(c => !tableColumnNames.includes(c)).join(", ")}`);
+        rows = jsonItem.map(obj => Object.values(obj));
+      }
+    } else {
+      rows = jsonItem.map(obj => Object.values(obj));
+    }
+
+    // --- Invertir si es days ---
+    if (sheetNames[i] === sheetDaysName) {
+      tableColumnNames.reverse();
+      rows = rows.map(r => r.reverse());
+    }
+
+    // --- Generar correos automáticos para teachers ---
+    if (sheetNames[i] === sheetTeachersName) {
+      rows.forEach(r => r[7] = `${r[4]}${emailDomain}`);
+    }
+
+    // --- Construir cuerpo ---
+    const body = [tableColumnNames, ...rows];
+    const name = sheetNames[i];
+    let sheet = ss.getSheetByName(name);
+    if (!sheet) {
+      ss.insertSheet(name);
+      sheet = ss.getSheetByName(name);
+    }
+
+    if (Array.isArray(body) && body.length > 0) {
+      sheet.getRange(1, 1, body.length, body[0].length).setValues(body);
+    } else {
+      Logger.log(`[createLoadSheets] ${name}: body vacío; no se escribe.`);
+    }
+
+    // --- Estilo visual ---
+    sheet.getRange(1, 1, 1, body[0].length)
+      .setBackground(cellColor)
+      .setFontColor(fontColor)
+      .setFontWeight("bold");
+
+    if (border) {
+      sheet.getRange(1, 1, body.length, body[0].length)
+        .setBorder(false, false, true, true, false, false, borderColor, SpreadsheetApp.BorderStyle.SOLID);
+    }
+
+    Logger.log(`[createLoadSheets] ${name} cargada correctamente.`);
+  }
+
+  Logger.log("Sheets Created & Loaded Ready ✅");
+}
+
+
+
+/*function createLoadSheets() {
+  // Active sheet
+  let totalSheets = ss.getNumSheets();
+  if (totalSheets > 1) {
+    ss.moveActiveSheet(totalSheets);
+  }
+
+  // Json items
+  for (let i in json) {
+    let jsonItem = json[i];
+
+    // Header
+    Object.keys(jsonItem[0]).forEach(item => tableColumnNames.push(item));
+
+    // Rows
+    jsonItem.forEach((item) => {
+      // json to array 
+      for (let j in item) {
+        rowCells.push(item[j]);
+      }
+
+      // Add row
+      rows.push(rowCells);
+      rowCells = [];
+    });
+
+    // Key days values reverse
+    if (sheetNames[i] == sheetDaysName) {
+      tableColumnNames = tableColumnNames.reverse();
+      rows.forEach(item => item = item.reverse());
+    }
+
+    // Build Email
+    if (sheetNames[i] == sheetTeachersName) {
+      rows.forEach((item, i) => {
+        item[7] = `${item[4]}${emailDomain}`;
+      });
+    }
+
+    // Extract Class
+    //if (sheetNames[i] == sheetClassesName) {
+    //  rows.forEach((item) => {
+    //item[1] = item[1].split("(")[1].split(")")[0];
+    //item[1] = item[1].split("(")[0];
+    //  });
+    //}
+
+    // Merge header & rows / (assign Arrays values)
+    body = [...[tableColumnNames], ...rows];
+    
+    // --- 🔧 Ordenar columnas específicas para "cards" y "lessons" ---
+    if (sheetNames[i] === "cards") {
+      const order = ["lessonid", "classroomids", "period", "weeks", "terms", "days", "lessons_per_day"];
+      const headerIndex = order.map(col => tableColumnNames.indexOf(col)).filter(index => index > -1);
+      if (headerIndex.length === order.length) {
+        const newBody = [];
+        newBody.push(order);
+        for (let r = 1; r < body.length; r++) {
+          newBody.push(headerIndex.map(idx => body[r][idx]));
+        }
+        body = newBody;
+      }
+    }
+
+    if (sheetNames[i] === "lessons") {
+      const order = ["id", "classids", "subjectid", "periodspercard", "periodsperweek", "teacherids", "classroomids", "groupids", "seminargroup", "termsdefid", "weeksdefid", "daysdefid", "capacity", "partner_id"];
+      const headerIndex = order.map(col => tableColumnNames.indexOf(col)).filter(index => index > -1);
+      if (headerIndex.length === order.length) {
+        const newBody = [];
+        newBody.push(order);
+        for (let r = 1; r < body.length; r++) {
+          newBody.push(headerIndex.map(idx => body[r][idx]));
+        }
+        body = newBody;
+      }
+    }
+    // Insert sheet
+    propertie = sheetNames[i];
+    let nameSheet = ss.getSheetByName(propertie);
+    if (!nameSheet) {
+      // Print
+      ss.insertSheet(propertie);
+      if (Array.isArray(body) && body.length > 0) {
+        ss.getSheetByName(propertie).getRange(1, 1, body.length, body[0].length).setValues(body);
+        } else {
+        Logger.log(`[configSheet_] ${propertie}: body vacío; no se escribe.`);
+      }
+    }
+
+    // Design
+    designSheet = ss.getSheetByName(propertie);
+    designSheet.getRange(1, 1, 1, body[0].length).setBackground(cellColor)
+    designSheet.getRange(1, 1, 1, body[0].length).setFontColor(fontColor)
+    if (fontWeight) {
+      designSheet.getRange(1, 1, 1, body[0].length).setFontWeight("bold")
+    }
+    if (border) {
+      designSheet.getRange(1, 1, body.length, body[0].length).setBorder(false, false, true, true, false, false, borderColor, SpreadsheetApp.BorderStyle.SOLID);
+    }
+
+    // Clean
+    tableColumnNames = [];
+    rows = [];
+  }
+  // Log
+  Logger.log("Sheeds Created & Loaded Ready");
+}
+*/
+function deleteSheetsByName() {
+  sheetNames.forEach((item) => {
+    propertie = item;
+    let del = ss.getSheetByName(propertie);
+
+    if (del) {
+      ss.deleteSheet(del);
+    }
+  });
+  Logger.log("Sheets Deleted by Name Ready");
+}
+
+function mainSheet() {
+  // Clean
+  sheetMain.getRange("$A:$Z").clearContent();
+  sheetMain.getRange("$A:$Z").clearFormat();
+
+  // Format table Horary
+  sheetMain.getRange(1, 1, 1, horaryTableColumns).setBackground(cellColor)
+  sheetMain.getRange(1, 1, 1, horaryTableColumns).setFontColor(fontColor)
+  sheetMain.getRange(1, 1, 1, horaryTableColumns).setFontWeight("bold")
+  sheetMain.getRange("$B:$D").setNumberFormat(formatTime);
+
+  // Log
+  Logger.log("Resset Main Sheet Ready");
+}
+/*
+function mainSheetFormulaQuery_(where, lesson) {
+ let query = `=QUERY({
+  ARRAYFORMULA(IFERROR(VLOOKUP(cards!F2:F,daysdefs!$A:$C,3,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(cards!C2:C,periods!$A:$E,4,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(cards!C2:C,periods!$A:$E,5,0),"")),
+  ARRAYFORMULA(IFERROR((VLOOKUP(cards!C2:C,periods!$A:$E,5,0) - VLOOKUP(cards!C2:C,periods!$A:$E,4,0)),"")),
+  ARRAYFORMULA(IFERROR((cards!G2:G ${lesson}),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(VLOOKUP(cards!A2:A,lessons!$A:$C,3,0),subjects!$A:$C,2,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(VLOOKUP(cards!A2:A,lessons!$A:$F,6,0),teachers!$A:$D,3,0),"")& " " & IFERROR(VLOOKUP(VLOOKUP(cards!A2:A,lessons!$A:$F,6,0),teachers!$A:$D,2,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(VLOOKUP(cards!A2:A,lessons!$A:$F,6,0),teachers!$A:$H,8,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(cards!B2:B,classrooms!$A:$B,2,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(VLOOKUP(cards!B2:B,classrooms!$A:$D,4,0),buildings!$A:$B,2,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(SPLIT(VLOOKUP(cards!A2:A,lessons!$A:$C,2,0),","),classes!$A:$C,2,0),""))}, 
+"Select * ${where} label Col1 '${horaryHeader[0]}', Col2 '${horaryHeader[1]}', Col3 '${horaryHeader[2]}', Col4 '${horaryHeader[3]}', Col5 '${horaryHeader[4]}', Col6 '${horaryHeader[5]}', Col7 '${horaryHeader[6]}', Col8 '${horaryHeader[7]}', Col9 '${horaryHeader[8]}', Col10 '${horaryHeader[9]}', Col11 '${horaryHeader[10]}'",0)
+`;
+  return query;
+}*/
+
+function mainSheetFormulaQuery_(where, lesson) {
+  let query = `=QUERY({
+  ARRAYFORMULA(
+    IFERROR(
+      VLOOKUP(
+        TRIM(TEXT(cards!F2:F,"0")),
+        {TRIM(TEXT(daysdefs!$D$2:$D,"0")), daysdefs!$B$2:$B},
+        2,
+        0
+      ),
+    "")
+  ),
+  ARRAYFORMULA(IFERROR(VLOOKUP(cards!C2:C,periods!$A:$E,4,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(cards!C2:C,periods!$A:$E,5,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(cards!C2:C,periods!$A:$E,5,0)-VLOOKUP(cards!C2:C,periods!$A:$E,4,0),"")),
+  ARRAYFORMULA(IFERROR((cards!G2:G),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(VLOOKUP(cards!A2:A,lessons!$A:$C,3,0),subjects!$A:$C,2,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(VLOOKUP(cards!A2:A,lessons!$A:$F,6,0),teachers!$A:$D,3,0),"")&" "&IFERROR(VLOOKUP(VLOOKUP(cards!A2:A,lessons!$A:$F,6,0),teachers!$A:$D,2,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(VLOOKUP(cards!A2:A,lessons!$A:$F,6,0),teachers!$A:$H,8,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(cards!B2:B,classrooms!$A:$B,2,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(VLOOKUP(cards!B2:B,classrooms!$A:$D,4,0),buildings!$A:$B,2,0),"")),
+  ARRAYFORMULA(IFERROR(VLOOKUP(SPLIT(VLOOKUP(cards!A2:A,lessons!$A:$C,2,0),","),classes!$A:$C,2,0),""))
+},
+"Select * ${where} label Col1 '${horaryHeader[0]}', Col2 '${horaryHeader[1]}', Col3 '${horaryHeader[2]}', Col4 '${horaryHeader[3]}', Col5 '${horaryHeader[4]}', Col6 '${horaryHeader[5]}', Col7 '${horaryHeader[6]}', Col8 '${horaryHeader[7]}', Col9 '${horaryHeader[8]}', Col10 '${horaryHeader[9]}', Col11 '${horaryHeader[10]}'",0)
+`;
+    return query;
+}
+
+function mainSheetSetFormula() {
+  // Formula Table Horary
+  let formulaWhere = "";
+  let lesson = "";
+  sheetMain.getRange("A1").setFormula(mainSheetFormulaQuery_(formulaWhere, lesson));
+
+  // Log
+  Logger.log("Set Formula Main Sheet Ready");
+}
+
+function mainSheetGetLessonsFormula() {
+  // Formula Table Horary
+  let formulaWhere = "where Col8<>'' ";
+  let lesson = "";
+  sheetMain.getRange("A1").setFormula(mainSheetFormulaQuery_(formulaWhere, lesson));
+
+  // Log
+  Logger.log("Update formula by Lessons  - Main Sheet Ready");
+}
+
+function mainSheetGetLessonFormula() {
+  // Formula Table Horary
+  let formulaWhere = "where Col8<>'' ";
+  let lesson = "* 0 + 1";
+  sheetMain.getRange("A1").setFormula(mainSheetFormulaQuery_(formulaWhere, lesson));
+
+  // Log
+  Logger.log("Update formula by Lesson  - Main Sheet Ready");
+}
+
+function examSheetGetLessonFormula() {
+  // Formula Table Horary
+  //let formulaWhere = "where Col6 = 'EXAMEN' ";
+  let formulaWhere = "where Col6 = 'EXSE'OR Col6 = 'EXSI' "
+  let lesson = "";
+  sheetExamClass.getRange("A1").setFormula(mainSheetFormulaQuery_(formulaWhere, lesson));
+
+  // Log
+  Logger.log("Set Formula Exam Sheet Ready");
+}
+
+function sortRelatedTables () {
+  // Cards
+  ss.getSheetByName(sheetsRelated[0])
+    .getRange(2, 1, ss.getSheetByName(sheetsRelated[0])
+      .getLastRow() - 1, ss.getSheetByName(sheetsRelated[0])
+        .getLastColumn()).sort([{ column: 6, ascending: false }, { column: 3, ascending: true }]);
+
+  // Lessons
+  ss.getSheetByName(sheetsRelated[1])
+    .getRange(2, 1, ss.getSheetByName(sheetsRelated[1])
+      .getLastRow() - 1, ss.getSheetByName(sheetsRelated[1])
+        .getLastColumn()).sort({ column: 6, ascending: true });
+
+  // Log
+  Logger.log("Related Sheets Ordered Ready");
+}
+
+function sortHoraryByLessons() {
+  //Add Column
+  sheetSecond.insertColumns(12, 1);
+  sheetSecond.insertColumns(13, 1);
+  let daysCol = sheetSecond.getRange(2, mainColDay + 1, sheetSecond.getLastRow() - 1, 1).getValues();
+  let claseCol = sheetSecond.getRange(2, mainColClass + 1, sheetSecond.getLastRow() - 1, 1).getValues();
+
+
+  claseCol.forEach((clase) => {
+    claseName = clase[0]
+    clase[0] = claseName.slice(claseName.length - 2)
+  })
+
+  //Logger.log(claseCol)
+
+  // Validate Days
+  daysCol.forEach((day) => {
+    day[0] == "Lunes" ? day[0] = "1" : "";
+    day[0] == "Martes" ? day[0] = "2" : "";
+    day[0] == "Miércoles" ? day[0] = "3" : "";
+    day[0] == "Jueves" ? day[0] = "4" : "";
+    day[0] == "Viernes" ? day[0] = "5" : "";
+  })
+
+  // Set Values day
+  if (Array.isArray(daysCol) && daysCol.length > 0) {
+    sheetSecond.getRange(2, 12, daysCol.length, 1).setValues(daysCol);
+  } else {
+    Logger.log("[loadHoraryByLessons] daysCol vacío.");
+  }
+  if (Array.isArray(claseCol) && claseCol.length > 0) {
+    sheetSecond.getRange(2, 13, claseCol.length, 1).setValues(claseCol);
+  } else {
+    Logger.log("[loadHoraryByLessons] claseCol vacío.");
+  }
+
+
+  // Sort by day and Class
+  ss.getSheetByName(sheetSecondName)
+    .getRange(2, 1, ss.getSheetByName(sheetSecondName).getLastRow() - 1, ss.getSheetByName(sheetSecondName).getLastColumn())
+    .sort([{ column: (mainColClass + 2), descending: true }, { column: (mainColClass + 3), ascending: true }, { column: (mainColClass - 1), ascending: true }, { column: (mainColClass + 1), ascending: true }]);
+
+  //Delete Column
+  sheetSecond.deleteColumns(13, 1);
+  sheetSecond.deleteColumns(12, 1);
+
+  // Log
+  Logger.log("Horary by Lessons Ordered Ready");
+}
+
+function hideRelatedTables() {
+  sheetsRelated.forEach(item => ss.getSheetByName(item).hideSheet());
+  
+  // Log
+  Logger.log("Related Sheets Hidden Ready");
+}
+
+/*function cardGetLessonPerDay() {
+  let horaryLastRow = sheetMain.getLastRow() - 1;
+  let horaryLastcol = sheetMain.getLastColumn();
+  let count = 0;
+  let totalPeriod = []
+
+  let horary = sheetMain.getRange(2, 1, horaryLastRow, horaryLastcol).getDisplayValues();
+  horary.forEach((items) => {
+    horary.forEach((item) => {
+      // Filter day
+      if (items[mainColDay] == item[mainColDay]) {
+        // Filter Subject, Teacher, Classes
+        if (items[mainColSubject] == item[mainColSubject] && items[mainColTeacher] == item[mainColTeacher] && items[mainColClass] == item[mainColClass]) {
+          count += 1;
+        }
+      }
+    })
+    if(count <= 10){
+      totalPeriod.push([count + ""])
+    }
+    count = 0;
+  })
+
+  // Format table Cards
+  ss.getSheetByName(sheetCardsName).getRange(1, 7,).setBackground(cellColor)
+  ss.getSheetByName(sheetCardsName).getRange(1, 7,).setFontColor(fontColor)
+  ss.getSheetByName(sheetCardsName).getRange(1, 7,).setFontWeight("bold")
+  ss.getSheetByName(sheetCardsName).getRange(1, 7,).setValue("lessons_per_day")
+  ss.getSheetByName(sheetCardsName).getRange(2, 7, totalPeriod.length, 1).setValues(totalPeriod);
+}
+*/
+function cardGetLessonPerDay() {
+  // Asegura hoja Cards
+  const cards = ss.getSheetByName(sheetCardsName) || ss.insertSheet(sheetCardsName);
+
+  // Datos de la hoja principal
+  const lastRowMain = Math.max(sheetMain.getLastRow() - 1, 0);
+  const lastColMain = sheetMain.getLastColumn();
+
+  // Si no hay datos, no intentes escribir filas 0
+  if (lastRowMain <= 0 || lastColMain <= 0) {
+    Logger.log("[cards] Main sin datos. Se omite escritura.");
+    // (opcional) Limpia columna G desde la fila 2
+    // cards.getRange(2, 7, cards.getMaxRows() - 1, 1).clearContent();
+    return;
+  }
+
+  const horary = sheetMain.getRange(2, 1, lastRowMain, lastColMain).getDisplayValues();
+
+  let count = 0;
+  const totalPeriod = [];
+
+  horary.forEach((items) => {
+    horary.forEach((item) => {
+      // Mismo día
+      if (items[mainColDay] == item[mainColDay]) {
+        // Misma materia, docente y clase
+        if (
+          items[mainColSubject] == item[mainColSubject] &&
+          items[mainColTeacher] == item[mainColTeacher] &&
+          items[mainColClass] == item[mainColClass]
+        ) {
+          count += 1;
+        }
+      }
+    });
+
+    // Guarda el conteo (capado a 10 como en tu lógica original)
+    totalPeriod.push([String(Math.min(count, 10))]);
+    count = 0;
+  });
+
+  // Cabecera
+  cards.getRange(1, 7).setBackground(cellColor).setFontColor(fontColor).setFontWeight("bold").setValue("lessons_per_day");
+
+  // Evita setValues con 0 filas
+  if (!totalPeriod.length) {
+    Logger.log("[cards] Sin resultados para escribir en Cards.");
+    return;
+  }
+
+  cards.getRange(2, 7, totalPeriod.length, 1).setValues(totalPeriod);
+}
+
+function loadHoraryByLessons() {
+  let horaryLastRow = sheetMain.getLastRow() - 1;
+  let horaryLastcol = sheetMain.getLastColumn();
+    if (horaryLastRow <= 0 || horaryLastcol <= 0) {
+    Logger.log("[loadHoraryByLessons] Main sin datos. Se omite escritura.");
+    return;
+  }
+  let count = 0;
+  let newHorary = [];
+  let horary = sheetMain.getRange(2, 1, horaryLastRow, horaryLastcol).getDisplayValues();
+  let claseArray = 0;
+  horary.forEach((item, k) => {
+    if(item[mainColClass].includes(",")){claseArray++}
+  })
+
+  horary.forEach((item, k) => {
+    //if (item[mainColTeacher] == "CHAVEZ VENEGAS LUIS ALBERTO") {
+
+       // Cycle Extraction 
+    if(item[mainColClass].includes("(") && item[mainColClass] != ""){ item[mainColClass] = item[mainColClass].split("(")[1].split(")")[0] };
+
+    if(claseArray >= 1){
+      // Cycle Extraction 
+      //if(item[mainColClass].includes("(") && item[mainColClass] != ""){ item[mainColClass] = item[mainColClass].split("(")[1].split(")")[0] };
+      if(item[mainColClass + 1].includes("(") && item[(mainColClass + 1)] != ""){ item[(mainColClass + 1)] = item[(mainColClass + 1)].split("(")[1].split(")")[0] };
+      if(item[mainColClass + 2].includes("(") && item[(mainColClass + 2)] != ""){ item[(mainColClass + 2)] = item[(mainColClass + 2)].split("(")[1].split(")")[0] };
+      if(item[mainColClass + 3].includes("(") && item[(mainColClass + 3)] != ""){ item[(mainColClass + 3)] = item[(mainColClass + 3)].split("(")[1].split(")")[0] };
+
+      item[(mainColClass + 1)] != "" ? item[(mainColClass + 1)] = ", " + item[(mainColClass + 1)] : "";
+      item[(mainColClass + 2)] != "" ? item[(mainColClass + 2)] = ", " + item[(mainColClass + 2)] : "";
+      item[(mainColClass + 3)] != "" ? item[(mainColClass + 3)] = ", " + item[(mainColClass + 3)] : "";
+      item[mainColClass] = `${item[mainColClass]}${item[(mainColClass + 1)]}${item[(mainColClass + 2)]}${item[(mainColClass + 3)]}`;
+    }
+
+    horary.forEach((itemArray) => {
+      // Filter day
+      if (itemArray[mainColDay] == item[mainColDay]) {
+        // Filter Subject, Teacher, Classes
+        if (itemArray[mainColSubject] == item[mainColSubject] && itemArray[mainColTeacher] == item[mainColTeacher] && itemArray[mainColClass] == item[mainColClass]) {
+          count += 1;
+
+          // Verify if records is added
+          if (!newHorary.includes(itemArray) && count == 1 && itemArray[mainColClass] == item[mainColClass]) {
+            itemArray[mainColDuration] = convertNumberToHour_(convertHourToMinutes_(itemArray[mainColDuration]) * itemArray[mainColLessons]);
+            newHorary.push(itemArray);
+          } else {
+            // Update record
+            newHorary.forEach((record, i) => {
+              if (itemArray[mainColDay] == record[mainColDay] && itemArray[mainColSubject] == record[mainColSubject] && itemArray[mainColTeacher] == record[mainColTeacher] && itemArray[mainColClass] == record[mainColClass]) {
+                if (record[mainColLessons] >= 1) { record[mainColHourEnd] = itemArray[mainColHourEnd]; }
+                //record[3] = convertNumberToHour_(record[4] * lessonTime);
+              }
+            })
+          }
+
+        }
+      }
+    })
+    count = 0;
+    //}
+  })
+  
+  let horaryByLessonsHeader = [...horaryHeader];
+  if(claseArray >= 1){
+    // Delete Class Ext
+    newHorary.forEach((element) => {
+      element.pop();
+      element.pop();
+      element.pop();
+    })
+    horaryByLessonsHeader.pop()
+    horaryByLessonsHeader.pop()
+    horaryByLessonsHeader.pop()
+  }
+
+  // Modify Horary
+  let horarySurvey = [...newHorary];
+  //horarySurvey.forEach(element => {
+  //  let textOperator = element[mainColSubject];
+  //  let textOperatorTemp = textOperator.slice(-3);
+  //  let operator = textOperatorTemp.slice(0,-2);
+  //  let operatorNum = textOperatorTemp.slice(-2);
+  //  let timeSubject = element[mainColHourEnd];    
+  //  let timeNew;
+  //    if (symbols.includes(operator)) { 
+  //    let target = new Date("2023-01-01 " + timeSubject);
+  //    if(operator == '+'){
+  //      target.setTime(target.getTime() + (operatorNum * 60 * 1000));
+  //    }else{
+  //      target.setTime(target.getTime() - (operatorNum * 60 * 1000));
+  //    }
+  //    
+  //    let timeTemp = new Date(target);
+  //      timeNew = getTime_(timeTemp)
+  //    
+  //    element[mainColHourEnd] = timeNew;
+  //    element[mainColSubject] = textOperator.slice(0,-3);
+  //  }
+  //})
+
+  horarySurvey.forEach((element, i) => {
+    let colSubject = element[mainColSubject];
+    let timeSubject;    
+    let timeNew;
+    let mode = '';
+    let operator, num, mode2, operator2, num2;
+    
+    // If exist (indications)
+    if(colSubject.includes("(") && colSubject != ""){ 
+      let subject = colSubject.split("(")[0]; 
+      let data = colSubject.split("(")[1].split(")")[0];
+      let stringCount = data.length;
+
+      if (stringCount == 2) {
+        element[mainColSubject] = subject + "-"; 
+      }else if (stringCount == 4) {
+        element[mainColSubject] = subject; 
+        mode = (data[data.length -4]).toLowerCase()
+        operator = data.slice(-3, -2);
+        num = data.slice(-2);
+      }else if (stringCount == 7) {
+        element[mainColSubject] = subject + "-";
+        mode = (data[data.length -4]).toLowerCase()
+        operator = data.slice(-3, -2);
+        num = data.slice(-2);
+      }else if (stringCount == 9) {
+        element[mainColSubject] = subject; 
+        mode = data[data.length -9].toLowerCase();
+        operator = data.slice(-8, -7);
+        num = data.slice(-7, -5);
+
+        mode2 = (data[data.length -4]).toLowerCase();
+        operator2 = data.slice(-3, -2);
+        num2 = data.slice(-2);
+      }else if (stringCount == 12) {
+        element[mainColSubject] = subject + "-"; 
+        mode = data[data.length -9].toLowerCase();
+        operator = data.slice(-8, -7);
+        num = data.slice(-7, -5);
+
+        mode2 = (data[data.length -4]).toLowerCase();
+        operator2 = data.slice(-3, -2);
+        num2 = data.slice(-2);       
+      }else{
+        element[mainColSubject] = subject; 
+      }
+
+      num = parseInt(num);
+      num2 = parseInt(num2);
+
+      // Validate first parameter
+      if (operator != "" && symbols.includes(operator) && typeof num === 'number') {
+        if (mode == "i") {
+          timeSubject = element[mainColHourStart];
+        }else{
+          timeSubject = element[mainColHourEnd];
+        }
+
+        if (timeSubject != "") {
+          let target = new Date("2023-01-01 " + timeSubject);
+          if(operator == '+'){
+            target.setTime(target.getTime() + (num * 60 * 1000));
+          }else{
+            target.setTime(target.getTime() - (num * 60 * 1000));
+          }
+          
+          let timeTemp = new Date(target);
+          timeNew = getTime_(timeTemp)
+          
+          if (mode == "i") {
+            element[mainColHourStart] = timeNew;
+          }else{
+            element[mainColHourEnd] = timeNew;
+          }
+        }
+      }
+
+      // Validate second parameter
+      if (operator2 != "" && symbols.includes(operator2) && typeof num2 === 'number') {     
+        timeSubject = element[mainColHourEnd];
+
+        let target = new Date("2023-01-01 " + timeSubject);
+        if(operator2 == '+'){
+          target.setTime(target.getTime() + (num2 * 60 * 1000));
+        }else{
+          target.setTime(target.getTime() - (num2 * 60 * 1000));
+        }
+        
+        let timeTemp = new Date(target);
+        timeNew = getTime_(timeTemp)
+        
+        element[mainColHourEnd] = timeNew;
+      }
+    }
+  });
+
+  // Clean Horary Grouped
+  sheetSecond.getRange("$A:$Z").clearContent();
+  sheetSurvey.getRange("$A:$Z").clearContent();
+  //sheetSecond.getRange("$A:$Z").clearFormat();
+
+  // Format table Horary By Lessons
+  sheetSecond.getRange(1, 1, 1, (horaryTableColumns - 3)).setBackground(cellColor)
+  sheetSecond.getRange(1, 1, 1, (horaryTableColumns - 3)).setFontColor(fontColor)
+  sheetSecond.getRange(1, 1, 1, (horaryTableColumns - 3)).setFontWeight("bold")
+  sheetSecond.getRange(1, 1, 1, horaryByLessonsHeader.length).setValues([horaryByLessonsHeader]);
+    if (Array.isArray(newHorary) && newHorary.length > 0) {
+    sheetSecond.getRange(2, 1, newHorary.length, newHorary[0].length).setValues(newHorary);
+  } else {
+    Logger.log("[loadHoraryByLessons] newHorary vacío; no se escribe.");
+  }
+
+  // Horary Survey
+  sheetSurvey.getRange(1, 1, 1, (horaryTableColumns - 3)).setBackground(cellColor)
+  sheetSurvey.getRange(1, 1, 1, (horaryTableColumns - 3)).setFontColor(fontColor)
+  sheetSurvey.getRange(1, 1, 1, (horaryTableColumns - 3)).setFontWeight("bold")
+  sheetSurvey.getRange(1, 1, 1, horaryByLessonsHeader.length).setValues([horaryByLessonsHeader]);
+    if (Array.isArray(horarySurvey) && horarySurvey.length > 0) {
+    sheetSurvey.getRange(2, 1, horarySurvey.length, horarySurvey[0].length).setValues(horarySurvey);
+    } else {
+    Logger.log("[loadHoraryByLessons] horarySurvey vacío; no se escribe.");
+  }
+
+  Logger.log("Horary By Lessons Loaded")
+}
+
+function loadHoraryByExams() {
+  let horaryLastRow = sheetExamClass.getLastRow() - 1;
+  let horaryLastcol = sheetExamClass.getLastColumn();
+  let count = 0;
+  let newHorary = [];
+  let horary;
+  let claseArray = 0;
+
+  try{
+    horary = sheetExamClass.getRange(2, 1, horaryLastRow, horaryLastcol).getDisplayValues();
+  }catch{
+    horary = [];
+  }
+
+
+  if(horary.length >= 1){
+
+    horary.forEach((item, k) => {
+      if(item[mainColClass].includes(",")){claseArray++}
+    })
+
+    horary.forEach((item, k) => {
+      
+      if(item[mainColClass].includes("(") && item[mainColClass] != ""){ item[mainColClass] = item[mainColClass].split("(")[1].split(")")[0] };
+      if(claseArray >= 1){
+        // Cycle Extraction 
+        //if(item[mainColClass].includes("(") && item[mainColClass] != ""){ item[mainColClass] = item[mainColClass].split("(")[1].split(")")[0] };
+        if(item[mainColClass + 1].includes("(") && item[(mainColClass + 1)] != ""){ item[(mainColClass + 1)] = item[(mainColClass + 1)].split("(")[1].split(")")[0] };
+        if(item[mainColClass + 2].includes("(") && item[(mainColClass + 2)] != ""){ item[(mainColClass + 2)] = item[(mainColClass + 2)].split("(")[1].split(")")[0] };
+        if(item[mainColClass + 3].includes("(") && item[(mainColClass + 3)] != ""){ item[(mainColClass + 3)] = item[(mainColClass + 3)].split("(")[1].split(")")[0] };
+
+        item[(mainColClass + 1)] != "" ? item[(mainColClass + 1)] = ", " + item[(mainColClass + 1)] : "";
+        item[(mainColClass + 2)] != "" ? item[(mainColClass + 2)] = ", " + item[(mainColClass + 2)] : "";
+        item[(mainColClass + 3)] != "" ? item[(mainColClass + 3)] = ", " + item[(mainColClass + 3)] : "";
+        item[mainColClass] = `${item[mainColClass]}${item[(mainColClass + 1)]}${item[(mainColClass + 2)]}${item[(mainColClass + 3)]}`;
+      }
+    })
+
+    horary.forEach((itemArray) => {
+      //if(itemArray[mainColSubject] = "EXAMEN"){
+      //  itemArray[mainColSubject] = "EXSE";
+      //}
+      newHorary.push(itemArray);
+    })
+
+    
+    let horaryByLessonsHeader = [...horaryHeader];
+    if(claseArray >= 1){
+      // Delete Class Ext
+      newHorary.forEach((element) => {
+        element.pop();
+        element.pop();
+        element.pop();
+      })
+      horaryByLessonsHeader.pop()
+      horaryByLessonsHeader.pop()
+      horaryByLessonsHeader.pop()
+    }
+
+    // Clean Horary Grouped
+    //sheetExam.getRange("$A:$Z").clearContent();
+    //sheetExam.getRange("$A:$Z").clearFormat();
+
+    // Format table Horary By Lessons
+    sheetExam.getRange(1, 1, 1, (horaryTableColumns - 3)).setBackground(cellColor)
+    sheetExam.getRange(1, 1, 1, (horaryTableColumns - 3)).setFontColor(fontColor)
+    sheetExam.getRange(1, 1, 1, (horaryTableColumns - 3)).setFontWeight("bold")
+    sheetExam.getRange(1, 1, 1, horaryByLessonsHeader.length).setValues([horaryByLessonsHeader]);
+    if (Array.isArray(newHorary) && newHorary.length > 0) {
+      sheetExam.getRange(2, 1, newHorary.length, newHorary[0].length).setValues(newHorary);
+    } else {
+      Logger.log("[loadHoraryByLessons/Exam] newHorary vacío; no se escribe.");
+    }
+
+    Logger.log("Horary Exams Loaded")
+  }else{
+    sheetExam.getRange("A2:Z900").clearContent();
+  }
+}
+
+function convertNumberToHour_(num) {
+  let hours = Math.floor(num / 60);
+  let minutes = num % 60;
+  return hours + ":" + minutes;
+}
+
+function convertHourToMinutes_(timeInHour) {
+  let timeParts = timeInHour.split(":");
+  return Number(timeParts[0]) * 60 + Number(timeParts[1]);
+}
+
+// Get Time
+function getTime_(timeNow) {
+  let hour = timeNow.getHours();
+  let minute = timeNow.getMinutes();
+  let seconds = timeNow.getSeconds();
+
+  if (hour <= 9) { hour = "0" + hour; }
+  if (minute <= 9) { minute = "0" + minute; }
+  if (seconds <= 9) { seconds = "0" + seconds; }
+
+  let time = `${hour}:${minute}`;
+  return time;
+}

@@ -1,0 +1,35 @@
+1601: BASE_URL: 'http://localhost:8000',
+1670: const res = await global.authFetch(global.CONFIG.BASE_URL + '/api/users/me');
+1771: document.addEventListener('DOMContentLoaded', () => {
+1788: const res = await global.authFetch(global.CONFIG.BASE_URL + '/api/users/login', {
+1820: const res = await global.authFetch(global.CONFIG.BASE_URL + '/api/users/roles');
+1832: const res = await global.authFetch(global.CONFIG.BASE_URL + '/api/users');
+1910: document.addEventListener('DOMContentLoaded', () => {
+1928: await global.authFetch(global.CONFIG.BASE_URL + '/api/users/' + id, {
+1933: const res = await global.authFetch(global.CONFIG.BASE_URL + '/api/users', {
+1942: await global.authFetch(global.CONFIG.BASE_URL + `/api/users/${targetId}/roles`, {
+1961: await global.authFetch(global.CONFIG.BASE_URL + '/api/users/' + id, { method: 'DELETE' });
+1984: const API_BASE_URL = 'http://localhost:8000';
+2110: const url = id ? `${API_BASE_URL}/api/config/${endpoint}/${id}` : `${API_BASE_URL}/api/config/${endpoint}`;
+2142: const res = await authFetch(`${API_BASE_URL}/api/config/${endpoint}/${id}`, { method: 'DELETE' });
+2166: const res = await authFetch(`${API_BASE_URL}/api/schedule/xml-uploads?page=${page}&limit=5`);
+2223: authFetch(`${API_BASE_URL}/api/rpt-planilla/docentes`),
+2224: authFetch(`${API_BASE_URL}/api/rpt-planilla/sedes`)
+2270: const res = await authFetch(`${API_BASE_URL}/api/rpt-planilla/aulas?sede=${encodeURIComponent(sede)}`);
+2304: let url = `${API_BASE_URL}/api/rpt-planilla/?fecha_inicio=${inicio}&fecha_fin=${fin}&page=${page}&limit=50`;
+2413: let url = `${API_BASE_URL}/api/rpt-planilla/export?fecha_inicio=${inicio}&fecha_fin=${fin}`;
+2463: const response = await authFetch(`${API_BASE_URL}/api/schedule/upload`, {
+2523: document.addEventListener("DOMContentLoaded", () => {
+2557: function updateFileName() {
+2650: const tRes = await authFetch(`${API_BASE_URL}/api/schedule/teachers`);
+2654: const cRes = await authFetch(`${API_BASE_URL}/api/schedule/classes`);
+2699: ? `${API_BASE_URL}/api/schedule/teacher/${targetId}?start_date=${sDate}&end_date=${eDate}`
+2700: : `${API_BASE_URL}/api/schedule/classroom/${targetId}?start_date=${sDate}&end_date=${eDate}`;
+2724: const endpoint = `${API_BASE_URL}/api/schedule/export?type=${type}&target_id=${targetId}&start_date=${sDate}&end_date=${eDate}`;
+3118: const res = await authFetch(`${API_BASE_URL}/api/schedule/teachers`);
+3168: const url = `${API_BASE_URL}/api/schedule/sessions-for-obs?teacher_id=${teacherId}&start_date=${dateStart}&end_date=${dateEnd}`;
+3463: const promises = payloads.map(p => authFetch(`${API_BASE_URL}/api/schedule/observations`, {
+3519: const res = await authFetch(`${API_BASE_URL}/api/schedule/observations/${obsId}`, {
+3546: const res = await authFetch(`${API_BASE_URL}/api/schedule/observations/logs`);
+3590: function toggleConfigMenu() {
+3746: document.addEventListener('DOMContentLoaded', () => {

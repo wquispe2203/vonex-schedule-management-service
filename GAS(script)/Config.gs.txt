@@ -1,0 +1,125 @@
+// Config
+const sheetMainName = "horary";                       //Nombre de la hoja Horario
+const sheetSecondName = "horaryByLessons";            //Nombre de la hoja Horario Lecciones
+const sheetExamName = "horaryExams";                  //Nombre de la hoja Horario Exams
+const sheetExamClassName = "horaryExamsClases";       //Nombre de la hoja Horario Exams Claces
+const sheetModifiedHoursClassName = "horaryModifyHours";       //Nombre de la hoja Horario Modificado horas
+const sheetLogName = "log";                           //Nombre de la hoja principal
+const sheetConfigName = "config";                     //Nombre de la hoja principal
+const sheetDaysName = "daysdefs";                     //Nombre de la hoja de los dias
+const sheetTeachersName = "teachers";                 //Nombre de la hoja de los teachers
+const sheetClassesName = "classes";                   //Nombre de la hoja de los classes
+const sheetLessonsName = "lessons";                   //Nombre de la hoja de los lessons
+const sheetCardsName = "cards";                       //Nombre de la hoja de los cards
+const sheetSurveyName = "horarySurvey";               //Nombre de la hoja de los survey
+const charset = 'UTF-8';                              //Codificación de caracteres en data XML
+const labelName = '@indrive';                         //Nombre a etiquetar en correo, con adjunto "data.xml"
+const horaryTableColumns = 14;                        //Numero de Columnas de la hoja principal
+const cellColor = "green";                            //Color de fonde de la cabezera de la hoja principal
+const fontColor = "white";                            //Color del texto de la cabezera de la hoja principal
+const fontWeight = true;                              //Activar la negrita en el texto de la cabezera
+const border = false;                                 //Activar el borde en las tablas a cargar
+const borderColor = "gray";                           //Color del borde de las tablas a cargar
+const lessonTime = 50;                                //Tiempo de una lección
+const formatTime = "h:mm:ss";                            //Formato de hora
+const formatDate = "dd/mm/yyyy";                      //Formato de Fecha
+const emailDomain = "@vonex.edu.pe";                  //Dominio Vonex
+let fileTypesToExtract = ['horario.xml'];             //Nombre de archivo a gestionar por defecto
+let authorizedEmail = ["horario@vonex.edu.pe"];       //Correo Electronico autorizado por defecto
+let mainColDay = 0;                                   //Indice de la columna Día de la hoja horary
+let mainColHourStart = 1;                             //Indice de la columna Día de la hoja horary
+let mainColHourEnd = 2;                               //Indice de la columna Día de la hoja horary
+let mainColDuration = 3;                              //Indice de la columna Día de la hoja horary
+let mainColLessons = 4;                               //Indice de la columna Día de la hoja horary
+let mainColSubject = 5;                               //Indice de la columna Asignatura de la hoja horary
+let mainColTeacher = 6;                               //Indice de la columna Docente de la hoja horary
+let mainColEmail = 7;                                 //Indice de la columna Email de la hoja horary
+let mainColClass = 10;                                //Indice de la columna Clase de la hoja horary
+let symbols = ['+','-'];
+
+// Nombres de las columnas hoja horary
+let horaryHeader = [
+  "DIA",
+  "HORA_INICIO",
+  "HORA_FIN",
+  "DURACION",
+  "LECCIONES DICTADAS",
+  "ASIGNATURA",
+  "DOCENTE",
+  "EMAIL",
+  "AULA",
+  "LOCAL",
+  "CLASE",
+  "CLASE EXT",
+  "CLASE EXT",
+  "CLASE EXT"
+];
+
+// Folder
+const folderId = '1GKlATBEPhLG9qy6j5v2Ah7sqDudHdM4g';
+const folder = DriveApp.getFolderById(folderId);
+const folderName = DriveApp.getFolderById(folderId).getName();
+const contents = folder.getFiles();
+
+// Sheet
+//const googleSheetId = "15kfVbc6_TpjsRz1ABPfteYrIQGSnhDAOoZGl2aNLKx8";
+const googleSheetId = "1ObzRxJ26-_FCDeMUo0_tJPX4bWI2beFYzSLMbs6mgs0";
+
+const sheetsRelated = ["cards", "lessons"];
+const ss = SpreadsheetApp.openById(googleSheetId);
+const sheets = ss.getSheets();
+const sheetMain = ss.getSheetByName(sheetMainName)
+const sheetSecond = ss.getSheetByName(sheetSecondName)
+const sheetExam = ss.getSheetByName(sheetExamName)
+const sheetExamClass = ss.getSheetByName(sheetExamClassName)
+const sheetLog = ss.getSheetByName(sheetLogName)
+const sheetConfig = ss.getSheetByName(sheetConfigName)
+const sheetDays = ss.getSheetByName(sheetDaysName)
+const sheetTeachers = ss.getSheetByName(sheetTeachersName)
+const sheetClasses = ss.getSheetByName(sheetClassesName)
+const sheetLessons = ss.getSheetByName(sheetLessonsName)
+const sheetCards = ss.getSheetByName(sheetCardsName)
+const sheetSurvey = ss.getSheetByName(sheetSurveyName)
+const sheetModifyHours = ss.getSheetByName(sheetModifiedHoursClassName)
+
+// Data
+let file;
+let fileId;
+let designSheet;
+let jsonParse;
+let jsonData;
+let jsonArray = [];
+let json = [];
+let rows = [];
+let rowCells = [];
+let sheetNames = [];
+let tableColumnNames = [];
+
+function callApp(){
+  configSheet_()
+  gmailToDrive()
+}
+
+function callSheets() {
+  getDataFile()
+  deleteSheetsByName()
+  SpreadsheetApp.flush();
+  Utilities.sleep(70000);
+  createLoadSheets()
+  Utilities.sleep(70000);
+  SpreadsheetApp.flush();
+
+  mainSheet()
+  mainSheetSetFormula()
+  cardGetLessonPerDay()
+  sortRelatedTables()
+  hideRelatedTables()
+  mainSheetGetLessonsFormula()
+  loadHoraryByLessons()
+  sortHoraryByLessons()
+  mainSheetGetLessonFormula()
+  examSheetGetLessonFormula()
+  loadHoraryByExams()
+  getBreak();
+  updateBD();
+}

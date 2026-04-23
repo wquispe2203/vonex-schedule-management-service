@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Horarios - Schedule Management Service</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex overflow-hidden">
+
+    <!-- ==============================================
+         MÓDULO DE LOGIN
+    =============================================== -->
+    <div id="login-container" class="fixed inset-0 bg-slate-900 z-[9999] flex items-center justify-center">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-in zoom-in duration-300">
+            <div class="text-center mb-8">
+                <i class="fa-solid fa-shield-halved text-4xl text-indigo-600 mb-3 block"></i>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Acceso Restringido</h2>
+                <p class="text-slate-500 text-sm mt-1">Ingresa con tu cuenta @vonex.edu.pe</p>
+            </div>
+            <form id="login-form" autocomplete="off">
+                <div class="mb-4">
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-wide">Usuario
+                        Institucional</label>
+                    <input type="email" id="login-username" required
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700"
+                        placeholder="ejemplo@vonex.edu.pe">
+                </div>
+                <div class="mb-6">
+                    <label
+                        class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-wide">Contraseña</label>
+                    <input type="password" id="login-password" required
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700"
+                        placeholder="••••••••">
+                </div>
+                <div id="login-error"
+                    class="hidden mb-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold p-3 rounded-lg text-center">
+                </div>
+                <button type="submit" id="login-btn"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3.5 rounded-xl shadow-lg transition-all flex justify-center items-center gap-2">
+                    Ingresar <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         APP PRINCIPAL (OCULTA HASTA LOGIN)
+    =============================================== -->
+    <div id="app-container" class="flex w-full h-full" style="display: none;">
+
+
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-xl z-20">
+            <div class="p-6 border-b border-slate-800">
+                <h1 class="text-xl font-bold flex items-center gap-3">
+                    <i class="fa-solid fa-calendar-days text-indigo-400"></i>
+                    Gestión Horarios
+                </h1>
+                <p class="text-slate-400 text-xs mt-2 uppercase tracking-wider font-semibold">Microservice Admin</p>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-2">
+                <button data-action="nav('upload')"
+                    class="nav-btn w-full flex items-center gap-3 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-left transition-all font-medium shadow-md shadow-indigo-900/50">
+                    <i class="fa-solid fa-file-arrow-up w-5"></i> Subir XML
+                </button>
+                <button data-action="nav('schedule')"
+                    class="nav-btn w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-table-cells w-5"></i> Ver Horarios
+                </button>
+                <button data-action="nav('observations')"
+                    class="nav-btn w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-triangle-exclamation w-5"></i> Observaciones
+                </button>
+                <button data-action="nav('rpt-planilla')"
+                    class="nav-btn w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-table-list w-5"></i> RPT PLANILLAS
+                </button>
+                <button data-action="nav('docentes')"
+                    class="nav-btn w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-chalkboard-user w-5"></i> Docentes
+                </button>
+
+                <div class="pt-4 mt-4 border-t border-slate-800">
+                    <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Administración
+                    </p>
+
+
+                    <!-- Módulo Usuarios -->
+                    <button id="nav-btn-usuarios" data-action="nav('usuarios-module')" style="display: none;"
+                        class="nav-btn w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white mt-1">
+                        <i class="fa-solid fa-user-shield w-5 text-center"></i> Control de Usuarios
+                    </button>
+
+                    <!-- Menú Desplegable Configuración -->
+                    <div class="px-2">
+                        <button data-action="toggle-config"
+                            class="w-full flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white group">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-gears w-5"></i>
+                                <span>Configuración</span>
+                            </div>
+                            <i id="config-chevron"
+                                class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+                        </button>
+
+                        <div id="config-submenu"
+                            class="hidden pl-8 pr-2 py-2 space-y-1 animate-in slide-in-from-top-1 duration-200">
+                            <button data-action="nav('recess-config')"
+                                class="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-800 rounded-lg text-left transition-all text-sm text-slate-400 hover:text-white">
+                                <i class="fa-solid fa-mug-hot w-4 text-center"></i> Recesos
+                            </button>
+                            <button data-action="nav('lunch-config')"
+                                class="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-800 rounded-lg text-left transition-all text-sm text-slate-400 hover:text-white">
+                                <i class="fa-solid fa-utensils w-4 text-center"></i> Almuerzos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="p-5 border-t border-slate-800 bg-slate-800/50">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-lg shadow-inner">
+                        A
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-200" id="current-username-display">Usuario</p><button
+                            data-action="logout()"
+                            class="text-xs text-rose-400 hover:text-rose-300 underline font-black">Cerrar
+                            Sesión</button>
+                        <p class="text-xs text-indigo-400">Administrador</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-10 relative bg-slate-50">
+
+            <!-- Upload Section -->
+            <div id="upload" class="section active max-w-4xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Procesar Archivo XML</h2>
+                    <p class="text-slate-500 mt-2">Sube la exportación de ASC Timetables para generar las sesiones de
+                        clases.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Fecha Inicio</label>
+                            <input type="date" id="start-date"
+                                class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Fecha Fin</label>
+                            <input type="date" id="end-date"
+                                class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm">
+                        </div>
+                    </div>
+
+                    <div id="drop-zone"
+                        class="border-2 border-dashed border-slate-300 rounded-2xl p-14 text-center hover:bg-indigo-50 hover:border-indigo-400 transition-all cursor-pointer group"
+                        data-action="document.getElementById('file-upload').click()">
+                        <div
+                            class="w-20 h-20 bg-indigo-100 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+                        </div>
+                        <h3 id="file-name-display" class="text-xl font-bold text-slate-700">Arrastra tu XML aquí</h3>
+                        <p class="text-slate-500 mt-2 text-sm">Sólo archivos provenientes de ASC Timetables</p>
+                        <input type="file" id="file-upload" class="hidden" accept=".xml">
+                    </div>
+
+                    <div class="mt-8 flex justify-end">
+                        <button id="upload-btn" data-action="simulateUpload()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-indigo-600/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            Vincular y Procesar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upload Progress -->
+                <div id="upload-progress"
+                    class="hidden mt-6 p-6 bg-white rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-notch fa-spin text-indigo-500"></i> Normalizando datos...
+                        </h3>
+                        <span id="progress-status"
+                            class="text-xs font-bold text-indigo-600 bg-indigo-100 px-3 py-1 rounded-full">Procesando</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-3 mb-3 overflow-hidden">
+                        <div id="progress-bar-fill" class="bg-indigo-500 h-3 rounded-full"
+                            style="width: 0%; transition: width 0.5s ease;"></div>
+                    </div>
+                    <ul class="text-sm text-slate-500 space-y-1">
+                        <li id="task-subjects"><i class="fa-regular fa-clock mr-2"></i> Extracción de Subjects</li>
+                        <li id="task-teachers"><i class="fa-regular fa-clock mr-2"></i> Extracción de Docentes</li>
+                        <li id="task-lessons" class="opacity-50"><i class="fa-regular fa-clock mr-2"></i> Generando
+                            Lesson
+                            Cards...</li>
+                    </ul>
+                </div>
+
+                <!-- Conflict Alert -->
+                <div id="conflict-alert"
+                    class="hidden mt-6 bg-amber-50 border border-amber-200 p-6 rounded-2xl shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                    <div class="flex items-start gap-4 pl-2">
+                        <div
+                            class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 text-amber-600">
+                            <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-amber-900 text-lg">Conflictos detectados en el Horario (2)</h3>
+                            <p class="text-amber-700 text-sm mt-1">El ScheduleBuilderService detectó colisiones lógicas.
+                                ¿Deseas sobrescribirlas?</p>
+
+                            <div class="mt-4 space-y-2">
+                                <div
+                                    class="bg-white/60 p-3 rounded-lg border border-amber-200 text-sm text-amber-900 flex gap-3 shadow-sm">
+                                    <i class="fa-solid fa-user-xmark mt-1 text-rose-500"></i>
+                                    <div>El docente <b>Juan Pérez</b> está asignado a <b>Aula 101</b> y <b>Aula 102</b>
+                                        simultáneamente el Lunes a las 08:00.</div>
+                                </div>
+                                <div
+                                    class="bg-white/60 p-3 rounded-lg border border-amber-200 text-sm text-amber-900 flex gap-3 shadow-sm">
+                                    <i class="fa-solid fa-building-circle-exclamation mt-1 text-rose-500"></i>
+                                    <div><b>Aula 205</b> tiene asignado <b>Física(F+20)</b> y <b>Química</b> en el mismo
+                                        bloque del Miércoles.</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 flex gap-3">
+                                <button id="overwrite-btn"
+                                    class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-md shadow-amber-500/20"
+                                    data-action="simulateUpload(true)">Aplicar Sobrescritura Force</button>
+                                <button
+                                    class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-5 py-2.5 rounded-lg text-sm font-bold transition-all"
+                                    data-action="resetUpload()">Cancelar Proceso</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overwrite Confirmation Modal -->
+                <div id="overwrite-modal"
+                    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                    <div
+                        class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in duration-300">
+                        <div class="p-6 text-center">
+                            <div
+                                class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fa-solid fa-arrows-rotate text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">¿Sobrescribir datos existentes?</h3>
+                            <p id="overwrite-modal-msg" class="text-slate-500 text-sm mb-6">Ya existen registros para
+                                las
+                                fechas seleccionadas en la tabla rpt_planilla. ¿Deseas reemplazarlos?</p>
+                            <div class="flex gap-3">
+                                <button data-action="confirmOverwrite()"
+                                    class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-amber-500/30 transition-all">Sí,
+                                    Sobrescribir</button>
+                                <button data-action="closeOverwriteModal()"
+                                    class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Historial de Subidas -->
+                <div class="mt-10 p-6 bg-white rounded-2xl shadow-sm border-2 border-indigo-200">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i> Historial de Subidas
+                        </h3>
+                        <button data-action="loadUploadHistory()"
+                            class="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fa-solid fa-arrows-rotate"></i> Actualizar Historial
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-indigo-50/50">
+                                    <th
+                                        class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100">
+                                        Fecha y Hora</th>
+                                    <th
+                                        class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100">
+                                        Archivo</th>
+                                    <th
+                                        class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100">
+                                        Rango</th>
+                                    <th
+                                        class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100 text-center">
+                                        ¿Overwrite?</th>
+                                </tr>
+                            </thead>
+                            <tbody id="upload-history-body" class="divide-y divide-slate-100 text-sm">
+                                <!-- Datos dinámicos -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination Controls -->
+                    <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+                        <div class="text-xs text-slate-500 font-medium">
+                            Mostrando <span id="history-total" class="font-bold text-indigo-600">0</span> registros
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="prev-page-btn" data-action="changeHistoryPage(-1)" disabled
+                                class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                                <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                            </button>
+                            <span id="page-indicator"
+                                class="text-xs font-bold text-slate-700 px-3 py-1.5 bg-slate-50 rounded-lg">Pagina 1 de
+                                1</span>
+                            <button id="next-page-btn" data-action="changeHistoryPage(1)" disabled
+                                class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                                Siguiente <i class="fa-solid fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Section -->
+            <div id="schedule" class="section max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Visor de Horarios</h2>
+                        <p class="text-slate-500 mt-2">Consulta sesiones generadas por Docente o Aula.</p>
+                    </div>
+                    <button id="export-excel-btn" data-action="exportSchedule()"
+                        class="bg-white border border-slate-300 text-slate-700 px-5 py-2.5 rounded-xl hover:bg-slate-50 shadow-sm font-semibold flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-download"></i> Exportar a Excel
+                    </button>
+                </div>
+
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-wrap lg:flex-nowrap gap-5 items-end">
+                    <div class="w-full lg:w-1/4">
+                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Filtro de
+                            Vista</label>
+                        <select id="schedule-filter-type" data-action="fillTargetSelect"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700">
+                            <option value="teacher">Horario por Docente</option>
+                            <option value="classroom">Horario por Aula</option>
+                        </select>
+                    </div>
+                    <div class="w-full lg:w-1/4">
+                        <label
+                            class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Selección</label>
+                        <select id="schedule-filter-target" data-action="loadSchedule"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700">
+                            <option value="">Cargando...</option>
+                        </select>
+                    </div>
+                    <div class="w-full lg:w-1/4">
+                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Fecha
+                            Inicio</label>
+                        <input type="date" id="schedule-start-date" data-action="loadSchedule"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700">
+                    </div>
+                    <div class="w-full lg:w-1/4">
+                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Fecha
+                            Fin</label>
+                        <input type="date" id="schedule-end-date" data-action="loadSchedule"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700">
+                    </div>
+                    <div class="w-full lg:w-48">
+                        <button data-action="loadSchedule()"
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-filter"></i> Filtrar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Teacher View Summary Panel -->
+                <div id="schedule-teacher-summary"
+                    class="hidden mb-6 bg-indigo-50 border-2 border-indigo-100 rounded-2xl p-6 flex flex-wrap gap-8 items-center shadow-sm">
+                    <div class="flex items-center gap-4 text-center sm:text-left">
+                        <div
+                            class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-xl shadow-lg shrink-0">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <div>
+                            <p
+                                class="text-[10px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-1">
+                                Docente</p>
+                            <h3 id="sch-summary-name" class="text-xl font-black text-slate-800 leading-none">---</h3>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 text-center sm:text-left">
+                        <div
+                            class="w-12 h-12 bg-amber-500 text-white rounded-xl flex items-center justify-center text-xl shadow-lg shrink-0">
+                            <i class="fa-solid fa-calendar-week"></i>
+                        </div>
+                        <div>
+                            <p
+                                class="text-[10px] font-black text-amber-600/60 uppercase tracking-widest leading-none mb-1">
+                                Rango de Semana</p>
+                            <h3 id="sch-summary-range" class="text-xl font-black text-slate-800 leading-none">---</h3>
+                        </div>
+                    </div>
+                    <div class="sm:ml-auto flex items-center gap-6 text-center sm:text-right">
+                        <div>
+                            <p
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                                Total Horas</p>
+                            <h3 id="sch-summary-hours"
+                                class="text-3xl font-black text-indigo-700 leading-none tracking-tighter">0.00</h3>
+                        </div>
+                        <div class="border-l border-slate-200 pl-6">
+                            <p
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                                Total Recesos</p>
+                            <h3 id="sch-summary-breaks"
+                                class="text-3xl font-black text-amber-600 leading-none tracking-tighter">0.00</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead
+                                class="text-xs text-slate-700 uppercase bg-slate-100 border-b-2 border-slate-200 font-black sticky top-0 z-20">
+                                <tr>
+                                    <th id="schedule-header-hour"
+                                        class="px-4 py-3 w-28 text-center border-r border-slate-200 tracking-wider bg-slate-100">
+                                        Horario</th>
+                                    <th
+                                        class="px-4 py-3 border-r border-slate-200 text-center tracking-wider bg-slate-100">
+                                        Lunes 13</th>
+                                    <th
+                                        class="px-4 py-3 border-r border-slate-200 text-center tracking-wider bg-slate-100">
+                                        Martes 14</th>
+                                    <th
+                                        class="px-4 py-3 border-r border-slate-200 text-center tracking-wider bg-slate-100">
+                                        Miércoles 15</th>
+                                    <th
+                                        class="px-4 py-3 border-r border-slate-200 text-center tracking-wider bg-slate-100">
+                                        Jueves 16</th>
+                                    <th class="px-4 py-3 text-center tracking-wider bg-slate-100">Viernes 17</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedule-grid-body">
+                                <!-- Dynamic Content Rendered Here -->
+                                <tr class="border-b border-slate-200">
+                                    <td colspan="6" class="p-8 text-center text-slate-400">Selecciona un docente o aula
+                                        para
+                                        visualizar su horario.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hours Section -->
+            <div id="hours" class="section max-w-5xl mx-auto">
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Conteo de Horas</h2>
+                <p class="text-slate-500 mb-8">Auditoría automática de tiempos totales y modificaciones de bloque.</p>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/80">
+                        <h3 class="font-bold text-slate-800 text-lg">Reporte Consolidado <span
+                                class="text-sm font-normal text-slate-500 ml-2">(Marzo 2026)</span></h3>
+                        <div class="relative">
+                            <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i>
+                            <input type="text" placeholder="Buscar docente..."
+                                class="pl-10 pr-4 py-2 border border-slate-300 rounded-xl text-sm w-72 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm">
+                        </div>
+                    </div>
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-600 uppercase bg-white border-b border-slate-200 font-bold">
+                            <tr>
+                                <th class="px-6 py-4">Docente Registrado</th>
+                                <th class="px-6 py-4 text-center">Horas Base</th>
+                                <th class="px-6 py-4 text-center">Modificadores (F+, I-)</th>
+                                <th class="px-6 py-4 text-center text-indigo-700">Tiempo Real Calculado</th>
+                                <th class="px-6 py-4 text-right">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                                <td class="px-6 py-5 font-bold text-slate-800">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center font-bold shadow-sm">
+                                            JP</div>
+                                        Juan Pérez
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-center text-slate-600 font-medium tracking-wide">20 h 00 m
+                                </td>
+                                <td class="px-6 py-5 text-center text-emerald-600 font-bold"><i
+                                        class="fa-solid fa-plus text-[10px] mr-1"></i>1 h 30 m</td>
+                                <td class="px-6 py-5 text-center font-black text-indigo-900 text-base bg-indigo-50/30">
+                                    21 h
+                                    30 m</td>
+                                <td class="px-6 py-5 text-right">
+                                    <button
+                                        class="text-indigo-600 hover:text-white hover:bg-indigo-600 font-bold text-xs bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-lg transition-colors">Auditar
+                                        Bloques</button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-6 py-5 font-bold text-slate-800">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-orange-400 text-white flex items-center justify-center font-bold shadow-sm">
+                                            MG</div>
+                                        María Gómez
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-center text-slate-600 font-medium tracking-wide">18 h 00 m
+                                </td>
+                                <td class="px-6 py-5 text-center text-rose-600 font-bold">-0 h 30 m</td>
+                                <td class="px-6 py-5 text-center font-black text-indigo-900 text-base bg-indigo-50/30">
+                                    17 h
+                                    30 m</td>
+                                <td class="px-6 py-5 text-right">
+                                    <button
+                                        class="text-indigo-600 hover:text-white hover:bg-indigo-600 font-bold text-xs bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-lg transition-colors">Auditar
+                                        Bloques</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="observations" class="section max-w-7xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Gestión de Incidencias y
+                        Observaciones
+                    </h2>
+                    <p class="text-slate-500 mt-2">Registra faltas, reemplazos y otros eventos que afecten la planilla.
+                    </p>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div class="flex border-b border-slate-200 mb-8 overflow-x-auto">
+                    <button data-action="toggleObsTab('register')" id="tab-btn-register"
+                        class="px-8 py-4 text-sm font-black border-b-2 border-indigo-600 text-indigo-600 transition-all uppercase tracking-widest">
+                        Registrar Incidencia
+                    </button>
+                    <button data-action="toggleObsTab('logs')" id="tab-btn-logs"
+                        class="px-8 py-4 text-sm font-black border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all uppercase tracking-widest">
+                        Logs de Cambios
+                    </button>
+                </div>
+
+                <!-- Tab 1: Registrar Incidencia -->
+                <div id="obs-tab-register" class="space-y-8">
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap lg:flex-nowrap gap-5 items-end">
+                        <div class="w-full lg:w-1/3">
+                            <label
+                                class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Seleccionar
+                                Docente</label>
+                            <select id="obs-filter-docente"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
+                                <option value="">Cargando docentes...</option>
+                            </select>
+                        </div>
+                        <div class="w-full lg:w-1/4">
+                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Fecha
+                                Inicio</label>
+                            <input type="date" id="obs-date-start"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
+                        </div>
+                        <div class="w-full lg:w-1/4">
+                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Fecha
+                                Fin</label>
+                            <input type="date" id="obs-date-end"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
+                        </div>
+                        <div class="w-full lg:w-1/6">
+                            <button data-action="searchClassesForObs()"
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-md shadow-indigo-600/20">
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200">
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Fecha</th>
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Curso</th>
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Ciclo</th>
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Horario</th>
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
+                                            Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="obs-search-body" class="divide-y divide-slate-100 text-sm">
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-12 text-center text-slate-400 font-medium">
+                                            Ingresa los filtros para buscar sesiones de clase.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Logs de Auditoría -->
+                <div id="obs-tab-logs" class="hidden">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200">
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Fecha Registro</th>
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Usuario</th>
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Docente Afectado</th>
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Tipo</th>
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Fecha Clase</th>
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Observación</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="obs-logs-body" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Cargado por JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RPT Planillas Section -->
+            <div id="rpt-planilla" class="section max-w-7xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">RPT Planillas</h2>
+                        <p class="text-slate-500 mt-2">Visualización, filtrado y exportación de datos de planilla.</p>
+                    </div>
+                    <button data-action="exportToExcel()"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-emerald-600/20 font-bold flex items-center gap-2 transition-all transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-file-excel text-lg"></i> Exportar a Excel
+                    </button>
+                </div>
+
+                <!-- Enhanced Filters -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
+                        <div class="lg:col-span-1">
+                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Fecha
+                                Inicio</label>
+                            <input type="date" id="rpt-fecha-inicio"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all text-sm">
+                        </div>
+                        <div class="lg:col-span-1">
+                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Fecha
+                                Fin</label>
+                            <input type="date" id="rpt-fecha-fin"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all text-sm">
+                        </div>
+                        <div class="lg:col-span-2 flex flex-col">
+                            <label
+                                class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Docente</label>
+                            <div class="flex gap-2">
+                                <button data-action="navRptTeacher(-1)" title="Docente anterior"
+                                    class="px-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-indigo-600 transition-all shadow-sm">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <select id="rpt-filter-docente"
+                                    class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all text-sm">
+                                    <option value="Todos">Todos los Docentes</option>
+                                </select>
+                                <button data-action="navRptTeacher(1)" title="Siguiente docente"
+                                    class="px-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-indigo-600 transition-all shadow-sm">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-1">
+                            <label
+                                class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Sede</label>
+                            <select id="rpt-filter-sede" data-action="handleSedeChange"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all text-sm">
+                                <option value="Todas">Todas las Sedes</option>
+                            </select>
+                        </div>
+                        <div class="lg:col-span-1">
+                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Aula
+                                /
+                                Ciclo</label>
+                            <select id="rpt-filter-aula" disabled data-action="loadRptPlanilla(1)"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all disabled:opacity-50 disabled:bg-slate-100 text-sm">
+                                <option value="Todos">Todos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button data-action="loadRptPlanilla(1)"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-8 rounded-xl shadow-md shadow-indigo-600/20 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-filter"></i> Filtrar Resultados
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Summary Panel -->
+                <div id="rpt-summary-panel" class="hidden mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-sm border-2 border-indigo-100 flex items-center gap-5 transition-all hover:shadow-md">
+                        <div
+                            class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                            <i class="fa-solid fa-clock-pulse"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Cantidad
+                                de
+                                horas dictadas</p>
+                            <h3 id="rpt-sum-hours" class="text-3xl font-black text-slate-900 tracking-tight">0.00</h3>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-sm border-2 border-amber-100 flex items-center gap-5 transition-all hover:shadow-md">
+                        <div
+                            class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                            <i class="fa-solid fa-mug-hot"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Cantidad
+                                de
+                                recesos (0.33)</p>
+                            <h3 id="rpt-count-recesos" class="text-3xl font-black text-slate-900 tracking-tight">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200">
+                                    <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                        Fecha
+                                    </th>
+                                    <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                        Sede
+                                    </th>
+                                    <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                        Ciclo
+                                    </th>
+                                    <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                        Docente</th>
+                                    <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                        Curso
+                                    </th>
+                                    <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                        Inicio</th>
+                                    <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                        Fin
+                                    </th>
+                                    <th
+                                        class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
+                                        Horas</th>
+                                    <th
+                                        class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
+                                        Receso</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rpt-planilla-body" class="divide-y divide-slate-100 text-sm">
+                                <tr>
+                                    <td colspan="9" class="px-4 py-12 text-center text-slate-400">
+                                        <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block"></i>
+                                        Cargando datos...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="p-6 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <div class="text-xs text-slate-500 font-medium">
+                            Mostrando <span id="rpt-total-records" class="font-bold text-indigo-600">0</span> registros
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="rpt-prev-btn" data-action="changeRptPage(-1)" disabled
+                                class="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 transition-all shadow-sm">
+                                <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                            </button>
+                            <span id="rpt-page-indicator"
+                                class="text-xs font-bold text-slate-700 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm">Página
+                                1 de 1</span>
+                            <button id="rpt-next-btn" data-action="changeRptPage(1)" disabled
+                                class="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 transition-all shadow-sm">
+                                Siguiente <i class="fa-solid fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ═══════════════════════════════════════════════════
+             DOCENTES SECTION
+             ═══════════════════════════════════════════════════ -->
+            <div id="docentes" class="section max-w-7xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Gestión de Docentes</h2>
+                    <p class="text-slate-500 mt-2">Carga Excel, maestra de docentes y docentes sin asignar del XML.</p>
+                </div>
+
+                <!-- Sub-tabs -->
+                <div class="flex border-b border-slate-200 mb-8 overflow-x-auto">
+                    <button data-action="toggleDocentesTab('upload')" id="doc-tab-btn-upload"
+                        class="doc-tab-btn px-8 py-4 text-sm font-black border-b-2 border-indigo-600 text-indigo-600 transition-all uppercase tracking-widest whitespace-nowrap">
+                        <i class="fa-solid fa-file-excel mr-2"></i>Subir Docentes
+                    </button>
+                    <button data-action="toggleDocentesTab('maestra')" id="doc-tab-btn-maestra"
+                        class="doc-tab-btn px-8 py-4 text-sm font-black border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all uppercase tracking-widest whitespace-nowrap">
+                        <i class="fa-solid fa-users mr-2"></i>Maestra
+                    </button>
+                    <button data-action="toggleDocentesTab('sinasignar')" id="doc-tab-btn-sinasignar"
+                        class="doc-tab-btn px-8 py-4 text-sm font-black border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all uppercase tracking-widest whitespace-nowrap">
+                        <i class="fa-solid fa-user-clock mr-2"></i>Sin Asignar
+                        <span id="sinasignar-badge"
+                            class="hidden ml-2 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
+                    </button>
+                    <button data-action="toggleDocentesTab('conflictos')" id="doc-tab-btn-conflictos"
+                        class="doc-tab-btn px-8 py-4 text-sm font-black border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all uppercase tracking-widest whitespace-nowrap">
+                        <i class="fa-solid fa-code-branch mr-2"></i>Revisión de Conflictos
+                        <span id="conflictos-badge"
+                            class="hidden ml-2 bg-rose-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
+                    </button>
+                </div>
+
+                <!-- Tab: Subir Excel -->
+                <div id="doc-tab-upload-excel">
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 w-full">
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Importar desde Excel</h3>
+                        <p class="text-sm text-slate-500 mb-6">Columnas requeridas: <strong>DNI | APELLIDOS | NOMBRES |
+                                RAZON SOCIAL</strong></p>
+                        <div id="doc-drop-zone"
+                            class="border-2 border-dashed border-slate-300 rounded-2xl p-10 text-center hover:bg-indigo-50 hover:border-indigo-400 transition-all cursor-pointer group mb-6">
+                            <div
+                                class="w-16 h-16 bg-indigo-100 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-file-arrow-up text-2xl"></i>
+                            </div>
+                            <p id="doc-file-name" class="font-bold text-slate-700">Arrastra tu Excel o haz clic aquí</p>
+                            <p class="text-slate-400 text-xs mt-1">.xlsx / .xls</p>
+                            <input type="file" id="doc-file-upload" class="hidden" accept=".xlsx,.xls">
+                        </div>
+                        <button data-action="uploadDocentesExcel()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-md shadow-indigo-600/30 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Importar
+                        </button>
+                    </div>
+                    <!-- Resultado importación -->
+                    <div id="doc-import-result"
+                        class="hidden mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 w-full">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-bold text-slate-800">Resultado de la importación</h4>
+                            <span id="doc-imp-pageinfo" class="text-xs text-slate-500"></span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 mb-5">
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                                <p class="text-2xl font-black text-emerald-700" id="doc-imp-inserted">0</p>
+                                <p class="text-xs font-bold text-emerald-600 uppercase tracking-wide">Insertados</p>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+                                <p class="text-2xl font-black text-amber-700" id="doc-imp-updated">0</p>
+                                <p class="text-xs font-bold text-amber-600 uppercase tracking-wide">Actualizados</p>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                                <p class="text-2xl font-black text-slate-700" id="doc-imp-total">0</p>
+                                <p class="text-xs font-bold text-slate-600 uppercase tracking-wide">Total filas</p>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b">
+                                        <th class="px-3 py-2 text-left text-xs font-black text-slate-500 uppercase">Fila
+                                        </th>
+                                        <th class="px-3 py-2 text-left text-xs font-black text-slate-500 uppercase">
+                                            Apellidos</th>
+                                        <th class="px-3 py-2 text-left text-xs font-black text-slate-500 uppercase">
+                                            Nombres</th>
+                                        <th class="px-3 py-2 text-left text-xs font-black text-slate-500 uppercase">DNI
+                                        </th>
+                                        <th class="px-3 py-2 text-left text-xs font-black text-slate-500 uppercase">
+                                            Razón Social</th>
+                                        <th class="px-3 py-2 text-center text-xs font-black text-slate-500 uppercase">
+                                            Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="doc-import-preview" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                        <!-- Paginación -->
+                        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+                            <span class="text-xs text-slate-500">Mostrando página <span id="doc-imp-pg">1</span> de
+                                <span id="doc-imp-pgtotal">1</span></span>
+                            <div class="flex gap-2">
+                                <button id="doc-imp-prev" data-action="changeImportPage(-1)" disabled
+                                    class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white disabled:opacity-50">
+                                    <i class="fa-solid fa-chevron-left"></i> Anterior
+                                </button>
+                                <button id="doc-imp-next" data-action="changeImportPage(1)" disabled
+                                    class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white disabled:opacity-50">
+                                    Siguiente <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Maestra -->
+                <div id="doc-tab-maestra" class="hidden">
+                    <div
+                        class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-5 flex flex-wrap gap-4 items-end">
+                        <div class="flex-1 min-w-[180px]">
+                            <label
+                                class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Buscar</label>
+                            <input id="doc-search" type="text" placeholder="Nombre, apellido o DNI..."
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500"
+                                onkeydown="if(event.key==='Enter') loadMaestra(1)">
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Estado
+                                (Manual)</label>
+                            <select id="doc-status-filter" data-action="loadDocentesMaestra"
+                                class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500">
+                                <option value="">Todos</option>
+                                <option value="acts">Solo Activos</option>
+                                <option value="inacts">Solo Inactivos</option>
+                            </select>
+                        </div>
+                        <button data-action="loadMaestra(1)"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-all">
+                            <i class="fa-solid fa-filter mr-1"></i> Filtrar
+                        </button>
+                        <button id="btn-merge-docentes" data-action="openMergeModal()" disabled
+                            title="Selecciona exactamente 2 docentes para fusionar"
+                            class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-code-merge mr-1"></i> Fusionar (0)
+                        </button>
+                        <button data-action="openTeacherModal()"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-all">
+                            <i class="fa-solid fa-plus mr-1"></i> Nuevo
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-slate-50 border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-4 py-3 w-10">
+                                            <input type="checkbox" disabled class="rounded border-slate-300">
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Apellidos</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Nombres</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            DNI</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Razón Social</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
+                                            Estado</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter text-right">
+                                            Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="doc-maestra-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-5 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+                            <span class="text-xs text-slate-500">Total: <span id="doc-maestra-total"
+                                    class="font-bold text-indigo-600">0</span></span>
+                            <div class="flex gap-2">
+                                <button id="doc-maestra-prev" data-action="changeMaestraPage(-1)" disabled
+                                    class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white disabled:opacity-50">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <span id="doc-maestra-indicator"
+                                    class="text-xs font-bold text-slate-700 px-3 py-1.5 bg-white border border-slate-200 rounded-lg">1
+                                    / 1</span>
+                                <button id="doc-maestra-next" data-action="changeMaestraPage(1)" disabled
+                                    class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white disabled:opacity-50">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Sin Asignar -->
+                <div id="doc-tab-sinasignar" class="hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-sm text-slate-500">Ordenados por frecuencia (más críticos primero). Origen: XML o
+                            Observación.</p>
+                        <button data-action="runReprocesarHistorico()"
+                            class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-5 rounded-xl text-sm shadow-md transition-all">
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Reprocesar Histórico
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-slate-50 border-b border-slate-200">
+                                    <tr>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Apellidos</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Nombres</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            DNI</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Razón Social</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
+                                            Origen</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
+                                            Detecciones</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Último visto</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter text-right">
+                                            Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="doc-sinasignar-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-5 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+                            <span class="text-xs text-slate-500">Total: <span id="doc-sinasignar-total"
+                                    class="font-bold text-amber-600">0</span></span>
+                            <div class="flex gap-2">
+                                <button id="doc-sa-prev" data-action="changeSinAsignarPage(-1)" disabled
+                                    class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white disabled:opacity-50">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <span id="doc-sa-indicator"
+                                    class="text-xs font-bold text-slate-700 px-3 py-1.5 bg-white border border-slate-200 rounded-lg">1
+                                    / 1</span>
+                                <button id="doc-sa-next" data-action="changeSinAsignarPage(1)" disabled
+                                    class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white disabled:opacity-50">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Conflictos Fuzzy -->
+                <div id="doc-tab-conflictos" class="hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-sm text-slate-500">Coincidencias aproximadas (&ge;90%) entre docentes XML y la
+                            maestra. Requieren validación humana.</p>
+                        <button data-action="runReprocesarHistorico()"
+                            class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 px-5 rounded-xl text-sm shadow-md transition-all">
+                            <i class="fa-solid fa-rotate mr-1"></i> Actualizar análisis
+                        </button>
+                    </div>
+                    <div id="conflictos-empty"
+                        class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-8 text-center">
+                        <i class="fa-solid fa-circle-check text-emerald-500 text-3xl mb-3 block"></i>
+                        <p class="font-bold text-emerald-800">Sin conflictos detectados</p>
+                        <p class="text-sm text-emerald-600 mt-1">Todos los docentes XML están correctamente vinculados a
+                            la maestra.</p>
+                    </div>
+                    <div id="conflictos-info"
+                        class="hidden mb-4 bg-rose-50 border border-rose-200 rounded-xl p-4 text-sm text-rose-800">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                        <span id="conflictos-count-msg"></span>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-slate-50 border-b border-slate-200">
+                                    <tr>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Detectado (XML)</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                            Sugerido (Maestra)</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
+                                            Similitud</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter text-right">
+                                            Decisión</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="doc-conflictos-body" class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-10 text-center text-slate-400">Ejecuta
+                                            "Actualizar análisis" para ver los conflictos.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Fusionar Docentes -->
+            <div id="merge-modal"
+                class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                <div
+                    class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col scale-in">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <div>
+                            <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight">Fusión de Docentes
+                            </h3>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Consolidación de
+                                registros duplicados</p>
+                        </div>
+                        <button data-action="closeMergeModal()"
+                            class="text-slate-400 hover:text-slate-600 transition-colors">
+                            <i class="fa-solid fa-xmark text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="p-8 overflow-y-auto">
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-8 flex gap-4 items-start">
+                            <div
+                                class="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-amber-900">Advertencia de Fusión</p>
+                                <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                                    Esta operación es irreversible. Todas las lecciones y observaciones del docente
+                                    <b>secundario</b> se transferirán al <b>principal</b>. El registro secundario será
+                                    eliminado permanentemente de la base de datos.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-8 relative">
+                            <!-- Divider visual -->
+                            <div
+                                class="absolute left-1/2 top-0 bottom-0 w-px bg-slate-100 -translate-x-1/2 hidden md:block">
+                            </div>
+
+                            <!-- Docente 1 -->
+                            <div id="merge-card-0"
+                                class="p-6 rounded-2xl border-2 border-slate-100 transition-all cursor-pointer relative"
+                                data-action="selectPrincipal(0)">
+                                <div class="absolute top-4 right-4">
+                                    <input type="radio" name="principal-choice" id="radio-p-0"
+                                        class="w-5 h-5 text-indigo-600 focus:ring-indigo-500 border-slate-300">
+                                </div>
+                                <span
+                                    class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Candidato
+                                    A</span>
+                                <h4 id="merge-name-0" class="text-lg font-black text-slate-900 mb-4">—</h4>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-[10px] font-black text-slate-400 uppercase">DNI</label>
+                                        <p id="merge-dni-0" class="text-sm font-mono font-bold text-slate-700">—</p>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-black text-slate-400 uppercase">Razón
+                                            Social</label>
+                                        <p id="merge-rs-0" class="text-sm font-bold text-slate-700">—</p>
+                                    </div>
+                                    <div id="merge-badge-0"></div>
+                                </div>
+                            </div>
+
+                            <!-- Docente 2 -->
+                            <div id="merge-card-1"
+                                class="p-6 rounded-2xl border-2 border-slate-100 transition-all cursor-pointer relative"
+                                data-action="selectPrincipal(1)">
+                                <div class="absolute top-4 right-4">
+                                    <input type="radio" name="principal-choice" id="radio-p-1"
+                                        class="w-5 h-5 text-indigo-600 focus:ring-indigo-500 border-slate-300">
+                                </div>
+                                <span
+                                    class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Candidato
+                                    B</span>
+                                <h4 id="merge-name-1" class="text-lg font-black text-slate-900 mb-4">—</h4>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-[10px] font-black text-slate-400 uppercase">DNI</label>
+                                        <p id="merge-dni-1" class="text-sm font-mono font-bold text-slate-700">—</p>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-black text-slate-400 uppercase">Razón
+                                            Social</label>
+                                        <p id="merge-rs-1" class="text-sm font-bold text-slate-700">—</p>
+                                    </div>
+                                    <div id="merge-badge-1"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                        <button data-action="closeMergeModal()"
+                            class="px-6 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-800 transition-colors">Cancelar</button>
+                        <button id="btn-confirm-merge" data-action="executeMerge()" disabled
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-8 rounded-xl shadow-lg shadow-indigo-600/20 transition-all disabled:opacity-50">
+                            CONFIRMAR FUSIÓN
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Editar / Crear Docente Maestra -->
+            <div id="teacher-modal"
+                class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                        <h3 id="teacher-modal-title" class="text-xl font-black text-slate-800">Docente</h3>
+                        <button data-action="closeTeacherModal()"
+                            class="text-slate-400 hover:text-rose-500 transition-colors">
+                            <i class="fa-solid fa-xmark text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <input type="hidden" id="teacher-modal-id">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Apellidos
+                                    *</label>
+                                <input id="teacher-modal-lastname" type="text"
+                                    class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                                    placeholder="PÉREZ GOMEZ">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Nombres
+                                    *</label>
+                                <input id="teacher-modal-firstname" type="text"
+                                    class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                                    placeholder="JUAN CARLOS">
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">DNI</label>
+                            <input id="teacher-modal-dni" type="text" maxlength="15"
+                                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                                placeholder="12345678">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Razón
+                                Social</label>
+                            <input id="teacher-modal-razon" type="text"
+                                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                                placeholder="Empresa S.A.C.">
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0 flex gap-3">
+                        <button data-action="saveTeacher()"
+                            class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> Guardar
+                        </button>
+                        <button data-action="closeTeacherModal()"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Editar Sin Asignar -->
+            <div id="sinasignar-modal"
+                class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="text-xl font-black text-slate-800">Editar Docente Sin Asignar</h3>
+                        <button data-action="closeSinAsignarModal()"
+                            class="text-slate-400 hover:text-rose-500 transition-colors">
+                            <i class="fa-solid fa-xmark text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <input type="hidden" id="sinasignar-modal-id">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Apellidos</label>
+                                <input id="sa-modal-apellidos" type="text"
+                                    class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Nombres</label>
+                                <input id="sa-modal-nombres" type="text"
+                                    class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">DNI</label>
+                            <input id="sa-modal-dni" type="text" maxlength="15"
+                                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Razón
+                                Social</label>
+                            <input id="sa-modal-razon" type="text"
+                                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0 flex gap-3">
+                        <button data-action="saveSinAsignar()"
+                            class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> Guardar
+                        </button>
+                        <button data-action="promoteSinAsignar()"
+                            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all">
+                            <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i> Promover a Maestra
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Confirmar Cambio de Estado (v3.10) -->
+            <div id="teacher-status-modal"
+                class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
+                <div
+                    class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-300">
+                    <div class="p-10 text-center">
+                        <div id="status-modal-icon"
+                            class="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-8 text-4xl shadow-lg border-4 border-white">
+                            <i class="fa-solid fa-power-off"></i>
+                        </div>
+                        <h3 id="status-modal-title"
+                            class="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">¿Confirmar cambio?
+                        </h3>
+                        <p id="status-modal-msg" class="text-slate-500 font-bold mb-8 leading-relaxed text-sm px-4">
+                            ¿Deseas cambiar el estado de este docente?</p>
+
+                        <!-- Advertencia de Actividad -->
+                        <div id="status-activity-warning"
+                            class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-5 mb-8 text-left flex gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm">
+                            <div class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
+                            </div>
+                            <p class="text-xs font-black text-rose-800 leading-tight uppercase tracking-tighter">
+                                Este docente tiene actividad registrada (lecciones o reemplazos).
+                                Al desactivarlo, dejará de aparecer en el RPT Planilla.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <button data-action="confirmStatusChange()" id="btn-status-confirm"
+                                class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-2xl transition-all shadow-xl active:scale-95 uppercase tracking-widest text-xs">
+                                SÍ, CONFIRMAR CAMBIO
+                            </button>
+                            <button data-action="closeStatusModal()"
+                                class="w-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-extrabold py-4 rounded-2xl transition-all uppercase tracking-widest text-xs">
+                                VOLVER
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recess Configuration Section -->
+            <div id="recess-config" class="section max-w-7xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Configuración de Recesos</h2>
+                        <p class="text-slate-500 mt-2">Gestiona los tiempos de descanso intermedios.</p>
+                    </div>
+                    <button data-action="openConfigModal('recess')"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-indigo-600/20 font-bold flex items-center gap-2 transition-all transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-plus text-lg"></i> Agregar Receso
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200">
+                                <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                    Nombre
+                                </th>
+                                <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">Hora
+                                    Inicio</th>
+                                <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">Hora
+                                    Fin
+                                </th>
+                                <th
+                                    class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
+                                    Duración</th>
+                                <th
+                                    class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter text-right">
+                                    Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recess-config-body" class="divide-y divide-slate-100 italic text-slate-400">
+                            <!-- Carga dinámica -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Lunch Configuration Section -->
+            <div id="lunch-config" class="section max-w-7xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Configuración de Almuerzos
+                        </h2>
+                        <p class="text-slate-500 mt-2">Gestiona los tiempos extendidos para alimentación.</p>
+                    </div>
+                    <button data-action="openConfigModal('lunch')"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-indigo-600/20 font-bold flex items-center gap-2 transition-all transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-plus text-lg"></i> Agregar Almuerzo
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200">
+                                <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
+                                    Nombre
+                                </th>
+                                <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">Hora
+                                    Inicio</th>
+                                <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">Hora
+                                    Fin
+                                </th>
+                                <th
+                                    class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
+                                    Duración</th>
+                                <th
+                                    class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter text-right">
+                                    Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lunch-config-body" class="divide-y divide-slate-100 italic text-slate-400">
+                            <!-- Carga dinámica -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modal Configuración -->
+            <div id="config-modal"
+                class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+                    <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 id="config-modal-title" class="text-2xl font-black text-slate-800 tracking-tight">Agregar
+                            Configuración</h3>
+                        <button data-action="closeConfigModal()"
+                            class="text-slate-400 hover:text-rose-500 transition-colors"><i
+                                class="fa-solid fa-xmark text-xl"></i></button>
+                    </div>
+                    <div class="p-8 space-y-6">
+                        <input type="hidden" id="config-id">
+                        <input type="hidden" id="config-type">
+
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Nombre
+                                descriptivo</label>
+                            <input type="text" id="config-name" placeholder="Ej: Receso Mañana"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Hora
+                                    Inicio</label>
+                                <input type="time" id="config-start" data-action="calculateDurationInModal"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Hora
+                                    Fin</label>
+                                <input type="time" id="config-end" data-action="calculateDurationInModal"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all">
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 flex items-center justify-between">
+                            <span class="text-xs font-bold text-indigo-700 uppercase tracking-widest">Duración
+                                estimada</span>
+                            <span id="config-duration" class="font-black text-indigo-800">0 min</span>
+                        </div>
+
+                        <button data-action="saveConfig()"
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-600/30 transition-all transform hover:-translate-y-1 active:scale-[0.98]">
+                            Guardar Configuración
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal: Registrar Observación -->
+            <div id="obs-register-modal"
+                class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+                <div
+                    class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all animate-in zoom-in duration-300">
+                    <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">Registrar Incidencia</h3>
+                        <button data-action="closeObsRegisterModal()"
+                            class="text-slate-400 hover:text-rose-500 transition-colors"><i
+                                class="fa-solid fa-xmark text-xl"></i></button>
+                    </div>
+                    <div class="p-8 space-y-6">
+                        <input type="hidden" id="obs-form-session-id">
+                        <input type="hidden" id="obs-form-teacher-id">
+
+                        <div class="grid grid-cols-2 gap-4 bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                            <div>
+                                <p
+                                    class="text-[10px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-1">
+                                    Docente Afectado</p>
+                                <p id="obs-modal-teacher-name" class="font-bold text-slate-800 text-sm">---</p>
+                            </div>
+                            <div>
+                                <p
+                                    class="text-[10px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-1">
+                                    Fecha de Clase</p>
+                                <p id="obs-modal-date" class="font-bold text-slate-800 text-sm">---</p>
+                            </div>
+                        </div>
+
+                        <!-- Toggle Desglose -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <label
+                                class="block text-xs font-black text-slate-500 mb-3 uppercase tracking-tighter">¿Aplicar
+                                incidencia a todo el bloque?</label>
+                            <div class="flex gap-6">
+                                <label class="flex items-center gap-2 cursor-pointer group">
+                                    <input type="radio" name="obs-block-mode" value="full" checked
+                                        data-action="toggleObsBlockMode('full')"
+                                        class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                    <span
+                                        class="text-sm font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">Sí,
+                                        todo el bloque</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer group">
+                                    <input type="radio" name="obs-block-mode" value="split"
+                                        data-action="toggleObsBlockMode('split')"
+                                        class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                    <span
+                                        class="text-sm font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">No,
+                                        desglosar por horas (50m)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Single Mode Container -->
+                        <div id="obs-single-mode-container" class="space-y-6">
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Tipo
+                                        de Incidencia</label>
+                                    <select id="obs-form-type" data-action="handleObsTypeChange"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
+                                        <option value="FALTA">FALTA</option>
+                                        <option value="REEMPLAZO">REEMPLAZO</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Tipo
+                                        de Descuento</label>
+                                    <select id="obs-form-discount"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
+                                        <option value="SIMPLE">SIMPLE</option>
+                                        <option value="DOBLE">DOBLE</option>
+                                        <option value="TRIPLE">TRIPLE</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="obs-replacement-container"
+                                class="hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                                
+                                <!-- Existing Teacher Search -->
+                                <div id="obs-replacement-search-container" class="mb-4">
+                                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Buscar Docente Reemplazante (Maestra)</label>
+                                    <div class="relative">
+                                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+                                        <input type="search" id="obs-form-replacement-search" list="teachers-datalist" 
+                                               placeholder="Escriba apellidos para buscar..." 
+                                               class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:outline-none focus:ring-indigo-500 font-medium text-slate-700 text-sm shadow-sm transition-all focus:bg-white">
+                                    </div>
+                                </div>
+
+                                <!-- New Teacher Toggle -->
+                                <div class="flex items-center gap-2 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                    <input type="checkbox" id="obs-form-replacement-is-new" data-action="toggleNewTeacherMode"
+                                           class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
+                                    <label for="obs-form-replacement-is-new" class="text-[10px] font-black text-slate-500 cursor-pointer uppercase tracking-widest">
+                                        ¿Es un docente nuevo? (No figura en la maestra)
+                                    </label>
+                                </div>
+
+                                <!-- Manual Fields (Hidden by default) -->
+                                <div id="obs-replacement-manual-fields" class="hidden animate-in slide-in-from-left-2 duration-300 space-y-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">Apellidos</label>
+                                            <input type="text" id="obs-form-replacement-last" placeholder="Ej: MOSTACERO..." 
+                                                   class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">Nombres</label>
+                                            <input type="text" id="obs-form-replacement-first" placeholder="Ej: JORDY..." 
+                                                   class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
+                                        </div>
+                                    </div>
+                                    <p class="text-[10px] text-amber-600 font-bold uppercase tracking-tight italic">
+                                        * Este docente se registrará en la categoría "Sin Asignar".
+                                    </p>
+                                </div>
+                                <datalist id="teachers-datalist"></datalist>
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Observación
+                                    / Justificación</label>
+                                <textarea id="obs-form-description" rows="3"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm"
+                                    placeholder="Detalle el motivo de la incidencia..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Split Mode Container (Dynamic) -->
+                        <div id="obs-split-mode-container"
+                            class="hidden space-y-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Dynamic slots go here -->
+                        </div>
+
+                        <button data-action="saveObservation()"
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-600/30 transition-all transform hover:-translate-y-1 active:scale-[0.98]">
+                            Confirmar y Registrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Confirmación -->
+            <div id="obs-confirm-modal"
+                class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
+                <div
+                    class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in duration-300">
+                    <div class="p-8 text-center">
+                        <div
+                            class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fa-solid fa-check text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-slate-900 mb-2">¡Registro Exitoso!</h3>
+                        <p class="text-slate-500 text-sm mb-8 leading-relaxed">La incidencia ha sido registrada
+                            correctamente. El cambio se verá reflejado en el reporte de planillas.</p>
+                        <button data-action="closeObsConfirmModal()"
+                            class="w-full bg-slate-800 hover:bg-slate-900 text-white font-black py-4 rounded-2xl transition-all">Entendido</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =================================================================
+             MÓDULO DE USUARIOS
+        ================================================================== -->
+            <div id="usuarios-module" class="section max-w-7xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Administración de Seguridad</h2>
+                    <p class="text-slate-50 mt-2 text-slate-500">Gestión de usuarios, roles y matriz de permisos RBAC.</p>
+                </div>
+
+                <!-- Sub-tabs Usuarios -->
+                <div class="flex border-b border-slate-200 mb-8 overflow-x-auto">
+                    <button data-action="toggleUsuariosTab('list')" id="usr-tab-btn-list"
+                        class="usr-tab-btn px-8 py-4 text-sm font-black border-b-2 border-indigo-600 text-indigo-600 transition-all uppercase tracking-widest whitespace-nowrap">
+                        <i class="fa-solid fa-users-gear mr-2"></i>Lista de Usuarios
+                    </button>
+                    <button data-action="toggleUsuariosTab('rbac')" id="usr-tab-btn-rbac"
+                        class="usr-tab-btn px-8 py-4 text-sm font-black border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all uppercase tracking-widest whitespace-nowrap">
+                        <i class="fa-solid fa-shield-halved mr-2"></i>Permisos por Rol
+                    </button>
+                </div>
+
+                <!-- TAB: Lista de Usuarios -->
+                <div id="usr-tab-list">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-slate-800">Cuentas de Usuario</h3>
+                        <button data-action="openUsuarioModal()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus"></i> Nuevo Usuario
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-slate-50 border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-5 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">Colaborador</th>
+                                        <th class="px-5 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">Cuenta / Email</th>
+                                        <th class="px-5 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">Roles</th>
+                                        <th class="px-5 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">Estado</th>
+                                        <th class="px-5 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usuarios-tbody" class="divide-y divide-slate-100">
+                                    <tr><td colspan="5" class="px-5 py-12 text-center text-slate-400">Cargando usuarios...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: RBAC Matrix -->
+                <div id="usr-tab-rbac" class="hidden">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">Matriz de Permisos</h3>
+                                <p class="text-xs text-slate-500 font-medium">Asigna permisos granulares a cada rol del sistema.</p>
+                            </div>
+                            <button data-action="saveRolePermissions()" id="btn-save-rbac" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-xl shadow-md transition-all">
+                                <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar Matriz
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left border-collapse">
+                                <thead id="rbac-thead" class="bg-slate-50 border-b border-slate-200">
+                                    <!-- Dynamic Roles Header -->
+                                </thead>
+                                <tbody id="rbac-tbody" class="divide-y divide-slate-100">
+                                    <!-- Dynamic Permissions Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Nuevo/Editar Usuario -->
+                <div id="usuario-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh]">
+                        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 text-slate-900">
+                            <h3 id="usuario-modal-title" class="text-xl font-bold">Configurar Acceso</h3>
+                            <button data-action="closeUsuarioModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+                        </div>
+                        <form id="usuario-form" class="p-6 overflow-y-auto">
+                            <input type="hidden" id="usr-id">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-wide">Nombres</label>
+                                    <input type="text" id="usr-nombres" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-wide">Apellidos</label>
+                                    <input type="text" id="usr-apellidos" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:border-indigo-500">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-wide">Correo Institucional</label>
+                                <input type="email" id="usr-email" placeholder="@vonex.edu.pe" required pattern=".*@vonex\.edu\.pe" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:border-indigo-500">
+                            </div>
+                            <div class="mb-4" id="usr-pwd-container">
+                                <label class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-wide">Contraseña Provisional</label>
+                                <input type="password" id="usr-password" minlength="6" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:border-indigo-500">
+                                <p class="text-[10px] text-slate-400 mt-1">Requerido para cuentas nuevas (mín 6 caracts).</p>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-wide">Área Operativa</label>
+                                <input type="text" id="usr-area" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:border-indigo-500">
+                            </div>
+                            <div class="border-t border-slate-200 pt-4">
+                                <label class="block text-xs font-black text-slate-800 mb-3 uppercase tracking-wider">Asignación de Roles</label>
+                                <div id="usr-roles-container" class="grid grid-cols-2 gap-3"></div>
+                            </div>
+                            <div class="mt-8 flex gap-3">
+                                <button type="submit" id="usr-save-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20">Guardar Credenciales</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Modal: Reset Password (Admin) -->
+                <div id="reset-pwd-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in duration-200">
+                        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 class="text-lg font-bold text-slate-900">Resetear Contraseña</h3>
+                            <button data-action="closeResetPwdModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-xs text-slate-500 mb-4 font-medium uppercase tracking-wider">Usuario: <span id="reset-pwd-user" class="font-black text-slate-800"></span></p>
+                            <label class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-wide">Nueva Contraseña</label>
+                            <input type="password" id="new-pwd-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl mb-6 focus:border-indigo-500 outline-none transition-all">
+                            <button data-action="confirmResetPassword()" id="btn-confirm-reset-pwd" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-black py-4 rounded-xl shadow-lg shadow-rose-600/20 transition-all uppercase tracking-widest text-xs">
+                                ACTUALIZAR CONTRASEÑA
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <script type="module" src="js/main.js"></script>
+    </body>
+</html>

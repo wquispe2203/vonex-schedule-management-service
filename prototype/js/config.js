@@ -1,0 +1,51 @@
+// Configuration Module - Environment Aware
+const isLocal = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+
+export const API_BASE_URL = isLocal
+    ? 'http://127.0.0.1:8000'
+    : window.location.origin;
+
+export const ENDPOINTS = {
+    AUTH: {
+        LOGIN: "/api/users/login",
+        ME: "/api/users/me"
+    },
+    USERS: {
+        BASE: "/api/users"
+    },
+    DOCENTES: {
+        BASE: "/api/docentes",
+        LIST: "/api/docentes",
+        IMPORT: "/api/docentes/import-excel",
+        SIN_ASIGNAR: "/api/docentes/sinasignar",
+        ALL: "/api/docentes/all"
+    },
+    MDM: {
+        REVIEWS: "/api/mdm/reviews",
+        STATS: "/api/mdm/stats"
+    },
+    OBSERVACIONES: {
+        BASE: "/api/schedule/observations",
+        LIST: "/api/schedule/observations",
+        LOGS: "/api/schedule/observations/logs"
+    },
+    HORARIOS: {
+        BASE: "/api/schedule",
+        UPLOAD: "/api/schedule/upload",
+        TEACHERS: "/api/schedule/teachers",
+        CLASSES: "/api/schedule/classes",
+        TEACHER_GRID: "/api/schedule/teacher",
+        CLASS_GRID: "/api/schedule/classroom",
+        HISTORY: "/api/schedule/xml-uploads"
+    },
+    REPORTES: {
+        BASE: "/api/rpt-planilla",
+        PLANILLA: "/api/rpt-planilla",
+        EXPORT: "/api/rpt-planilla/export"
+    },
+    CONFIG: {
+        BASE: "/api/config",
+        RECESOS: "/api/config/recesos",
+        ALMUERZOS: "/api/config/almuerzos"
+    }
+};

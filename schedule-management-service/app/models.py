@@ -1,0 +1,264 @@
+from sqlalchemy import Column, Integer, String, Date, Time, DateTime, Boolean, ForeignKey, Text, Numeric, Table, UniqueConstraint
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
+from .database import Base
+
+# --- TABLAS INTERMEDIAS (100% UUID) ---
+
+user_roles = Table(
+    "user_roles",
+    Base.metadata,
+    Column("user_id", UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
+    Column("role_id", UUID(as_uuid=True), ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
+    UniqueConstraint("user_id", "role_id", name="uq_user_role")
+)
+
+role_permissions = Table(
+    "role_permissions",
+    Base.metadata,
+    Column("role_id", UUID(as_uuid=True), ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
+    Column("permission_id", UUID(as_uuid=True), ForeignKey("permissions.id", ondelete="CASCADE"), primary_key=True),
+    UniqueConstraint("role_id", "permission_id", name="uq_role_permission")
+)
+
+# ─── TABLAS DE CONFIGURACIÓN (SOBERANÍA UUID - SIN LEGACY_ID) ───
+
+class Role(Base):
+    __tablename__ = "roles"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    name = Column(String(50), unique=True, index=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    users = relationship("User", secondary=user_roles, back_populates="roles")
+    permissions = relationship("Permission", secondary=role_permissions, back_populates="roles")
+
+class Permission(Base):
+    __tablename__ = "permissions"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    code = Column(String(100), unique=True, index=True, nullable=False)
+    description = Column(String(255), nullable=True)
+    roles = relationship("Role", secondary=role_permissions, back_populates="permissions")
+
+class Grade(Base):
+    __tablename__ = "grades"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    name = Column(String(100), unique=True, nullable=False)
+    classes = relationship("ClassGroup", back_populates="grade")
+
+class Building(Base):
+    __tablename__ = "buildings"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    source_id = Column(String(50), unique=True, nullable=False)
+    name = Column(String(100))
+
+class Subject(Base):
+    __tablename__ = "subjects"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    source_id = Column(String(50), unique=True, nullable=False)
+    name = Column(String(255))
+    short_name = Column(String(50))
+    lessons = relationship("Lesson", back_populates="subject")
+
+class BreakConfig(Base):
+    __tablename__ = "break_config"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    description = Column(String(255), nullable=False)
+    start_time = Column(Time, nullable=False)
+    end_time = Column(Time, nullable=False)
+
+class LunchConfig(Base):
+    __tablename__ = "lunch_config"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    description = Column(String(255), nullable=False)
+    start_time = Column(Time, nullable=False)
+    end_time = Column(Time, nullable=False)
+
+# ─── TABLAS TRANSACCIONALES (HÍBRIDAS - CON LEGACY_ID) ───
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    username = Column(String(255), unique=True, index=True, nullable=False)
+    password_hash = Column(String(255), nullable=True)
+    nombres = Column(String(100))
+    apellidos = Column(String(100))
+    is_active = Column(Boolean, default=True)
+    roles = relationship("Role", secondary=user_roles, back_populates="users")
+    observations = relationship("Observation", back_populates="user")
+
+class Teacher(Base):
+    __tablename__ = "teachers"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    source_id = Column(String(50), unique=True, nullable=True)
+    first_name = Column(String(100))
+    last_name = Column(String(100))
+    dni = Column(String(15), nullable=True)
+    short_name = Column(String(50), nullable=True)
+    razon_social = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True)
+    normalized_name = Column(String(400), nullable=True, index=True)
+    possible_duplicate = Column(Boolean, default=False)
+    
+    # --- Campos de Unificación (Docentes Sin Asignar) ---
+    is_assigned = Column(Boolean, default=True, index=True)
+    times_detected = Column(Integer, default=0)
+    last_seen_at = Column(DateTime(timezone=True))
+    source = Column(String(100))
+    possible_match_id = Column(UUID(as_uuid=True), ForeignKey("teachers.id", ondelete="SET NULL"))
+    match_review_id = Column(UUID(as_uuid=True), ForeignKey("match_reviews.id", ondelete="SET NULL"))
+    merged_into_id = Column(UUID(as_uuid=True), ForeignKey("teachers.id", ondelete="SET NULL"), nullable=True)
+    normalized_for_match = Column(String(400), nullable=True, index=True)
+    
+    # --- Relaciones ---
+    lessons = relationship("Lesson", back_populates="teacher")
+    possible_match = relationship("Teacher", remote_side=[id], foreign_keys=[possible_match_id])
+    review = relationship("MatchReview", foreign_keys=[match_review_id])
+
+class MatchReview(Base):
+    __tablename__ = "match_reviews"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    xml_raw_name = Column(String(255), nullable=False)
+    normalized_name = Column(String(400), nullable=False)
+    candidate_id = Column(UUID(as_uuid=True), ForeignKey("teachers.id", ondelete="CASCADE"), nullable=False)
+    xml_teacher_id = Column(UUID(as_uuid=True), ForeignKey("teachers.id", ondelete="SET NULL"), nullable=True)
+    score = Column(Numeric(5, 2))
+    decision = Column(String(50), default="MATCH_DUDOSO")
+    request_id = Column(UUID(as_uuid=True), nullable=True)
+    xml_source_id = Column(String(100), nullable=True)
+    upload_id = Column(UUID(as_uuid=True), ForeignKey("xml_uploads.id", ondelete="SET NULL"), nullable=True)
+    status = Column(String(50), default="PENDING") # PENDING, RESOLVED, REJECTED
+    
+    # Auditoría extendida
+    resolved_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    resolved_by_snapshot = Column(String(255), nullable=True)
+    resolved_at = Column(DateTime(timezone=True), nullable=True)
+    resolution_note = Column(Text, nullable=True)
+    resolution_time_seconds = Column(Integer, nullable=True)
+    resolution_type = Column(String(50), nullable=True) # AUTO_OVERRIDE, MANUAL_MATCH, MANUAL_REJECT
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    candidate = relationship("Teacher", foreign_keys=[candidate_id])
+    xml_teacher = relationship("Teacher", foreign_keys=[xml_teacher_id])
+    resolver = relationship("User", foreign_keys=[resolved_by])
+
+class ClassGroup(Base):
+    __tablename__ = "classes"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    source_id = Column(String(50), unique=True, nullable=False)
+    name = Column(String(100))
+    grade_id = Column(UUID(as_uuid=True), ForeignKey("grades.id", ondelete="SET NULL"))
+    grade = relationship("Grade", back_populates="classes")
+    lessons = relationship("Lesson", back_populates="class_group")
+
+class Lesson(Base):
+    __tablename__ = "lessons"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    source_id = Column(String(50), unique=True, nullable=False)
+    subject_id = Column(UUID(as_uuid=True), ForeignKey("subjects.id", ondelete="CASCADE"), nullable=False)
+    teacher_id = Column(UUID(as_uuid=True), ForeignKey("teachers.id", ondelete="CASCADE"))
+    class_id = Column(UUID(as_uuid=True), ForeignKey("classes.id", ondelete="CASCADE"))
+    old_system_subject_id = Column(Integer)
+    old_system_teacher_id = Column(Integer)
+    old_system_class_id = Column(Integer)
+    subject = relationship("Subject", back_populates="lessons")
+    teacher = relationship("Teacher", back_populates="lessons")
+    class_group = relationship("ClassGroup", back_populates="lessons")
+    sessions = relationship("ScheduleSession", back_populates="lesson")
+    cards = relationship("Card", back_populates="lesson")
+
+class Card(Base):
+    __tablename__ = "cards"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    source_id = Column(String(50), unique=True, nullable=False)
+    lesson_id = Column(UUID(as_uuid=True), ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False)
+    days = Column(String(10))
+    period = Column(Integer)
+    lesson = relationship("Lesson", back_populates="cards")
+
+class ScheduleSession(Base):
+    __tablename__ = "schedule_sessions"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    lesson_id = Column(UUID(as_uuid=True), ForeignKey("lessons.id", ondelete="CASCADE"))
+    session_date = Column(Date, nullable=False, index=True)
+    start_time = Column(Time, nullable=False)
+    end_time = Column(Time, nullable=False)
+    status = Column(String(50), default="ACTIVE")
+    lesson = relationship("Lesson", back_populates="sessions")
+    observations = relationship("Observation", back_populates="session")
+
+class Observation(Base):
+    __tablename__ = "observations"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    session_id = Column(UUID(as_uuid=True), ForeignKey("schedule_sessions.id", ondelete="CASCADE"), nullable=False)
+    teacher_id = Column(UUID(as_uuid=True), ForeignKey("teachers.id", ondelete="CASCADE"))
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"))
+    replacement_teacher_id = Column(UUID(as_uuid=True), ForeignKey("teachers.id", ondelete="SET NULL"))
+    old_system_session_id = Column(Integer)
+    old_system_teacher_id = Column(Integer)
+    type = Column(String(50), nullable=False)
+    discount_type = Column(String(50), default="SIMPLE")
+    replacement_teacher_name = Column(String(255))
+    teacher_uid = Column(UUID(as_uuid=True), nullable=True)
+    replacement_teacher_uid = Column(UUID(as_uuid=True), nullable=True)
+    description = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    session = relationship("ScheduleSession", back_populates="observations")
+    user = relationship("User", back_populates="observations")
+    teacher = relationship("Teacher", foreign_keys=[teacher_id])
+    replacement_teacher = relationship("Teacher", foreign_keys=[replacement_teacher_id])
+
+class RptPlanilla(Base):
+    __tablename__ = "rpt_planilla"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    fecha_clase = Column(Date, nullable=False, index=True)
+    docente = Column(String(255), nullable=False, index=True)
+    horas_dictadas = Column(Numeric(10, 2), nullable=False)
+
+# ─── TABLAS DE INFRAESTRUCTURA (LOGS XML - AHORA UUID) ───
+
+class XmlUpload(Base):
+    __tablename__ = "xml_uploads"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    filename = Column(String(255))
+    start_date = Column(Date)
+    end_date = Column(Date)
+    is_force_overwrite = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    logs = relationship("XmlUploadLog", back_populates="upload")
+    change_logs = relationship("XmlChangeLog", back_populates="upload")
+
+class XmlUploadLog(Base):
+    __tablename__ = "xml_upload_logs"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    upload_id = Column(UUID(as_uuid=True), ForeignKey("xml_uploads.id", ondelete="CASCADE"))
+    status = Column(String(50))
+    upload = relationship("XmlUpload", back_populates="logs")
+
+class XmlChangeLog(Base):
+    __tablename__ = "xml_change_logs"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    old_system_id = Column(Integer, nullable=True)
+    upload_id = Column(UUID(as_uuid=True), ForeignKey("xml_uploads.id", ondelete="CASCADE"))
+    action = Column(String(50))
+    upload = relationship("XmlUpload", back_populates="change_logs")
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"))
+    accion = Column(String(100), nullable=False)
+    fecha = Column(DateTime(timezone=True), server_default=func.now())

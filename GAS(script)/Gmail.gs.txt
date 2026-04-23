@@ -1,0 +1,132 @@
+function gmailToDrive() {
+  // Data
+  let msgDate;
+  let msgFrom;
+  let msgCc;
+  let msgSubject;
+  let msgBody;
+
+  // Filter query
+  let query = '';
+  let queryFrom = '';
+  for (let item of fileTypesToExtract) {
+    query += (query === '' ? ('filename:' + item) : (' OR filename:' + item));
+  }
+  for (let item of authorizedEmail) {
+    queryFrom += (queryFrom === '' ? (' from:<' + item + '>') : (' OR from:<' + item + '>'));
+  }
+  //query = `in:inbox has:nouserlabels from:"<${authorizedEmail}>"` + query;
+  query = `in:inbox has:nouserlabels ` + query + queryFrom;
+  let threads = GmailApp.search(query);
+  let label = getGmailLabel_(labelName);
+  let parentFolder;
+
+  // Check files
+  if (threads.length > 0) {
+    parentFolder = getFolder_(folderName);
+    Logger.log("File found")
+    deleteFiles_();
+
+    // Process file 
+    let root = DriveApp.getRootFolder();
+    for (let i in threads) {
+      // Select the last query file
+      if (i == 0) {
+        let mesgs = threads[i].getMessages();
+
+        mesgs.forEach((msg) => {
+
+          // Create Data Log
+          msgDate = msg.getDate();
+          msgFrom = msg.getFrom();
+          msgCc = msg.getCc();
+          msgSubject = msg.getSubject();
+          msgBody = msg.getBody();
+          if(msgBody != ''){
+            msgBody = msgBody.replaceAll('<div dir="ltr">', "");
+            msgBody = msgBody.replaceAll('<div>', "");
+            msgBody = msgBody.replaceAll('</div>', "");
+            msgBody = msgBody.replaceAll('<br>', "");
+            msgBody = msgBody.replaceAll('<br/>', "");
+            //msgBody = msgBody.slice(15,-8);
+            //if(msgBody == '<br>'){
+            //  msgBody = '';
+            //}
+          }
+
+          // Get attachments
+          let attachments = msg.getAttachments();
+
+          attachments.forEach((attachment) => {
+            // File name
+            let attachmentFileName = attachment.getName().toLowerCase();
+
+            if (attachmentFileName == fileTypesToExtract[0]) {
+              let fileNameNew = attachment.getName();
+
+              // Upload file data
+              let attachmentBlob = attachment.copyBlob();
+              let file = DriveApp.createFile(attachmentBlob);
+              parentFolder.addFile(file);
+              root.removeFile(file);
+              let thisFile = folder.getFiles();
+              while (thisFile.hasNext()) {
+                let fileRename = thisFile.next();
+                let oldName = file.getName();
+                let newName = oldName.toLowerCase();
+                fileRename.setName(newName)
+              }
+              Logger.log("File uploaded: " + fileNameNew)
+            }
+          });
+        });
+      }
+      // Add label to Email
+      threads[i].addLabel(label);
+    }
+
+    // Call Manage Sheets
+    callSheets()
+
+    // Save Log
+    logSheet_(msgDate, msgFrom, msgCc, msgSubject,msgBody)
+  } else {
+    Logger.log("File not found")
+  }
+}
+
+// Delete Files
+function deleteFiles_() {
+  let thisFile = folder.getFiles();
+
+  while (thisFile.hasNext()) {
+    let eachFile = thisFile.next();
+    let fileId = eachFile.getId();
+    if (fileId != googleSheetId) {
+      DriveApp.getFileById(fileId).setTrashed(true);
+      Logger.log("File removed: " + eachFile.getName());
+    }
+  };
+}
+
+//This function will get the parent folder in Google drive
+function getFolder_(folderName) {
+  let folder;
+  let fi = DriveApp.getFoldersByName(folderName);
+  if (fi.hasNext()) {
+    folder = fi.next();
+  }
+  else {
+    folder = DriveApp.createFolder(folderName);
+  }
+  return folder;
+}
+
+// Get Label
+function getGmailLabel_(name) {
+  let label = GmailApp.getUserLabelByName(name);
+  if (!label) {
+    label = GmailApp.createLabel(name);
+  }
+  return label;
+}

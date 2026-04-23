@@ -1,0 +1,1654 @@
+[
+  {
+    "id": 220,
+    "source_id": "FE7C0AEB948E51F5",
+    "name": "ALGEBRA(I+10/F-10)",
+    "short_name": "AL",
+    "uid": "b5590ab3-6a04-41de-94db-c7b0bf242905"
+  },
+  {
+    "id": 221,
+    "source_id": "1408C12EF9DC6B71",
+    "name": "ALGEBRA(I+10/F-20)",
+    "short_name": "AL",
+    "uid": "36c7ca98-082d-4c68-8732-8e589838b38d"
+  },
+  {
+    "id": 222,
+    "source_id": "32C7F1B2E1E34B14",
+    "name": "ARITMETICA(F-30)",
+    "short_name": "AR",
+    "uid": "f8009fb3-3782-44cc-90de-b6d390920b5b"
+  },
+  {
+    "id": 223,
+    "source_id": "634B2722DECCAB35",
+    "name": "ARITMETICA(I+10/F-20)",
+    "short_name": "AR",
+    "uid": "cbc261eb-caf4-48d4-8e1d-fd4c177dd124"
+  },
+  {
+    "id": 224,
+    "source_id": "41D57284A76F8502",
+    "name": "FISICA(F-30)",
+    "short_name": "FI",
+    "uid": "c09d4f26-1ea6-4b50-a201-69fd81b31032"
+  },
+  {
+    "id": 225,
+    "source_id": "69BF6619B1ADA903",
+    "name": "FISICA(I-20/F-20)",
+    "short_name": "FI",
+    "uid": "d210012d-5d88-4afe-8418-71526405e39c"
+  },
+  {
+    "id": 226,
+    "source_id": "90A5562AECA89C0B",
+    "name": "GEOMETRIA (E0/F-10)",
+    "short_name": "GE",
+    "uid": "b35586d3-e1c5-4f4c-966e-5446a315b557"
+  },
+  {
+    "id": 227,
+    "source_id": "552313E92A943BEC",
+    "name": "GEOMETRIA(F-30)",
+    "short_name": "GE",
+    "uid": "9586ff90-1cfa-4f29-aaf5-e5135a150fdc"
+  },
+  {
+    "id": 228,
+    "source_id": "7F0B93E24D19981B",
+    "name": "GEOMETRIA(I-10/F-10)",
+    "short_name": "GE",
+    "uid": "566535ba-c7ae-4071-9a70-1576d9dfaa62"
+  },
+  {
+    "id": 229,
+    "source_id": "C1BADF5717F11F44",
+    "name": "GEOMETRIA(I+10/F-20)",
+    "short_name": "GE",
+    "uid": "73e9f2df-3277-49eb-a1e7-8983ac3a1cdb"
+  },
+  {
+    "id": 230,
+    "source_id": "A028910F5A8077CC",
+    "name": "LENGUAJE(I-20/F-20)",
+    "short_name": "LE",
+    "uid": "2e32335b-ca5d-46b2-ad62-6d00eb2c7055"
+  },
+  {
+    "id": 231,
+    "source_id": "047FF2BDEBA54877",
+    "name": "PSICOLOGIA(F-30)",
+    "short_name": "PS",
+    "uid": "6cb22338-1987-4c0b-aa6a-2c34c1b8695e"
+  },
+  {
+    "id": 232,
+    "source_id": "1E4285DEDDF65F74",
+    "name": "QUIMICA(F-20)",
+    "short_name": "QU",
+    "uid": "873d8e7c-6cad-47ff-8b71-24cfaf4a9e74"
+  },
+  {
+    "id": 233,
+    "source_id": "2CA737989FA7DB1E",
+    "name": "QUIMICA(I-20/F-20)",
+    "short_name": "QU",
+    "uid": "1a720cf2-17a1-4d49-bb77-c18c9d6f1895"
+  },
+  {
+    "id": 234,
+    "source_id": "4A77E1E8DE2FCCF1",
+    "name": "RAZ. MATEMATICO(I+10/F-20)",
+    "short_name": "RM",
+    "uid": "d09ad95a-4558-4236-b3d3-35177965ff2d"
+  },
+  {
+    "id": 235,
+    "source_id": "B867CEB3A020C3B3",
+    "name": "RAZ. MATEMATICO(I+10/F+10)",
+    "short_name": "RM",
+    "uid": "852d8efc-ac3f-4d85-9e81-f10013ef7123"
+  },
+  {
+    "id": 236,
+    "source_id": "F9553FC4CC82A29F",
+    "name": "RAZ. VERBAL(I+10/F-20)",
+    "short_name": "RV",
+    "uid": "b0644ba8-54c0-4cc3-9e53-9b28aab1b670"
+  },
+  {
+    "id": 1,
+    "source_id": "AD093AD8B62F2B86",
+    "name": "ALGEBRA",
+    "short_name": "AL",
+    "uid": "0ad220cc-0d66-4963-974c-9f94026ed061"
+  },
+  {
+    "id": 2,
+    "source_id": "8559A7067AE69C2C",
+    "name": "ALGEBRA(E0)",
+    "short_name": "AL",
+    "uid": "d457e79f-afd2-439c-be13-7ff63fcde2e7"
+  },
+  {
+    "id": 3,
+    "source_id": "E082E86545E7CE7E",
+    "name": "ALGEBRA(E0/F+30)",
+    "short_name": "AL",
+    "uid": "dcf9d4c2-3607-45f7-98ad-338371c32975"
+  },
+  {
+    "id": 4,
+    "source_id": "D4B005B9FB9E6E97",
+    "name": "ALGEBRA(E0/I-10/F-10)",
+    "short_name": "AL",
+    "uid": "6146ffc2-3187-4b43-8b79-f18b191b2d19"
+  },
+  {
+    "id": 5,
+    "source_id": "018C0EBC66780222",
+    "name": "ALGEBRA(E0/I+10/F+10)",
+    "short_name": "AL",
+    "uid": "f04572f6-4c7b-4724-b296-42538b56f9d1"
+  },
+  {
+    "id": 6,
+    "source_id": "893CC0B3E50F8C79",
+    "name": "ALGEBRA(E0/I+20/F+20)",
+    "short_name": "AL",
+    "uid": "2079a8aa-082e-4d18-9fd9-96612875e2d0"
+  },
+  {
+    "id": 7,
+    "source_id": "678477B0C630014F",
+    "name": "ALGEBRA(F-10)",
+    "short_name": "AL",
+    "uid": "b5c85891-3293-403b-a1a9-4b3059192dae"
+  },
+  {
+    "id": 8,
+    "source_id": "4F5C351EDB1E0BF6",
+    "name": "ALGEBRA(F+30)",
+    "short_name": "AL",
+    "uid": "b947bf21-be7c-4359-a6ac-9ea29964db62"
+  },
+  {
+    "id": 9,
+    "source_id": "EB356D84CEF47408",
+    "name": "ALGEBRA(I-10/F-10)",
+    "short_name": "AL",
+    "uid": "1d796855-9761-422b-9095-a1cae2a44483"
+  },
+  {
+    "id": 10,
+    "source_id": "F50DD5850CF4B4D4",
+    "name": "ALGEBRA(I+10)",
+    "short_name": "AL",
+    "uid": "73e0fc53-1a0a-4406-bc01-cc0edfc3bc19"
+  },
+  {
+    "id": 11,
+    "source_id": "C20F7FDD4EF5B980",
+    "name": "ALGEBRA(I+10/F+10)",
+    "short_name": "AL",
+    "uid": "3c355029-bdea-44f5-805d-f35094ee1447"
+  },
+  {
+    "id": 12,
+    "source_id": "8AEEEBC256E1475C",
+    "name": "ALGEBRA(I+20/F+20)",
+    "short_name": "AL",
+    "uid": "674fc76b-8dd6-40f0-862c-3c9f0b802376"
+  },
+  {
+    "id": 13,
+    "source_id": "1E75A53AA2DBEAAC",
+    "name": "ALGEBRA(I+30/F+30)",
+    "short_name": "AL",
+    "uid": "4c7a1b61-6790-44e8-9f17-6fdc0a1eb389"
+  },
+  {
+    "id": 14,
+    "source_id": "3AFBD648EA40AFCF",
+    "name": "ALMUERZO",
+    "short_name": "ALM",
+    "uid": "f2b26fce-5d2f-428a-853d-ad13044092b0"
+  },
+  {
+    "id": 15,
+    "source_id": "687BEC908205177A",
+    "name": "ANATOMIA",
+    "short_name": "AN",
+    "uid": "a240f4d5-d154-43ab-8616-704b1fe2beb6"
+  },
+  {
+    "id": 16,
+    "source_id": "6123CEECB9C636D3",
+    "name": "ANATOMIA(E0)",
+    "short_name": "AN",
+    "uid": "a69096d4-7560-4f58-b143-361c5a26f846"
+  },
+  {
+    "id": 17,
+    "source_id": "F170B4F64EDE01BC",
+    "name": "ANATOMIA(F-10)",
+    "short_name": "AN",
+    "uid": "7f5e4448-2c9d-44d6-a772-3cc3e93a843b"
+  },
+  {
+    "id": 18,
+    "source_id": "0EF32CBA22428AEF",
+    "name": "ANATOMIA(F+30)",
+    "short_name": "AN",
+    "uid": "ff8d62c8-b96c-4a84-9ab9-8a8fe2699ae4"
+  },
+  {
+    "id": 19,
+    "source_id": "AFE32DDB73FD6182",
+    "name": "ANATOMIA(I+15/F+15)",
+    "short_name": "AN",
+    "uid": "f32c76ba-e45d-4ee2-8680-a153433a65e4"
+  },
+  {
+    "id": 20,
+    "source_id": "572093B9AC207A59",
+    "name": "ANATOMIA(I+30/F+30)",
+    "short_name": "AN",
+    "uid": "1f6d6fe1-0239-4566-aa1d-74782b7de6bf"
+  },
+  {
+    "id": 21,
+    "source_id": "3D17B157E67BCF96",
+    "name": "ARITMETICA",
+    "short_name": "AR",
+    "uid": "f35c9439-9bfe-4e16-a9bb-06e3d77d6cdd"
+  },
+  {
+    "id": 22,
+    "source_id": "6B8301FDC73DA46B",
+    "name": "ARITMETICA(E0)",
+    "short_name": "AR",
+    "uid": "21f82883-8536-45a5-8a77-0030ddc5479d"
+  },
+  {
+    "id": 23,
+    "source_id": "05358916E9424009",
+    "name": "ARITMETICA(E0/F+30)",
+    "short_name": "AR",
+    "uid": "0f785dd4-9eef-466b-8181-55f6e4de8b12"
+  },
+  {
+    "id": 24,
+    "source_id": "72DE3A7CD4695CDB",
+    "name": "ARITMETICA(E0/I-10/F-10)",
+    "short_name": "AR",
+    "uid": "d4e36b45-dd30-4fd4-ac36-ebf620978141"
+  },
+  {
+    "id": 25,
+    "source_id": "D903259366F46F5F",
+    "name": "ARITMETICA(E0/I+10/F+10)",
+    "short_name": "AR",
+    "uid": "cb5ed1fd-2329-4db6-b4a3-88a7b5ba3d52"
+  },
+  {
+    "id": 26,
+    "source_id": "2961ACA8B700DF9B",
+    "name": "ARITMETICA(F-10)",
+    "short_name": "AR",
+    "uid": "3d9dcf5a-565d-4ce9-8eb3-5b568f7fb0eb"
+  },
+  {
+    "id": 27,
+    "source_id": "AEB55F63E628702C",
+    "name": "ARITMETICA(F+30)",
+    "short_name": "AR",
+    "uid": "2eac757c-4d2f-433c-adde-c5f36aa6faa9"
+  },
+  {
+    "id": 28,
+    "source_id": "FDEAF90995F8B511",
+    "name": "ARITMETICA(I-10/F-10)",
+    "short_name": "AR",
+    "uid": "1bb3805b-33f4-4950-8406-c38fa03a16e3"
+  },
+  {
+    "id": 29,
+    "source_id": "BF401386AD09E5DC",
+    "name": "ARITMETICA(I+10)",
+    "short_name": "AR",
+    "uid": "cb5110b0-c2f5-4e33-ba54-7ab97afd3d34"
+  },
+  {
+    "id": 30,
+    "source_id": "237DEB9C040F12BE",
+    "name": "ARITMETICA(I+10/F-10)",
+    "short_name": "AR",
+    "uid": "d4711bd9-c7e5-4c26-9413-6f8913079c72"
+  },
+  {
+    "id": 31,
+    "source_id": "DD456C1E10003C0E",
+    "name": "ARITMETICA(I+10/F+10)",
+    "short_name": "AR",
+    "uid": "d543248d-26bc-4e9d-bbdf-fefc70435844"
+  },
+  {
+    "id": 32,
+    "source_id": "B426D6AA3B9A990F",
+    "name": "ARITMETICA(I+20/F+20)",
+    "short_name": "AR",
+    "uid": "13fd64e4-49ad-44f3-b7bd-3512561e6165"
+  },
+  {
+    "id": 33,
+    "source_id": "A6E9780074A1F584",
+    "name": "ARITMETICA(I+30/F+30)",
+    "short_name": "AR",
+    "uid": "b2e24d54-7a07-4340-8a67-fc25242d6852"
+  },
+  {
+    "id": 34,
+    "source_id": "82AEB437EB1867D4",
+    "name": "BIOLOGIA",
+    "short_name": "BI",
+    "uid": "84758a42-ed33-4c49-9cc4-82467aa110e4"
+  },
+  {
+    "id": 35,
+    "source_id": "122A95FF895DD1E8",
+    "name": "BIOLOGIA(E0)",
+    "short_name": "BI",
+    "uid": "b872957e-9769-430f-bda2-80c420e51243"
+  },
+  {
+    "id": 36,
+    "source_id": "51F0728D557A44DB",
+    "name": "BIOLOGIA(E0/F-10)",
+    "short_name": "BI",
+    "uid": "1688f5d3-e734-43ff-8aaa-552e03db71d1"
+  },
+  {
+    "id": 37,
+    "source_id": "D3ABE3F33BCCCB94",
+    "name": "BIOLOGIA(E0/F+30)",
+    "short_name": "BI",
+    "uid": "54adac39-b62d-4e1d-9705-1a7869ffebae"
+  },
+  {
+    "id": 38,
+    "source_id": "B2BD1769D490DC25",
+    "name": "BIOLOGIA(E0/I+10/F+10)",
+    "short_name": "BI",
+    "uid": "d1e8c871-76ff-4534-9216-1c823f115c7c"
+  },
+  {
+    "id": 39,
+    "source_id": "7E5F1D2798C87D62",
+    "name": "BIOLOGIA(E0/I+15/F+15)",
+    "short_name": "BI",
+    "uid": "18d93d91-466c-436d-9a26-fde61e0c909d"
+  },
+  {
+    "id": 40,
+    "source_id": "8CA7F4675011F910",
+    "name": "BIOLOGIA(F-10)",
+    "short_name": "BI",
+    "uid": "1550890e-669e-4681-9f50-c55e6773e099"
+  },
+  {
+    "id": 41,
+    "source_id": "B04C59438A72CF7C",
+    "name": "BIOLOGIA(F+30)",
+    "short_name": "BI",
+    "uid": "4ba2f6cd-de1a-49ae-90fe-1c86cff14e91"
+  },
+  {
+    "id": 42,
+    "source_id": "101105B8619A70A4",
+    "name": "BIOLOGIA(I-10/F-10)",
+    "short_name": "BI",
+    "uid": "5bf3b3a5-4d9f-45dd-aaf6-4521f4b4fbec"
+  },
+  {
+    "id": 43,
+    "source_id": "9DC048084A4A9A15",
+    "name": "BIOLOGIA(I-20/F-20)",
+    "short_name": "BI",
+    "uid": "e0950841-379e-4796-b1e2-91d0903cafc5"
+  },
+  {
+    "id": 44,
+    "source_id": "41D77CDCA525645D",
+    "name": "BIOLOGIA(I+10)",
+    "short_name": "BI",
+    "uid": "40028e8f-04cd-4de1-9df2-803c04dd2187"
+  },
+  {
+    "id": 45,
+    "source_id": "ECAE3FD5AB117248",
+    "name": "BIOLOGIA(I+15/F+15)",
+    "short_name": "BI",
+    "uid": "d7177b23-d596-4179-b488-4d4fd5889a4f"
+  },
+  {
+    "id": 46,
+    "source_id": "0B2DA3AB91665532",
+    "name": "BIOLOGIA(I+30/F+30)",
+    "short_name": "BI",
+    "uid": "c922ce21-566d-4379-a68f-e5b6fd167f26"
+  },
+  {
+    "id": 47,
+    "source_id": "048B032B9DD190AD",
+    "name": "CIVICA",
+    "short_name": "CI",
+    "uid": "50f0e14c-6b39-4d35-80e3-3092d939e0aa"
+  },
+  {
+    "id": 48,
+    "source_id": "E2578960C90BCAA3",
+    "name": "CIVICA(E0)",
+    "short_name": "CI",
+    "uid": "20af5f54-e1f5-4875-bb7b-69633daa4abf"
+  },
+  {
+    "id": 49,
+    "source_id": "3DEA49759D35A41F",
+    "name": "CIVICA(F-10)",
+    "short_name": "CI",
+    "uid": "c401653e-e912-4242-9a6c-a61da3eec460"
+  },
+  {
+    "id": 50,
+    "source_id": "306C60B18B8155C4",
+    "name": "CIVICA(F+30)",
+    "short_name": "CI",
+    "uid": "09971efe-042d-4939-b558-1b8e12a133ea"
+  },
+  {
+    "id": 51,
+    "source_id": "0FCB0FF729BBAECA",
+    "name": "CIVICA(I-10/F-10)",
+    "short_name": "CI",
+    "uid": "2461cc83-5261-479a-89a0-274cbfab6bc8"
+  },
+  {
+    "id": 52,
+    "source_id": "791626FFD2EEA805",
+    "name": "CIVICA(I+10)",
+    "short_name": "CI",
+    "uid": "3a9d2a41-6746-4095-9092-469b75314570"
+  },
+  {
+    "id": 53,
+    "source_id": "8DCFFAE8F560A671",
+    "name": "CIVICA(I+10/F+10)",
+    "short_name": "CI",
+    "uid": "79270cf0-776e-4874-9e35-57ed55baf689"
+  },
+  {
+    "id": 54,
+    "source_id": "FAD606C3EF695481",
+    "name": "CIVICA(I+15/F+45)",
+    "short_name": "CI",
+    "uid": "89cb3254-65ef-45b5-8eed-8c26140c660e"
+  },
+  {
+    "id": 55,
+    "source_id": "CFEB3D500BC8BDE4",
+    "name": "CIVICA(I+30/F+30)",
+    "short_name": "CI",
+    "uid": "93a2c559-e536-4292-98ec-0d685ea0b0ac"
+  },
+  {
+    "id": 56,
+    "source_id": "BCE8981AED763433",
+    "name": "ECONOMIA",
+    "short_name": "EC",
+    "uid": "c44e1803-332e-4322-a61a-5358bfd43e62"
+  },
+  {
+    "id": 57,
+    "source_id": "C6275E79383811F8",
+    "name": "ECONOMIA(E0)",
+    "short_name": "EC",
+    "uid": "6cddc1cb-efb0-43b5-932a-9e1016558a52"
+  },
+  {
+    "id": 58,
+    "source_id": "6596CF7E75FC4562",
+    "name": "ECONOMIA(E0/F+30)",
+    "short_name": "EC",
+    "uid": "fccfa41d-9d58-42ae-a043-d1ab43b963ea"
+  },
+  {
+    "id": 59,
+    "source_id": "A0B86CB7AE26206F",
+    "name": "ECONOMIA(E0/I-10/F-10)",
+    "short_name": "EC",
+    "uid": "382cf400-9fb9-45ae-be62-fe736fd1a9be"
+  },
+  {
+    "id": 60,
+    "source_id": "88AB733A774276F5",
+    "name": "ECONOMIA(F-10)",
+    "short_name": "EC",
+    "uid": "103002a1-1406-4d58-87f3-d73039422791"
+  },
+  {
+    "id": 61,
+    "source_id": "E6298C610CFB9B06",
+    "name": "ECONOMIA(F+30)",
+    "short_name": "EC",
+    "uid": "bdb9c67d-4394-4fd4-8b10-9525ad8cf552"
+  },
+  {
+    "id": 62,
+    "source_id": "009F787407E8A311",
+    "name": "ECONOMIA(I+10)",
+    "short_name": "EC",
+    "uid": "d910d20a-5fb0-4876-a88e-10cb5bd499fb"
+  },
+  {
+    "id": 63,
+    "source_id": "271DBAB08A01164A",
+    "name": "ECONOMIA(I+10/F+10)",
+    "short_name": "EC",
+    "uid": "efa8849d-10da-410e-a0a9-6016ff049cb9"
+  },
+  {
+    "id": 64,
+    "source_id": "CF6F5BA8020319F5",
+    "name": "ECONOMIA(I+15/F+15)",
+    "short_name": "EC",
+    "uid": "e4f05bf0-c299-4ad9-b2e8-70fcf4402d90"
+  },
+  {
+    "id": 65,
+    "source_id": "A6B585A1FDC77AB8",
+    "name": "ECONOMIA(I+15/F+45)",
+    "short_name": "EC",
+    "uid": "ef4804b3-3ac1-4f0d-9404-fb14c42049ab"
+  },
+  {
+    "id": 66,
+    "source_id": "AAF23409526A5052",
+    "name": "EXSE",
+    "short_name": "EXSE",
+    "uid": "9c48e89a-2a99-4eda-943a-41a95e64e14f"
+  },
+  {
+    "id": 67,
+    "source_id": "184A9493194CA08F",
+    "name": "EXSI",
+    "short_name": "EXSI",
+    "uid": "9fc3754d-a81d-431a-9a4f-c15e870970e8"
+  },
+  {
+    "id": 68,
+    "source_id": "4F8DCAEF51E99708",
+    "name": "FILOSOFIA",
+    "short_name": "FL",
+    "uid": "17bca4f0-5175-4a33-943f-fa480e4a7b3d"
+  },
+  {
+    "id": 69,
+    "source_id": "A0411EBB2E54DE9F",
+    "name": "FILOSOFIA(E0)",
+    "short_name": "FL",
+    "uid": "1dff8a95-a470-40fe-be1f-827daa23a665"
+  },
+  {
+    "id": 70,
+    "source_id": "F1E79AAB547540CE",
+    "name": "FILOSOFIA(E0/F+30)",
+    "short_name": "FL",
+    "uid": "08fcfdf9-0826-4550-8a39-7f5addeb0ab6"
+  },
+  {
+    "id": 71,
+    "source_id": "6D4BE9DBAB06B9F9",
+    "name": "FILOSOFIA(E0/I-10/F-10)",
+    "short_name": "FL",
+    "uid": "92f4bd2e-1959-4c6a-8726-a65741bf8af0"
+  },
+  {
+    "id": 72,
+    "source_id": "64036E4B51817440",
+    "name": "FILOSOFIA(F-10)",
+    "short_name": "FL",
+    "uid": "c89e960d-fa38-43ce-8dfe-774b7cd6389a"
+  },
+  {
+    "id": 73,
+    "source_id": "54AB2890D400B407",
+    "name": "FILOSOFIA(F+30)",
+    "short_name": "FL",
+    "uid": "c109d099-fb35-4fba-a417-4a6aeaa47b9f"
+  },
+  {
+    "id": 74,
+    "source_id": "C852EE7E17185E9E",
+    "name": "FILOSOFIA(I+10/F+10)",
+    "short_name": "FL",
+    "uid": "76994569-6011-4338-9a97-eaea0b922841"
+  },
+  {
+    "id": 75,
+    "source_id": "F581E160A4724EF3",
+    "name": "FILOSOFIA(I+15/F+15)",
+    "short_name": "FL",
+    "uid": "37844790-9540-4796-82fc-32692d60a101"
+  },
+  {
+    "id": 76,
+    "source_id": "26F5121F0C71CE73",
+    "name": "FISICA",
+    "short_name": "FI",
+    "uid": "9f386eed-2283-4f6f-a28f-08184dcab880"
+  },
+  {
+    "id": 77,
+    "source_id": "B5312E8072661CBF",
+    "name": "FISICA(E0)",
+    "short_name": "FI",
+    "uid": "a78364f6-58d0-4228-a25d-798ffaeadf82"
+  },
+  {
+    "id": 78,
+    "source_id": "53E96FA6756D6247",
+    "name": "FISICA(E0/F-10)",
+    "short_name": "FI",
+    "uid": "6cbdaf75-8f8e-4acf-96a2-53db5fdc7ce4"
+  },
+  {
+    "id": 79,
+    "source_id": "EE7BF9128F86F942",
+    "name": "FISICA(E0/F+30)",
+    "short_name": "FI",
+    "uid": "e7f3dc36-8b7d-48c4-a7e0-011cf748bcee"
+  },
+  {
+    "id": 80,
+    "source_id": "DFC3FFCEC2062346",
+    "name": "FISICA(E0/I-10/F-10)",
+    "short_name": "FI",
+    "uid": "2a39e0ee-bcb6-48d1-852a-7ca15090d312"
+  },
+  {
+    "id": 81,
+    "source_id": "C20C2672B580071E",
+    "name": "FISICA(E0/I+10/F+10)",
+    "short_name": "FI",
+    "uid": "e9177034-390d-4235-a0a5-b7b44862909e"
+  },
+  {
+    "id": 82,
+    "source_id": "7175082236F6AC71",
+    "name": "FISICA(E0/I+30/F+30)",
+    "short_name": "FI",
+    "uid": "ccc11f41-1669-4696-b045-7d1d0e0f7105"
+  },
+  {
+    "id": 83,
+    "source_id": "7A93FE1C8073A16C",
+    "name": "FISICA(F-10)",
+    "short_name": "FI",
+    "uid": "b7d3ef94-838d-4da8-a103-dad69b67ee8d"
+  },
+  {
+    "id": 84,
+    "source_id": "B5B529331AEF06A5",
+    "name": "FISICA(F+30)",
+    "short_name": "FI",
+    "uid": "0bfd70f0-85bc-4e8a-b5f7-eac938b4385b"
+  },
+  {
+    "id": 85,
+    "source_id": "B1A2204EDA13D3F6",
+    "name": "FISICA(I+10)",
+    "short_name": "FI",
+    "uid": "5ec4dfda-e432-4124-b6ea-872cdf2bb336"
+  },
+  {
+    "id": 86,
+    "source_id": "9FE1B513301A9631",
+    "name": "FISICA(I+10/F+10)",
+    "short_name": "FI",
+    "uid": "8360e3fb-f9b5-4202-9f5d-4db59ce74f56"
+  },
+  {
+    "id": 87,
+    "source_id": "EEB0C808DB0D08D0",
+    "name": "FISICA(I+30/F+30)",
+    "short_name": "FI",
+    "uid": "808cb8b1-fd31-44bd-b054-5ea740e09c33"
+  },
+  {
+    "id": 88,
+    "source_id": "4A5AFF8AAC83F043",
+    "name": "GEOGRAFIA",
+    "short_name": "GF",
+    "uid": "c3399d88-cdbf-4869-82a6-34304494ea3c"
+  },
+  {
+    "id": 89,
+    "source_id": "997005B8FD8CA3D4",
+    "name": "GEOGRAFIA (E0)",
+    "short_name": "GF",
+    "uid": "4a5796c7-1d7a-4f70-9a57-1e7cac3a5d51"
+  },
+  {
+    "id": 90,
+    "source_id": "0D9F940891952129",
+    "name": "GEOGRAFIA (E0/F+30)",
+    "short_name": "GF",
+    "uid": "cd084c1b-1a45-449a-b0c4-923584c0c50a"
+  },
+  {
+    "id": 91,
+    "source_id": "7192C345799D2CEC",
+    "name": "GEOGRAFIA(E0/I-10/F-10)",
+    "short_name": "GF",
+    "uid": "b36ad98c-08b3-4860-b3fa-b1353845b555"
+  },
+  {
+    "id": 92,
+    "source_id": "D17E2569B1DE78D7",
+    "name": "GEOGRAFIA(F-10)",
+    "short_name": "GF",
+    "uid": "9eefd7bf-b00a-47a0-a31f-0494bf1488d2"
+  },
+  {
+    "id": 93,
+    "source_id": "D7B9EC7107BC6964",
+    "name": "GEOGRAFIA(F-30)",
+    "short_name": "GF",
+    "uid": "c808ba86-0a78-4ed2-a9f0-738fdd2055e3"
+  },
+  {
+    "id": 94,
+    "source_id": "2499CBA665076F5C",
+    "name": "GEOGRAFIA(F+30)",
+    "short_name": "GF",
+    "uid": "1e5d1b25-9ddb-4756-ad55-954e2eba2af5"
+  },
+  {
+    "id": 95,
+    "source_id": "5A063A6B6E90366A",
+    "name": "GEOGRAFIA(I+10/F+10)",
+    "short_name": "GF",
+    "uid": "9ef7447a-e07d-4cf8-ae72-be22c0eb08e4"
+  },
+  {
+    "id": 96,
+    "source_id": "527E5D1E3BB15C03",
+    "name": "GEOGRAFIA(I+15/F+15)",
+    "short_name": "GF",
+    "uid": "973a5a3b-6f02-4954-aadd-c0544b87a8fd"
+  },
+  {
+    "id": 97,
+    "source_id": "A3D0B196A482D6B9",
+    "name": "GEOMETRIA",
+    "short_name": "GE",
+    "uid": "7e1ab852-5356-4d32-8677-6ccbf93534bc"
+  },
+  {
+    "id": 98,
+    "source_id": "44E02C4B91524FA5",
+    "name": "GEOMETRIA (E0)",
+    "short_name": "GE",
+    "uid": "5cb1b360-1a75-4e4b-9e45-5410707c3670"
+  },
+  {
+    "id": 99,
+    "source_id": "6B80A628C1BDF9F6",
+    "name": "GEOMETRIA (E0/F+30)",
+    "short_name": "GE",
+    "uid": "0709f7e4-899d-43b2-af7b-7798b6fce3b7"
+  },
+  {
+    "id": 100,
+    "source_id": "56C94315379C77A5",
+    "name": "GEOMETRIA (E0/I-10/F-10)",
+    "short_name": "GE",
+    "uid": "66b98749-420d-475d-a2c8-2a3b4dd61eb9"
+  },
+  {
+    "id": 101,
+    "source_id": "11954E2A999C7DC7",
+    "name": "GEOMETRIA(E0/I+10/F+10)",
+    "short_name": "GE",
+    "uid": "6bc06bf3-3cfe-4f2a-b88c-2cccdf7eec74"
+  },
+  {
+    "id": 102,
+    "source_id": "670746BB642A84A6",
+    "name": "GEOMETRIA(F-10)",
+    "short_name": "GE",
+    "uid": "5d9fb2d1-23d6-485f-8431-19bb4e354832"
+  },
+  {
+    "id": 103,
+    "source_id": "4832F886D2D78C2E",
+    "name": "GEOMETRIA(F+30)",
+    "short_name": "GE",
+    "uid": "50b0f6c6-c00e-46fc-8f0d-1f0af26ac835"
+  },
+  {
+    "id": 104,
+    "source_id": "9CC199E820D0EC03",
+    "name": "GEOMETRIA(I+10)",
+    "short_name": "GE",
+    "uid": "d266e3d9-a393-400f-aecd-31b62b1c4fe5"
+  },
+  {
+    "id": 105,
+    "source_id": "DA8473301AE302C3",
+    "name": "GEOMETRIA(I+10/F-10)",
+    "short_name": "GE",
+    "uid": "705e92b6-678e-450b-b1bd-edd46edc51fc"
+  },
+  {
+    "id": 106,
+    "source_id": "C9AC55319199DC8D",
+    "name": "GEOMETRIA(I+10/F+10)",
+    "short_name": "GE",
+    "uid": "8a1944b7-e977-48ea-80c2-02577b269e12"
+  },
+  {
+    "id": 107,
+    "source_id": "14050BE0ED8E06C9",
+    "name": "GEOMETRIA(I+15/F+15)",
+    "short_name": "GE",
+    "uid": "ec72c941-6c69-4273-97e1-9daade0c92eb"
+  },
+  {
+    "id": 108,
+    "source_id": "2E7BC8890EFB4900",
+    "name": "GEOMETRIA(I+15/F+45)",
+    "short_name": "GE",
+    "uid": "93d5a522-fc11-4791-9ec2-280769e9c7eb"
+  },
+  {
+    "id": 109,
+    "source_id": "FD1058DA6AF2B78E",
+    "name": "GEOMETRIA(I+20/F+20)",
+    "short_name": "GE",
+    "uid": "f9ec8e1d-c322-4d63-a292-0b085e6d96b1"
+  },
+  {
+    "id": 110,
+    "source_id": "AF79D65F9728917B",
+    "name": "GEOMETRIA(I+30/F+30)",
+    "short_name": "GE",
+    "uid": "ae7f55ca-23f4-4c21-a8bd-2b237c1e5be9"
+  },
+  {
+    "id": 111,
+    "source_id": "71F203F425EF2605",
+    "name": "HISTORIA DEL PERU",
+    "short_name": "HP",
+    "uid": "a159ddf5-2e1f-4c22-9a30-845a2deb635d"
+  },
+  {
+    "id": 112,
+    "source_id": "1BA9BABE85AAFB3C",
+    "name": "HISTORIA DEL PERU(E0)",
+    "short_name": "HP",
+    "uid": "7205190e-d1c0-467a-ab3f-bee2b448f234"
+  },
+  {
+    "id": 113,
+    "source_id": "83A0336A5860D606",
+    "name": "HISTORIA DEL PERU(E0/F+30)",
+    "short_name": "HP",
+    "uid": "f00a4959-b289-4d07-9cbe-5126d2da671b"
+  },
+  {
+    "id": 114,
+    "source_id": "E884BB2FC2E7501B",
+    "name": "HISTORIA DEL PERU(E0/I-10/F-10)",
+    "short_name": "HP",
+    "uid": "2ddb96e1-6de4-4914-9788-42ba0c7db663"
+  },
+  {
+    "id": 115,
+    "source_id": "F7D30AB3DD95FAB9",
+    "name": "HISTORIA DEL PERU(F-10)",
+    "short_name": "HP",
+    "uid": "c2c4b375-0be8-48aa-a580-0b9b70b29fea"
+  },
+  {
+    "id": 116,
+    "source_id": "8488098ECEE528EC",
+    "name": "HISTORIA DEL PERU(F+30)",
+    "short_name": "HP",
+    "uid": "e04edc93-fab1-479d-8ac2-5f742e31d8ae"
+  },
+  {
+    "id": 117,
+    "source_id": "D8CA4D1C364AA6DB",
+    "name": "HISTORIA DEL PERU(I+10/F+10)",
+    "short_name": "HP",
+    "uid": "f23d7707-d5fc-430e-a54c-c6e7f39d8bd5"
+  },
+  {
+    "id": 118,
+    "source_id": "14578751F8EC00D9",
+    "name": "HISTORIA DEL PERU(I+15/F+15)",
+    "short_name": "HP",
+    "uid": "5f048ba4-237b-42be-b7b8-85f5639da924"
+  },
+  {
+    "id": 119,
+    "source_id": "C4CA4AC48C3F0B23",
+    "name": "HISTORIA UNIVERSAL",
+    "short_name": "HU",
+    "uid": "b89a9e0e-4d96-47ea-b7dc-ffda16502aec"
+  },
+  {
+    "id": 120,
+    "source_id": "2A8EEF65A4C80F9E",
+    "name": "HISTORIA UNIVERSAL(E0)",
+    "short_name": "HU",
+    "uid": "6e066397-835c-4916-b825-ebf1c26ee2b2"
+  },
+  {
+    "id": 121,
+    "source_id": "5AFB6B2FAF916664",
+    "name": "HISTORIA UNIVERSAL(E0/F+30)",
+    "short_name": "HU",
+    "uid": "60b570d2-7ec3-4e58-8ed5-0d29ad8b1145"
+  },
+  {
+    "id": 122,
+    "source_id": "26D0ADE3CC9A6DFE",
+    "name": "HISTORIA UNIVERSAL(E0/I-10/F-10)",
+    "short_name": "HU",
+    "uid": "41d78573-5417-4bca-baa1-0b8282d5227d"
+  },
+  {
+    "id": 123,
+    "source_id": "B0110B602ABCC0A5",
+    "name": "HISTORIA UNIVERSAL(F-10)",
+    "short_name": "HU",
+    "uid": "677dc9cc-bc95-4906-ab3e-5f90f415a79e"
+  },
+  {
+    "id": 124,
+    "source_id": "B9F41556A3B34F49",
+    "name": "HISTORIA UNIVERSAL(F+30)",
+    "short_name": "HU",
+    "uid": "15c4bb6e-ad06-4ae9-b702-a6d773fb677f"
+  },
+  {
+    "id": 125,
+    "source_id": "2943A05BD91EDB90",
+    "name": "HISTORIA UNIVERSAL(I+10/F+10)",
+    "short_name": "HU",
+    "uid": "ea16bce0-bd74-4cd6-b537-10ce700b67b3"
+  },
+  {
+    "id": 126,
+    "source_id": "3F5266D23F915F0E",
+    "name": "HISTORIA UNIVERSAL(I+15/F+15)",
+    "short_name": "HU",
+    "uid": "6c4116fd-60a6-49df-baf4-9ef3210b07ec"
+  },
+  {
+    "id": 127,
+    "source_id": "F8E1187D5571C3C9",
+    "name": "INGLES",
+    "short_name": "IN",
+    "uid": "7e0d8b98-e91c-4c94-800e-3603eb2d360c"
+  },
+  {
+    "id": 128,
+    "source_id": "EA73824B59903D98",
+    "name": "INGLES(F-10)",
+    "short_name": "IN",
+    "uid": "85aa8357-21f5-4897-b15c-1fa459b214b9"
+  },
+  {
+    "id": 129,
+    "source_id": "2016DE4977C04E50",
+    "name": "INGLES(F+30)",
+    "short_name": "IN",
+    "uid": "cc50de66-e293-4962-a8fb-adf02960a0f5"
+  },
+  {
+    "id": 130,
+    "source_id": "AB88FD9CBFA1CA83",
+    "name": "INGLES(I-10/F-10)",
+    "short_name": "IN",
+    "uid": "c34c169b-eda9-4fcc-9b14-83e139c0fa00"
+  },
+  {
+    "id": 131,
+    "source_id": "88B09FA5CC0366B5",
+    "name": "INGLES(I+10/F+10)",
+    "short_name": "IN",
+    "uid": "a3719d4e-9aea-4d1c-b20d-66edb3aced4e"
+  },
+  {
+    "id": 132,
+    "source_id": "B3702DBB648F4A8C",
+    "name": "INGLES(I+30/F+30)",
+    "short_name": "IN",
+    "uid": "f9e5a461-1383-4ef3-b7e4-37d2a7c6ef2b"
+  },
+  {
+    "id": 133,
+    "source_id": "CC6DAB5BB43C1E7D",
+    "name": "LENGUAJE",
+    "short_name": "LE",
+    "uid": "1c9b9bd2-2052-4e4c-adc3-706d4da6192f"
+  },
+  {
+    "id": 134,
+    "source_id": "3C3159C4A0CA3D00",
+    "name": "LENGUAJE(E0)",
+    "short_name": "LE",
+    "uid": "7a289af2-3b01-4a20-b59c-ccae9e8d63fa"
+  },
+  {
+    "id": 135,
+    "source_id": "DAAF4D6E454B1B06",
+    "name": "LENGUAJE(E0/F-10)",
+    "short_name": "LE",
+    "uid": "6c351eb7-fafb-4ed4-9d8c-7a7a9e1ba645"
+  },
+  {
+    "id": 136,
+    "source_id": "28341BA7253A46F0",
+    "name": "LENGUAJE(E0/F+30)",
+    "short_name": "LE",
+    "uid": "9f61feb6-68bd-4634-ae7e-0e4ff26d49e2"
+  },
+  {
+    "id": 137,
+    "source_id": "78F8F463A371FC4B",
+    "name": "LENGUAJE(E0/I-10/F-10)",
+    "short_name": "LE",
+    "uid": "c42745fc-49c1-4ae3-a6bb-a6cb466bc4cd"
+  },
+  {
+    "id": 138,
+    "source_id": "03F495FF6524D02B",
+    "name": "LENGUAJE(E0/I+10/F+10)",
+    "short_name": "LE",
+    "uid": "51a7b0c4-12a6-494b-bf6f-74b1d1c53ad4"
+  },
+  {
+    "id": 139,
+    "source_id": "66034586C2D635C3",
+    "name": "LENGUAJE(F-10)",
+    "short_name": "LE",
+    "uid": "79da54ba-c74e-4ebc-9675-a6d97bf27974"
+  },
+  {
+    "id": 140,
+    "source_id": "A76A5436B972A480",
+    "name": "LENGUAJE(F+30)",
+    "short_name": "LE",
+    "uid": "7f6a9898-2231-40e9-981c-e5f8d47009fe"
+  },
+  {
+    "id": 141,
+    "source_id": "A546437C1E84D708",
+    "name": "LENGUAJE(I+10)",
+    "short_name": "LE",
+    "uid": "8f11b29c-9388-4cac-84f1-bc4bb17d55bc"
+  },
+  {
+    "id": 142,
+    "source_id": "CB445BB82ED29889",
+    "name": "LENGUAJE(I+10/F+10)",
+    "short_name": "LE",
+    "uid": "d9114581-bebe-4689-b6b1-48504783b1d6"
+  },
+  {
+    "id": 143,
+    "source_id": "EAA32FB2C43F131A",
+    "name": "LENGUAJE(I+30/F+30)",
+    "short_name": "LE",
+    "uid": "2b03a928-5bea-433e-bb4c-7a26fde15ad4"
+  },
+  {
+    "id": 144,
+    "source_id": "2A79954F141298C7",
+    "name": "LITERATURA",
+    "short_name": "LI",
+    "uid": "62092f3b-3b4e-4163-b3e8-3147d2c1896b"
+  },
+  {
+    "id": 145,
+    "source_id": "9F16374377CB8DF2",
+    "name": "LITERATURA (E0)",
+    "short_name": "LI",
+    "uid": "a7994a82-eafa-44cf-be58-4c303ef8974f"
+  },
+  {
+    "id": 146,
+    "source_id": "618DC19FB18E6DE0",
+    "name": "LITERATURA(E0/F+30)",
+    "short_name": "LI",
+    "uid": "7cd35a89-3773-4c6a-b402-8faca3271ed0"
+  },
+  {
+    "id": 147,
+    "source_id": "B2020BDEA9250BBF",
+    "name": "LITERATURA(E0/I-10/F-10)",
+    "short_name": "LI",
+    "uid": "e987526d-3363-448b-9656-74d65f2abf7e"
+  },
+  {
+    "id": 148,
+    "source_id": "41EBB0E735A7A528",
+    "name": "LITERATURA(F-10)",
+    "short_name": "LI",
+    "uid": "1f6f03b8-963b-457b-ab3c-7a7b93b1a3a0"
+  },
+  {
+    "id": 149,
+    "source_id": "2A245CF2E9F516EA",
+    "name": "LITERATURA(F+30)",
+    "short_name": "LI",
+    "uid": "30dc72b5-454f-44c1-9ec0-26ac8c97c8c1"
+  },
+  {
+    "id": 150,
+    "source_id": "BFEC559BD0416589",
+    "name": "LITERATURA(I+10/F+10)",
+    "short_name": "LI",
+    "uid": "11f0404b-1bcc-42d9-a780-e4af1ff0c246"
+  },
+  {
+    "id": 151,
+    "source_id": "59E5BDCC5540D1A6",
+    "name": "LITERATURA(I+15/F+15)",
+    "short_name": "LI",
+    "uid": "2fee45a6-c117-4331-ba96-90ddd117eb70"
+  },
+  {
+    "id": 152,
+    "source_id": "CD6B5D83B997E0C8",
+    "name": "PC",
+    "short_name": "PC",
+    "uid": "714f7e5b-41ff-4a41-9c71-8e05b6f679f6"
+  },
+  {
+    "id": 153,
+    "source_id": "C01A4466ED9197F8",
+    "name": "PSICOLOGIA",
+    "short_name": "PS",
+    "uid": "7df5a360-7dc3-4290-8f0f-705d1057db8a"
+  },
+  {
+    "id": 154,
+    "source_id": "B1B696D3642AD6B5",
+    "name": "PSICOLOGIA(E0)",
+    "short_name": "PS",
+    "uid": "778ef8f1-4e68-4225-b5b7-3dc48062369f"
+  },
+  {
+    "id": 155,
+    "source_id": "C7B70A437E12EC6F",
+    "name": "PSICOLOGIA(E0/F+30)",
+    "short_name": "PS",
+    "uid": "09b3ec73-af8f-41e5-b963-6e19f00f5b94"
+  },
+  {
+    "id": 156,
+    "source_id": "2C922141577DED85",
+    "name": "PSICOLOGIA(E0/I-10/F-10)",
+    "short_name": "PS",
+    "uid": "efbdb7c4-0009-471f-b375-bd7e89f1d881"
+  },
+  {
+    "id": 157,
+    "source_id": "C2B5A35931DB9452",
+    "name": "PSICOLOGIA(E0/I+10/F+10)",
+    "short_name": "PS",
+    "uid": "4440383d-5595-41fa-910b-daec61cf705c"
+  },
+  {
+    "id": 158,
+    "source_id": "646E7B83EDAC7B93",
+    "name": "PSICOLOGIA(F-10)",
+    "short_name": "PS",
+    "uid": "ea7846f5-ef70-4b7c-b8e1-d1e42bb61da3"
+  },
+  {
+    "id": 159,
+    "source_id": "37A49CD733310C55",
+    "name": "PSICOLOGIA(F+30)",
+    "short_name": "PS",
+    "uid": "064beee1-28c9-4af4-b3db-0f978d4b6197"
+  },
+  {
+    "id": 160,
+    "source_id": "6CE8C598DBEED2C5",
+    "name": "PSICOLOGIA(I+10)",
+    "short_name": "PS",
+    "uid": "be532038-03f6-4e4d-a09b-24b3052b812f"
+  },
+  {
+    "id": 161,
+    "source_id": "53E960B35602DE74",
+    "name": "PSICOLOGIA(I+10/F+10)",
+    "short_name": "PS",
+    "uid": "edda1691-2b5d-4d3a-acb7-174197a7ede2"
+  },
+  {
+    "id": 162,
+    "source_id": "5372CC2A370F9ED8",
+    "name": "PSICOLOGIA(I+30/F+30)",
+    "short_name": "PS",
+    "uid": "b8956a56-f7cb-44a5-8983-e02a57cae02d"
+  },
+  {
+    "id": 163,
+    "source_id": "A9210684DF3F2535",
+    "name": "QUIMICA",
+    "short_name": "QU",
+    "uid": "d7515942-dd87-48e7-9067-728438a96695"
+  },
+  {
+    "id": 164,
+    "source_id": "494013D0E12C0EDD",
+    "name": "QUIMICA(E0)",
+    "short_name": "QU",
+    "uid": "abe5b3a3-65a3-403d-8564-3d1e66813b6c"
+  },
+  {
+    "id": 165,
+    "source_id": "6A405A9AD25F71D8",
+    "name": "QUIMICA(E0/F-10)",
+    "short_name": "QU",
+    "uid": "cae6d6eb-3df8-4f52-81fa-24959486a7a9"
+  },
+  {
+    "id": 166,
+    "source_id": "D1311BD774A2F095",
+    "name": "QUIMICA(E0/F+30)",
+    "short_name": "QU",
+    "uid": "54431feb-e40f-4ebe-baa3-ac131e1e1abd"
+  },
+  {
+    "id": 167,
+    "source_id": "5E584C7A0E0C4926",
+    "name": "QUIMICA(E0/I-10/F-10)",
+    "short_name": "QU",
+    "uid": "e3d359ab-bbff-4991-9856-df0ac9be62ea"
+  },
+  {
+    "id": 168,
+    "source_id": "59A2B044242A3C61",
+    "name": "QUIMICA(E0/I+10/F+10)",
+    "short_name": "QU",
+    "uid": "b97e227e-995d-4b23-8182-a2ba4337a5e6"
+  },
+  {
+    "id": 169,
+    "source_id": "60813C3B16FEC62C",
+    "name": "QUIMICA(E0/I+30/F+30)",
+    "short_name": "QU",
+    "uid": "49e15f0b-059f-4a1d-88cf-087060594bd7"
+  },
+  {
+    "id": 170,
+    "source_id": "566656F1A71D0455",
+    "name": "QUIMICA(F-10)",
+    "short_name": "QU",
+    "uid": "d4e8ac50-1677-40c6-90aa-b699a20a4e40"
+  },
+  {
+    "id": 171,
+    "source_id": "459A6E212CE4EE3D",
+    "name": "QUIMICA(F+30)",
+    "short_name": "QU",
+    "uid": "af63aa0a-d20c-48f8-8564-1cacf7d9835a"
+  },
+  {
+    "id": 172,
+    "source_id": "8B0E059E8150E5A7",
+    "name": "QUIMICA(I+10)",
+    "short_name": "QU",
+    "uid": "66d1429f-7be6-4130-a715-55fa32094602"
+  },
+  {
+    "id": 173,
+    "source_id": "93D91B74BB9CAD72",
+    "name": "QUIMICA(I+30/F+30)",
+    "short_name": "QU",
+    "uid": "6c209922-5711-417f-8755-a90430d85610"
+  },
+  {
+    "id": 174,
+    "source_id": "2BF760C3EA249722",
+    "name": "RAZ. MATEMATICO",
+    "short_name": "RM",
+    "uid": "97773dc2-e33d-4450-b8a0-4c8a6b5b64c7"
+  },
+  {
+    "id": 175,
+    "source_id": "C5257B0FFFB44E25",
+    "name": "RAZ. MATEMATICO(E0)",
+    "short_name": "RM",
+    "uid": "9ad6ea77-5587-4795-b071-7cb209c30205"
+  },
+  {
+    "id": 176,
+    "source_id": "7B8CFE8DC40F410D",
+    "name": "RAZ. MATEMATICO(E0/I-10/F-10)",
+    "short_name": "RM",
+    "uid": "720dca6e-5729-4ed6-8493-ea7aa71af1a2"
+  },
+  {
+    "id": 177,
+    "source_id": "F79AE2D2744C490D",
+    "name": "RAZ. MATEMATICO(E0/I+10/F+10)",
+    "short_name": "RM",
+    "uid": "1221f09a-480d-4b03-a084-0b7f9df28db7"
+  },
+  {
+    "id": 178,
+    "source_id": "9926ED556EB78EBD",
+    "name": "RAZ. MATEMATICO(E0/I+30/F+30)",
+    "short_name": "RM",
+    "uid": "515efbfe-4d80-48fd-bbe5-90caae136b66"
+  },
+  {
+    "id": 179,
+    "source_id": "E508882703A56671",
+    "name": "RAZ. MATEMATICO(F-10)",
+    "short_name": "RM",
+    "uid": "65477b51-e143-4f39-a23d-7ae7d9c55ef3"
+  },
+  {
+    "id": 180,
+    "source_id": "11EA1EFCD36E1607",
+    "name": "RAZ. MATEMATICO(F+30)",
+    "short_name": "RM",
+    "uid": "2f9b5f3e-0b8b-4fd5-ba08-d75a50458f84"
+  },
+  {
+    "id": 181,
+    "source_id": "C00C95C6757DB7F8",
+    "name": "RAZ. MATEMATICO(I-20/F-20)",
+    "short_name": "RM",
+    "uid": "82512873-5b48-40b6-b0d3-3d0866c03a31"
+  },
+  {
+    "id": 182,
+    "source_id": "E5E11B07BE8C60C4",
+    "name": "RAZ. MATEMATICO(I+10)",
+    "short_name": "RM",
+    "uid": "022c5f39-5eca-4853-9e2e-89009697e08e"
+  },
+  {
+    "id": 183,
+    "source_id": "9775F72F4A4F579F",
+    "name": "RAZ. MATEMATICO(I+30/F+30)",
+    "short_name": "RM",
+    "uid": "e1079600-3eb3-4a20-a661-3505536aad79"
+  },
+  {
+    "id": 184,
+    "source_id": "5CC527F01180A698",
+    "name": "RAZ. VERBAL",
+    "short_name": "RV",
+    "uid": "b866e8ad-b282-4a80-add0-4c2c2adb7ab2"
+  },
+  {
+    "id": 185,
+    "source_id": "9D4BDCE374109F6F",
+    "name": "RAZ. VERBAL(E0)",
+    "short_name": "RV",
+    "uid": "f748c31a-75be-46b2-a695-dabef1ec03c7"
+  },
+  {
+    "id": 186,
+    "source_id": "873BF7C0F7E05AE7",
+    "name": "RAZ. VERBAL(E0/F+30)",
+    "short_name": "RV",
+    "uid": "4d6e26e0-9a71-4668-8e18-5ba02d306a3b"
+  },
+  {
+    "id": 187,
+    "source_id": "A281CE000A7CCB99",
+    "name": "RAZ. VERBAL(E0/I-10/F-10)",
+    "short_name": "RV",
+    "uid": "245d1cbc-2c2f-4142-b781-5d9dd03f3b47"
+  },
+  {
+    "id": 188,
+    "source_id": "8E5B59E69E48F029",
+    "name": "RAZ. VERBAL(F-10)",
+    "short_name": "RV",
+    "uid": "bc86a910-cd69-4fad-9a51-be30ec208329"
+  },
+  {
+    "id": 189,
+    "source_id": "1FDDCE73C912D846",
+    "name": "RAZ. VERBAL(F+30)",
+    "short_name": "RV",
+    "uid": "a8fc5406-c62f-42e1-bceb-0b81eed3e33c"
+  },
+  {
+    "id": 190,
+    "source_id": "77D7E3D7DA24FA04",
+    "name": "RAZ. VERBAL(I-20/F-20)",
+    "short_name": "RV",
+    "uid": "a74fd7a7-d07e-4043-b01e-e2381037d39c"
+  },
+  {
+    "id": 191,
+    "source_id": "FCC349A48806B5E8",
+    "name": "RAZ. VERBAL(I+10)",
+    "short_name": "RV",
+    "uid": "bc64447d-33e2-4286-89f1-f3ea784a7dee"
+  },
+  {
+    "id": 192,
+    "source_id": "2B75B897238C403D",
+    "name": "RAZ. VERBAL(I+10/F+10)",
+    "short_name": "RV",
+    "uid": "93623aa0-ad46-4d99-81ce-f30873715595"
+  },
+  {
+    "id": 193,
+    "source_id": "7BF00CECA0294228",
+    "name": "RAZ. VERBAL(I+15/F+15)",
+    "short_name": "RV",
+    "uid": "90be98fe-0ae3-4df7-91ce-6d611064594b"
+  },
+  {
+    "id": 194,
+    "source_id": "DEC9E2CF08AFE327",
+    "name": "RAZ. VERBAL(I+20/F+20)",
+    "short_name": "RV",
+    "uid": "d075f46d-feeb-4d6a-8789-83b0b728b77e"
+  },
+  {
+    "id": 195,
+    "source_id": "6D803537DE380DF6",
+    "name": "RECESO",
+    "short_name": "REC",
+    "uid": "496c7287-6d6b-4933-8a7e-6630d042a9bc"
+  },
+  {
+    "id": 196,
+    "source_id": "2B963CB1999CF8E5",
+    "name": "TRIGONOMETRIA",
+    "short_name": "TR",
+    "uid": "8caca3a1-5893-4374-abb7-63575d6eeed1"
+  },
+  {
+    "id": 197,
+    "source_id": "78F3114E55CC0935",
+    "name": "TRIGONOMETRIA(E0)",
+    "short_name": "TR",
+    "uid": "d899d769-9f9f-4104-847c-0ecb18c2d210"
+  },
+  {
+    "id": 198,
+    "source_id": "AD74E38165423EA0",
+    "name": "TRIGONOMETRIA(E0/F+30)",
+    "short_name": "TR",
+    "uid": "bf2bbcdd-a730-46a7-b380-46bd3fc3c913"
+  },
+  {
+    "id": 199,
+    "source_id": "D9BCDE83245F2F7C",
+    "name": "TRIGONOMETRIA(E0/I-10/F-10)",
+    "short_name": "TR",
+    "uid": "86b7a480-c41e-49a7-ab89-15b2a4050631"
+  },
+  {
+    "id": 200,
+    "source_id": "1DA79A33D584FA2E",
+    "name": "TRIGONOMETRIA(E0/I+10/F+10)",
+    "short_name": "TR",
+    "uid": "0d0764b1-08fc-41fd-a449-5e9ad8a7839b"
+  },
+  {
+    "id": 201,
+    "source_id": "D8AA1D61E50102DF",
+    "name": "TRIGONOMETRIA(F-10)",
+    "short_name": "TR",
+    "uid": "730a4479-d1cb-4ecf-9250-c55293ca6eab"
+  },
+  {
+    "id": 202,
+    "source_id": "7B39BC078098954F",
+    "name": "TRIGONOMETRIA(F+30)",
+    "short_name": "TR",
+    "uid": "986102b6-f4c3-469e-a1ad-408218bf8777"
+  },
+  {
+    "id": 203,
+    "source_id": "112F5FFE08CA2576",
+    "name": "TRIGONOMETRIA(I+10)",
+    "short_name": "TR",
+    "uid": "1cd264ef-45d5-4752-89f7-5b6641bda758"
+  },
+  {
+    "id": 204,
+    "source_id": "6A15150C17945277",
+    "name": "TRIGONOMETRIA(I+10/F+10)",
+    "short_name": "TR",
+    "uid": "ab540872-ffb6-4f55-9437-e2988759583b"
+  },
+  {
+    "id": 205,
+    "source_id": "4887711F57C28717",
+    "name": "TRIGONOMETRIA(I+15/F+15)",
+    "short_name": "TR",
+    "uid": "b1f02271-3843-458b-8953-93ebf1fef73d"
+  },
+  {
+    "id": 206,
+    "source_id": "0DE0B344F0F4C415",
+    "name": "TRIGONOMETRIA(I+15/F+45)",
+    "short_name": "TR",
+    "uid": "5c37abde-bed2-4ee9-a126-1c0ce7e9d6b7"
+  },
+  {
+    "id": 207,
+    "source_id": "D6D187536F2E37B0",
+    "name": "TRIGONOMETRIA(I+30/F+30)",
+    "short_name": "TR",
+    "uid": "401cb6dc-c92f-4454-ae6f-e6c36b6ed8a7"
+  },
+  {
+    "id": 208,
+    "source_id": "26860DEE21E91860",
+    "name": "ALGEBRA(I+15/F+15)",
+    "short_name": "AL",
+    "uid": "d5e8cf54-2594-4b3d-8bb8-78f058e42771"
+  },
+  {
+    "id": 209,
+    "source_id": "96D1260E02B2942E",
+    "name": "ARITMETICA(I+15/F+15)",
+    "short_name": "AR",
+    "uid": "91738ed1-8fcf-48b7-8b4c-e616a4a7c3dc"
+  },
+  {
+    "id": 210,
+    "source_id": "73BF091F83A61637",
+    "name": "BIOLOGIA(I+10/F-20)",
+    "short_name": "BI",
+    "uid": "251616e1-56ae-4372-be8f-6c59da3267a6"
+  },
+  {
+    "id": 211,
+    "source_id": "0004195EF79368AE",
+    "name": "BIOLOGIA(I+10/F+10)",
+    "short_name": "BI",
+    "uid": "06f366ea-cc2d-44a7-b4da-f0b938d69e3b"
+  },
+  {
+    "id": 212,
+    "source_id": "EBBD5858A4067DF5",
+    "name": "FISICA(I-10/F-40)",
+    "short_name": "FI",
+    "uid": "4386b315-8372-484a-9afa-91e73235b57c"
+  },
+  {
+    "id": 213,
+    "source_id": "FCE625DCFDDB043A",
+    "name": "GEOMETRIA(E0/F-10)",
+    "short_name": "GE",
+    "uid": "e69908d9-1c70-440a-89b8-86f9ec5b47ac"
+  },
+  {
+    "id": 214,
+    "source_id": "B5ECFA4BCD24EDA6",
+    "name": "LENGUAJE(I+15/F+15)",
+    "short_name": "LE",
+    "uid": "bbd7f29c-ea88-40d4-92e4-37b9ab2b36d8"
+  },
+  {
+    "id": 215,
+    "source_id": "F674434F316E432E",
+    "name": "PC",
+    "short_name": "PC",
+    "uid": "289854e2-3769-469b-85ec-6d97a27ce84a"
+  },
+  {
+    "id": 216,
+    "source_id": "94322B609A526D95",
+    "name": "QUIMICA(I+10/F+10)",
+    "short_name": "QU",
+    "uid": "8398af12-e976-4ca2-9856-d1cab84d9b1f"
+  },
+  {
+    "id": 217,
+    "source_id": "DA5E3D11C50C749A",
+    "name": "RAZ. VERBAL(E0/I+10/F+10)",
+    "short_name": "RV",
+    "uid": "ba0fe12e-4639-4cdf-a549-03bdd078a8cf"
+  },
+  {
+    "id": 218,
+    "source_id": "D590DE19A50DE1B0",
+    "name": "RAZ. VERBAL(I+30/F+30)",
+    "short_name": "RV",
+    "uid": "af63f3ae-d0ab-4743-82ab-d91206672806"
+  },
+  {
+    "id": 219,
+    "source_id": "4D08AE187FDF5541",
+    "name": "TRIGONOMETRIA(I-20/F-20)",
+    "short_name": "TR",
+    "uid": "893f253e-8e78-49e3-bcc1-7045a406dbda"
+  }
+]

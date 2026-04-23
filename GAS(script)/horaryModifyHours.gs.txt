@@ -1,0 +1,58 @@
+function horaryModify() {
+  let horaryLastRow = sheetMain.getLastRow() - 1;
+  let horaryLastcol = sheetMain.getLastColumn();
+  let horary = sheetMain.getRange(2, 1, horaryLastRow, horaryLastcol).getDisplayValues();
+  //let horaryByLessonsHeader = [...horaryHeader];
+  //mainColHourStart
+  //mainColHourEnd
+  if(horary.length >= 1){
+    horary.forEach((element) => {
+      let textOperator = element[mainColSubject];
+      let textOperatorTemp = textOperator.slice(-3);
+      let operator = textOperatorTemp.slice(0,-2);
+      let operatorNum = textOperatorTemp.slice(-2);
+      let timeSubject = element[mainColHourEnd];    
+      let timeNew;
+
+      if (symbols.includes(operator)) { 
+        let target = new Date("2023-01-01 " + timeSubject);
+        if(operator == '+'){
+          target.setTime(target.getTime() + (operatorNum * 60 * 1000));
+        }else{
+          target.setTime(target.getTime() - (operatorNum * 60 * 1000));
+        }
+        
+        let timeTemp = new Date(target);
+          timeNew = getTime_(timeTemp)
+        
+        element[mainColHourEnd] = timeNew;
+        element[mainColSubject] = textOperator.slice(0,-3);
+      }
+    })
+  }
+
+  // Clean Horary Grouped
+  sheetModifyHours.getRange("$A:$Z").clearContent();
+  sheetModifyHours.getRange("$A:$Z").clearContent();
+  //sheetSecond.getRange("$A:$Z").clearFormat();
+
+  // Format table Horary By Lessons
+  //sheetModifyHours.getRange(1, 1, 1, (horaryTableColumns - 3)).setBackground(cellColor)
+  //sheetModifyHours.getRange(1, 1, 1, (horaryTableColumns - 3)).setFontColor(fontColor)
+  //sheetModifyHours.getRange(1, 1, 1, (horaryTableColumns - 3)).setFontWeight("bold")
+  //sheetModifyHours.getRange(1, 1, 1, horaryByLessonsHeader.length).setValues([horaryByLessonsHeader]);
+  //sheetModifyHours.getRange(2, 1, newHorary.length, newHorary[0].length).setValues(newHorary);
+
+  // Horary Survey
+  //sheetModifyHours.getRange(1, 1, 1, (horaryTableColumns - 3)).setBackground(cellColor)
+  //sheetModifyHours.getRange(1, 1, 1, (horaryTableColumns - 3)).setFontColor(fontColor)
+  //sheetModifyHours.getRange(1, 1, 1, (horaryTableColumns - 3)).setFontWeight("bold")
+  //sheetModifyHours.getRange(1, 1, 1, horaryByLessonsHeader.length).setValues([horaryByLessonsHeader]);
+  if (Array.isArray(horary) && horary.length > 0) {
+    sheetModifyHours.getRange(2, 1, horary.length, horary[0].length).setValues(horary);
+  } else {
+    Logger.log("[horaryModifyHours] horary vacío; no se escribe.");
+  }
+
+  Logger.log("Horary By Lessons Loaded MDF")
+}

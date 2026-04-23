@@ -1,0 +1,198 @@
+// Config
+const sheetBreakName = "horaryBreak";
+const sheetBreak = ss.getSheetByName(sheetBreakName);
+
+// Data
+let teacherDayList = [];
+let horaryBreak = [];
+// let breakTime = 15; ahora solo hay un receso de 20 min (Ezequiel - 04/25/24)
+let breakTime = 20;
+let breakLesson = 1;
+let breakTotal = 0;
+let breakDay = "00:00";
+let horaryFilter = [];
+let subjectNone = ["MATERIALES","FACEBOOK"];
+let horaryTemp = [];
+
+function getBreak() {
+
+  const sheetBreakName = "horaryBreak";
+  const sheetBreak = ss.getSheetByName(sheetBreakName);
+
+  if (!sheetBreak) {
+    throw new Error("No existe la hoja horaryBreak");
+  }
+
+  // =============================
+  // CONFIGURACIÓN
+  // =============================
+  const breakTime = 20; // minutos
+  const breakStart1 = new Date(); breakStart1.setHours(9, 40, 0, 0);
+  const breakEnd1   = new Date(); breakEnd1.setHours(10, 0, 0, 0);
+  const breakStart2 = new Date(); breakStart2.setHours(10, 30, 0, 0);
+  const breakEnd2   = new Date(); breakEnd2.setHours(10, 50, 0, 0);
+  const breakEnd3   = new Date(); breakEnd3.setHours(11, 40, 0, 0);
+
+  // =============================
+  // LIMPIEZA SEGURA
+  // =============================
+  const maxRows = sheetBreak.getMaxRows();
+  const maxCols = sheetBreak.getMaxColumns();
+
+  if (maxRows > 1) {
+    sheetBreak.getRange(2, 1, maxRows - 1, maxCols).clearContent();
+  }
+
+  // =============================
+  // LEER HORARIO PRINCIPAL
+  // =============================
+  const lastRow = sheetMain.getLastRow();
+  const lastCol = sheetMain.getLastColumn();
+  if (lastRow < 2 || lastCol === 0) return;
+
+  const data = sheetMain.getRange(2, 1, lastRow - 1, lastCol).getValues();
+
+  let teacherDayMap = {};
+  let result = [];
+
+  // =============================
+  // CONSTRUIR BASE POR DOCENTE/DÍA
+  // =============================
+  data.forEach(row => {
+    const colDay     = row[0];
+    const colTimeS   = row[1];
+    const colTimeE   = row[2];
+    const colTeacher = row[6];
+
+    if (!(colTimeS instanceof Date) || !(colTimeE instanceof Date)) return;
+
+    const key = `${colDay}|${colTeacher}`;
+    if (teacherDayMap[key]) return;
+
+    const daynumber = {
+      "Lunes": 2,
+      "Martes": 3,
+      "Miércoles": 4,
+      "Jueves": 5,
+      "Viernes": 6,
+      "Sábado": 7
+    }[colDay] || 0;
+
+    const start = new Date(); start.setHours(colTimeS.getHours(), colTimeS.getMinutes(), 0, 0);
+    const end   = new Date(); end.setHours(colTimeE.getHours(), colTimeE.getMinutes(), 0, 0);
+
+    teacherDayMap[key] = {
+      day: colDay,
+      teacher: colTeacher,
+      start,
+      middle: end,
+      end,
+      daynumber,
+      breakDecimal: 0
+    };
+  });
+
+  // =============================
+  // CALCULAR HORAS FINALES
+  // =============================
+  data.forEach(row => {
+    const colDay     = row[0];
+    const colTimeE   = row[2];
+    const colTeacher = row[6];
+
+    if (!(colTimeE instanceof Date)) return;
+
+    const key = `${colDay}|${colTeacher}`;
+    const entry = teacherDayMap[key];
+    if (!entry) return;
+
+    const end = new Date();
+    end.setHours(colTimeE.getHours(), colTimeE.getMinutes(), 0, 0);
+
+    if (end >= breakEnd1 && end <= breakEnd3) entry.end = end;
+    if (end >= breakEnd1 && end <= breakEnd2) entry.middle = end;
+  });
+
+  // =============================
+  // CALCULAR RECESOS
+  // =============================
+  Object.values(teacherDayMap).forEach(e => {
+    let total = 0;
+
+    if (e.start < breakStart1 && e.middle >= breakEnd1 && e.middle <= breakEnd2) {
+      total += breakTime;
+    }
+    if (e.middle >= breakEnd1 && e.middle <= breakEnd2 && e.end >= breakEnd2 && e.end <= breakEnd3) {
+      total += breakTime;
+    }
+
+    e.breakDecimal = total === 20 ? 0.33 : total === 40 ? 0.66 : 0;
+
+    const timeText =
+      String(e.start.getHours()).padStart(2, "0") + ":" +
+      String(e.start.getMinutes()).padStart(2, "0") + ":00";
+
+    const id = `${e.daynumber} ${e.teacher} ${timeText}`;
+
+    result.push([
+      id,
+      e.day,
+      e.start,
+      e.middle,
+      e.end,
+      e.teacher,
+      e.breakDecimal,
+      e.daynumber,
+      timeText
+    ]);
+  });
+
+  if (result.length === 0) return;
+
+  // =============================
+  // ASEGURAR COLUMNAS
+  // =============================
+  const neededCols = result[0].length;
+  if (sheetBreak.getMaxColumns() < neededCols) {
+    sheetBreak.insertColumnsAfter(
+      sheetBreak.getMaxColumns(),
+      neededCols - sheetBreak.getMaxColumns()
+    );
+  }
+
+  // =============================
+  // ESCRIBIR RESULTADO
+  // =============================
+  sheetBreak
+    .getRange(2, 1, result.length, neededCols)
+    .setValues(result);
+
+  // =============================
+  // FORMATOS
+  // =============================
+  sheetBreak.getRange("C:E").setNumberFormat("hh:mm");
+  sheetBreak.getRange("G:G").setNumberFormat("0.00");
+  sheetBreak.getRange("H:H").setNumberFormat("0");
+
+  // =============================
+  // ORDENAR
+  // =============================
+  sheetBreak
+    .getRange(2, 1, result.length, neededCols)
+    .sort([
+      { column: 8, ascending: true },
+      { column: 7, ascending: true }
+    ]);
+
+  Logger.log("getBreak OK");
+}
+
+function timeToDecimal(t) {
+    t = t.split(':');
+    return parseFloat(parseInt(t[0], 10) + parseInt(t[1], 10)/60).toFixed(2);
+}  
+
+function testing() {
+  Logger.log(timeToDecimal("08:00"))
+}
+
