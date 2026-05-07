@@ -2,7 +2,7 @@ import uuid
 import random
 from datetime import date, time, timedelta
 from sqlalchemy.orm import Session
-from app.database import SessionLocal, engine
+from app.core.database import SessionLocal, engine
 from app.models import Teacher, Subject, ClassGroup, Lesson, ScheduleSession, Grade
 
 def seed_performance_data():

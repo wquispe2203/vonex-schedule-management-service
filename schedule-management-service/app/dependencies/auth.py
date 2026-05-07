@@ -3,8 +3,9 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from uuid import UUID
 from sqlalchemy.orm import Session, joinedload
-from app.database import get_db
-from app.models import User, Role, AuditLog
+from app.core.database import get_db
+from app.models.user import User, Role
+from app.models.infrastructure import AuditLog
 from app.core.security import SECRET_KEY, ALGORITHM
 import json
 import traceback
@@ -69,7 +70,12 @@ def require_permission(permission_code: str):
         current_user: User = Depends(get_current_active_user),
         db: Session = Depends(get_db)
     ):
+        # 0. BYPASS SUPERADMIN (Prioridad Máxima)
         user_role_names = [role.name.upper() for role in current_user.roles]
+        if "SUPERADMIN" in user_role_names:
+            print(f"[AUTH] ACCESO TOTAL (BYPASS): {current_user.username} [SUPERADMIN]")
+            return current_user
+
         user_permissions = []
         for role in current_user.roles:
             user_permissions.extend([p.code for p in role.permissions])

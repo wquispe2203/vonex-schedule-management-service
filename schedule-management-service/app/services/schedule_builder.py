@@ -31,48 +31,61 @@ class ScheduleBuilderService:
         lesson_map = {str(l.get("source_id")): l for l in lessons if l.get("source_id")}
 
         # PRE-CALCULAR: Tiempos modificados para cada card (O(N_cards))
-        # Esto evita llamar a regex/datetime 120 veces por card en el bucle inferior.
         precalculated_cards = []
         for card in cards:
-            lesson = lesson_map.get(str(card.get("lesson_id")))
-            if not lesson: continue
+            l_id = str(card.get("lesson_id"))
+            lesson = lesson_map.get(l_id)
+            if not lesson:
+                # logger.debug(f"[BUILDER] Lesson {l_id} not found for card {card.get('source_id')}")
+                continue
 
             period = card.get("period", 0)
             period_time = periods_map.get(period)
-            if not period_time: continue
-
-            subject_name = subjects_map.get(str(lesson.get("subject_id")), "")
-            
-            # FILTRO ABSOLUTO: Omitir RECESO y ALMUERZO completamente al inicio
-            import re
-            clean_name = re.sub(r'\(.*?\)', '', subject_name).strip().upper()
-            if clean_name in ["RECESO", "ALMUERZO"]:
+            if not period_time:
+                # logger.debug(f"[BUILDER] Period {period} not found in periods_map for card {card.get('source_id')}")
                 continue
 
-            class_ids = lesson.get("class_ids", [])
-            for cid in class_ids:
-                precalculated_cards.append({
-                    "lesson_id": f"{lesson.get('source_id')}_{cid}",
-                    "teacher_id": lesson.get("teacher_id"),
-                    "class_id": cid,
-                    "subject_id": lesson.get("subject_id"),
-                    "subject_name_raw": subject_name,
-                    "days_bits": card.get("days", ""),
-                    "period": period,
-                    "start_time": period_time["start"],
-                    "end_time": period_time["end"]
-                })
+            import re
+            if lesson:
+                s_id = str(lesson.get("subject_id"))
+                subject_name = subjects_map.get(s_id, "")
+                clean_name = re.sub(r'\(.*?\)', '', subject_name).strip().upper()
+                if clean_name in ["RECESO", "ALMUERZO"]:
+                    continue
+
+                class_ids = lesson.get("class_ids", [])
+                for cid in class_ids:
+                    precalculated_cards.append({
+                        "lesson_id": f"{lesson.get('source_id')}_{cid}",
+                        "teacher_id": lesson.get("teacher_id"),
+                        "class_id": cid,
+                        "subject_id": s_id,
+                        "subject_name_raw": subject_name,
+                        "days_bits": card.get("days", ""),
+                        "period": period,
+                        "start_time": period_time["start"],
+                        "end_time": period_time["end"]
+                    })
+
+        print(f"[STEP 3] Cards: {len(precalculated_cards)}")
+        if precalculated_cards:
+            print(f"[DEBUG] first card: {precalculated_cards[0]}")
+
+        print(f"[DEBUG BUILDER] precalculated_cards: {len(precalculated_cards)}")
+        print(f"[DEBUG BUILDER] range: {start_date} to {end_date}")
 
         # Iterar diariamente desde start_date hasta end_date
         current_date = start_date
+        total_days = 0
         while current_date <= end_date:
+            total_days += 1
             current_weekday = current_date.weekday()
+            # print(f"[DEBUG BUILDER] Processing {current_date.date()} (weekday={current_weekday})")
 
             for card in precalculated_cards:
                 days_val = str(card["days_bits"])
                 
                 # El XML indica los días con bits '1' (ej: 1111100 -> Lunes a Viernes)
-                # Iteramos sobre los bits para agregar la sesión en cada día marcado
                 for day_index, bit in enumerate(days_val):
                     if bit == "1" and day_index == current_weekday:
                         sessions.append({
@@ -90,5 +103,7 @@ class ScheduleBuilderService:
                     
             # Avanzar al siguiente día
             current_date += timedelta(days=1)
+            
+        print(f"[DEBUG BUILDER] sessions generated: {len(sessions)} in {total_days} days")
             
         return sessions

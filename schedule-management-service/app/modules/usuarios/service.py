@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models import User
+from app.models.user import User
 from app.core.security import get_password_hash, verify_password, create_access_token
 from typing import Dict, Any, List
 from uuid import UUID

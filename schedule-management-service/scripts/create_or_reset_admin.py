@@ -14,8 +14,8 @@ logging.basicConfig(level=logging.INFO, format='%(message)s')
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 try:
-    from app.database import SessionLocal
-    from app.models import User, Role, Permission, user_roles, role_permissions
+    from app.core.database import SessionLocal
+    from app.models.user import User, Role, Permission, user_roles, role_permissions
     from app.core.security import get_password_hash
     from sqlalchemy import insert, select, delete
 except ImportError as e:

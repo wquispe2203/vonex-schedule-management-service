@@ -3,8 +3,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import event
 import contextvars
-import time
 import logging
+from app.core.config import settings
 
 # Configuración de Logger para Auditoría SQL
 audit_logger = logging.getLogger("sql_audit")
@@ -17,10 +17,8 @@ if not audit_logger.handlers:
 # Variable de contexto para habilitar logging SQL selectivo
 sql_logging_ctx = contextvars.ContextVar("sql_logging_ctx", default=False)
 
-# Configuración de base de datos PostgreSQL
-# En producción, esto debe provenir de variables de entorno, por ejemplo:
-# SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:C%40rden4s2k24@localhost/schedule_db"
+# Configuración de base de datos desde settings
+SQLALCHEMY_DATABASE_URL = settings.database_url
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
@@ -32,7 +30,7 @@ engine = create_engine(
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
+from app.models.base import Base
 
 def get_db():
     db = SessionLocal()
@@ -41,7 +39,7 @@ def get_db():
     finally:
         db.close()
 
-# --- INSTRUMENTACIÓN DE DEBUG SQL (UUID vs INT) ---
+# --- INSTRUMENTACIÓN DE DEBUG SQL ---
 @event.listens_for(engine, "before_cursor_execute")
 def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
     if sql_logging_ctx.get():
@@ -49,7 +47,6 @@ def before_cursor_execute(conn, cursor, statement, parameters, context, executem
         audit_logger.info(f"STMT: {statement}")
         audit_logger.info(f"PARAMS: {parameters}")
         
-        # Intentar inferir tipos de parámetros si es posible
         if parameters:
             types_info = {k: type(v).__name__ for k, v in (parameters.items() if isinstance(parameters, dict) else enumerate(parameters))}
             audit_logger.info(f"PARAM_TYPES: {types_info}")

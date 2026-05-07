@@ -1,14 +1,8 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List, TypeVar, Generic, Union
+from typing import Optional, List
 from datetime import time
 from uuid import UUID
-
-T = TypeVar("T")
-
-class SuccessResponse(BaseModel, Generic[T]):
-    success: bool
-    data: Optional[Union[T, List[T]]] = None
-    message: Optional[str] = None
+from app.core.schemas import StandardResponse, PaginatedResponseData
 
 class ConfigSchema(BaseModel):
     description: Optional[str] = None
@@ -22,3 +16,6 @@ class ConfigResponse(BaseModel):
     end_time: time
 
     model_config = ConfigDict(from_attributes=True)
+
+class ConfigListStandardResponse(StandardResponse[PaginatedResponseData[ConfigResponse]]):
+    pass

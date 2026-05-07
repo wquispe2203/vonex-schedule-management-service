@@ -9,6 +9,8 @@ from app.models import Teacher, ScheduleSession, Lesson, Observation, MatchRevie
 from typing import List, Optional, Dict, Any, Tuple
 from datetime import datetime, timezone
 
+logger = logging.getLogger(__name__)
+
 
 # ════════════════════════════════════════════════════════
 #  FUNCIONES EXISTENTES — INTOCABLES
@@ -105,11 +107,14 @@ def fetch_all_teachers_paginated(
         elif filter_mode == "inactive":
             q = q.filter(Teacher.id.notin_(_active_subquery(db)))
             
-        # Filtro manual de estado v3.10
-        if status_filter == "acts":
-            q = q.filter(Teacher.is_active == True)
-        elif status_filter == "inacts":
-            q = q.filter(Teacher.is_active == False)
+        # Filtro por status (Gobernanza v5)
+        if status_filter in ["INCOMPLETO", "CONFLICTO", "INVALIDO"]:
+            q = q.filter(Teacher.status == status_filter)
+        elif status_filter == "ACTIVO":
+            q = q.filter(Teacher.status == "ACTIVO", Teacher.dni.isnot(None))
+        else:
+            # Por defecto (None, "all", etc.), mostrar solo ACTIVO y con DNI no nulo (v5.5 estricto)
+            q = q.filter(Teacher.status == "ACTIVO", Teacher.dni.isnot(None))
             
         if search:
             term = f"%{search.strip().upper()}%"
@@ -142,10 +147,9 @@ def fetch_teacher_by_dni(db: Session, dni: str) -> Optional[Teacher]:
 
 
 def fetch_teacher_by_normalized(db: Session, normalized: str) -> Optional[Teacher]:
-    """Busca match exacto SOLO en la maestra (is_assigned=True) y no fusionados."""
+    """Busca match exacto por normalized_name en teachers no fusionados."""
     return db.query(Teacher).filter(
         Teacher.normalized_name == normalized,
-        Teacher.is_assigned == True,
         Teacher.merged_into_id.is_(None)
     ).first()
 
@@ -264,7 +268,6 @@ def get_root_teacher_id(db: Session, teacher_id: UUID, visited: Optional[set] = 
         visited = set()
     
     if teacher_id in visited:
-        logger = logging.getLogger(__name__)
         logger.error(f"MDM_CRITICAL: Ciclo de merge detectado para teacher_id {teacher_id}")
         return teacher_id # Romper ciclo retornando el actual
     

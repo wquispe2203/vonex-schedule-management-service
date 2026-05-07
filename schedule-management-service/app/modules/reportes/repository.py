@@ -9,37 +9,78 @@ def fetch_rpt_records(
     fecha_inicio: date, 
     fecha_fin: date, 
     sede: Optional[str] = None, 
-    aula: Optional[str] = None
+    aula: Optional[str] = None,
+    xml_upload_id: Optional[str] = None
 ) -> List[RptPlanilla]:
-    """Obtiene los registros base de RptPlanilla filtrados por fecha y ubicación."""
+    """Obtiene los registros base de RptPlanilla filtrados por fecha, ubicación y upload activo."""
     query = db.query(RptPlanilla).filter(
         RptPlanilla.fecha_clase >= fecha_inicio,
         RptPlanilla.fecha_clase <= fecha_fin
     )
+    
+    from app.models import XmlUpload
+    import logging
+    logger = logging.getLogger(__name__)
+
+    print(f"[RPT RANGE QUERY]\nstart_date: {fecha_inicio}\nend_date: {fecha_fin}")
+    logger.info(f"[RPT RANGE QUERY] start_date={fecha_inicio} end_date={fecha_fin}")
+
+    if xml_upload_id:
+        query = query.filter(RptPlanilla.xml_upload_id == xml_upload_id)
+        active_uploads = db.query(XmlUpload).filter(XmlUpload.id == xml_upload_id).all()
+    else:
+        active_uploads = (
+            db.query(XmlUpload)
+            .filter(
+                XmlUpload.status == "COMPLETED",
+                XmlUpload.start_date <= fecha_fin,
+                XmlUpload.end_date >= fecha_inicio
+            )
+            .order_by(XmlUpload.created_at.desc())
+            .all()
+        )
+        if active_uploads:
+            u_ids = [u.id for u in active_uploads]
+            query = query.filter(RptPlanilla.xml_upload_id.in_(u_ids))
+
+    u_ids_str = [str(u.id) for u in active_uploads]
+    print(f"[RPT ACTIVE UPLOADS]\nupload_ids: {u_ids_str}")
+    logger.info(f"[RPT ACTIVE UPLOADS] upload_ids={u_ids_str}")
+
     if sede and sede != "Todas":
         query = query.filter(RptPlanilla.sede == sede)
     if aula and aula != "Todos":
         query = query.filter(RptPlanilla.ciclo == aula)
     
-    return query.order_by(asc(RptPlanilla.fecha_clase), asc(RptPlanilla.hora_inicio)).all()
+    records = query.order_by(asc(RptPlanilla.fecha_clase), asc(RptPlanilla.hora_inicio)).all()
+    print(f"[RPT RECORDS]\ntotal_rows: {len(records)}")
+    logger.info(f"[RPT RECORDS] total_rows: {len(records)}")
+    return records
 
-def fetch_context_data(db: Session, fecha_init: date, fecha_end: date):
+def fetch_context_data(db: Session, fecha_init: date, fecha_end: date, xml_upload_id: Optional[str] = None):
     """
-    Obtiene Sessions y Observations en bloques optimizados (Anti N+1).
+    Obtiene Sessions y Observations en bloques optimizados (Anti N+1) filtrados por upload activo.
     """
-    # Observations con su sesión para evitar sub-queries
-    observations = (
-        db.query(Observation)
-        .join(ScheduleSession, Observation.session_id == ScheduleSession.id)
-        .filter(
-            ScheduleSession.session_date >= fecha_init,
-            ScheduleSession.session_date <= fecha_end
+    from app.models import XmlUpload
+    
+    u_ids = []
+    if xml_upload_id:
+        u_ids = [xml_upload_id]
+    else:
+        active_uploads = (
+            db.query(XmlUpload)
+            .filter(
+                XmlUpload.status == "COMPLETED",
+                XmlUpload.start_date <= fecha_end,
+                XmlUpload.end_date >= fecha_init
+            )
+            .order_by(XmlUpload.created_at.desc())
+            .all()
         )
-        .all()
-    )
+        u_ids = [u.id for u in active_uploads]
 
     # Sessions con Lesson y ClassGroup para metadata
-    sessions = (
+    sess_query = (
         db.query(
             ScheduleSession.id, 
             ScheduleSession.session_date,
@@ -52,13 +93,31 @@ def fetch_context_data(db: Session, fecha_init: date, fecha_end: date):
             ScheduleSession.session_date >= fecha_init, 
             ScheduleSession.session_date <= fecha_end
         )
-        .all()
     )
+    if u_ids:
+        sess_query = sess_query.filter(ScheduleSession.xml_upload_id.in_(u_ids))
+        
+    sessions = sess_query.all()
+    session_ids = [s[0] for s in sessions]
+
+    # Observations con su sesión para evitar sub-queries
+    if session_ids:
+        observations = (
+            db.query(Observation)
+            .filter(Observation.session_id.in_(session_ids))
+            .all()
+        )
+    else:
+        observations = []
 
     return observations, sessions
 
 def fetch_teachers_lookup(db: Session) -> List[Teacher]:
-    return db.query(Teacher.id, Teacher.uid, Teacher.first_name, Teacher.last_name).all()
+    return db.query(Teacher.id, Teacher.source_id, Teacher.first_name, Teacher.last_name).all()
+
+def fetch_distinct_docentes(db: Session) -> List[str]:
+    results = db.query(RptPlanilla.docente).distinct().order_by(RptPlanilla.docente).all()
+    return [r[0] for r in results if r[0]]
 
 def fetch_distinct_sedes(db: Session) -> List[str]:
     results = db.query(RptPlanilla.sede).distinct().order_by(RptPlanilla.sede).all()

@@ -4,7 +4,7 @@ from app.models import AuditLog
 from fastapi.encoders import jsonable_encoder
 from typing import Optional, Any
 import traceback
-from app.database import SessionLocal
+from app.core.database import SessionLocal
 
 def log_audit_action(accion: str, modulo: str, registro_id: int, datos_antes: Optional[Any], datos_despues: Optional[Any], usuario_id: int):
     """

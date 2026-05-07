@@ -1,7 +1,8 @@
-from pydantic import BaseModel, EmailStr, Field, computed_field
+from pydantic import BaseModel, Field, computed_field
 from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
+from app.core.schemas import StandardResponse, PaginatedResponseData
 
 class UserBase(BaseModel):
     username: str = Field(..., description="Email institucional (debe terminar en @vonex.edu.pe)")
@@ -79,3 +80,19 @@ class PermissionAssign(BaseModel):
 
 class PasswordChange(BaseModel):
     new_password: str = Field(..., min_length=6)
+
+# Standardized Responses for Users
+class UserStandardResponse(StandardResponse[UserResponseFull]):
+    pass
+
+class UserListStandardResponse(StandardResponse[PaginatedResponseData[UserResponseFull]]):
+    pass
+
+class RoleStandardResponse(StandardResponse[RoleResponse]):
+    pass
+
+class RoleListStandardResponse(StandardResponse[PaginatedResponseData[RoleResponse]]):
+    pass
+
+class PermissionListStandardResponse(StandardResponse[PaginatedResponseData[PermissionResponse]]):
+    pass

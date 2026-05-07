@@ -1,12 +1,7 @@
 from pydantic import BaseModel, computed_field
-from typing import Optional, List, TypeVar, Generic
+from typing import Optional, List
 from uuid import UUID
-
-T = TypeVar("T")
-
-class SuccessResponse(BaseModel, Generic[T]):
-    success: bool
-    data: List[T] | T
+from app.core.schemas import StandardResponse, PaginatedResponseData
 
 class TeacherBasicResponse(BaseModel):
     id: UUID
@@ -59,3 +54,19 @@ class ClassroomSessionResponse(BaseModel):
     is_break: bool
     status: str
     observations: List[ObservationSubResponse]
+
+class XmlUploadHistoryItem(BaseModel):
+    id: UUID
+    filename: str
+    status: str
+    total_records: int
+    processed_records: int
+    fallback_count: int
+    process_time_ms: int
+    created_at: Optional[str]
+
+class XmlUploadReportResponse(BaseModel):
+    matched_exact: List[str]
+    matched_fuzzy: List[dict]
+    unmatched_new: List[str]
+    duplicates: List[str] = []

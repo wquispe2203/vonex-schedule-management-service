@@ -1,15 +1,9 @@
-from pydantic import BaseModel, field_validator
-from typing import Optional, List, TypeVar, Generic, Union, Any
+from pydantic import BaseModel
+from typing import Optional, List
 from uuid import UUID
-from datetime import date
+from app.core.schemas import StandardResponse, PaginatedResponseData
 
-T = TypeVar("T")
-
-class SuccessResponse(BaseModel, Generic[T]):
-    success: bool
-    data: List[T] | T
-
-# Entradas (Requests) con validación restaurada
+# Entradas (Requests)
 class ObservationPayload(BaseModel):
     session_id: Optional[UUID] = None
     teacher_id: Optional[UUID] = None
@@ -23,7 +17,6 @@ class ObservationPayload(BaseModel):
     description: Optional[str] = ""
     start_time: Optional[str] = None
     end_time: Optional[str] = None
-
 
 # Salidas (Responses)
 class ObservationResponse(BaseModel):
@@ -47,3 +40,8 @@ class ObservationLogResponse(BaseModel):
     class_date: Optional[str] = None
     description: Optional[str] = None
 
+class ObservationListStandardResponse(StandardResponse[PaginatedResponseData[ObservationResponse]]):
+    pass
+
+class ObservationLogListStandardResponse(StandardResponse[PaginatedResponseData[ObservationLogResponse]]):
+    pass

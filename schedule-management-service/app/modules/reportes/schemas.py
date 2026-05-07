@@ -1,13 +1,9 @@
-from pydantic import BaseModel
-from typing import Optional, List, TypeVar, Generic, Union, Any
-from datetime import date, time
+from pydantic import BaseModel, Field
+from typing import Optional, List, Generic, TypeVar, Any
 from uuid import UUID
+from app.core.schemas import StandardResponse, PaginatedResponseData
 
 T = TypeVar("T")
-
-class SuccessResponse(BaseModel, Generic[T]):
-    success: bool
-    data: List[T] | T
 
 class ReportObservationSchema(BaseModel):
     type: str
@@ -18,7 +14,7 @@ class ReportObservationSchema(BaseModel):
     ids: List[UUID] = []
 
 class ReportRowResponse(BaseModel):
-    id: UUID
+    id: Any = Field(description="ID puede ser UUID o string para fallbacks")
     fecha_clase: str
     sede: str
     ciclo: str
@@ -32,11 +28,15 @@ class ReportRowResponse(BaseModel):
     titular_original: Optional[str] = None
     observation: Optional[ReportObservationSchema] = None
 
-class ReportFullResponse(BaseModel):
-    success: bool
-    data: List[ReportRowResponse]
-    total_records: int
-    total_pages: int
-    current_page: int
+class ReportPaginatedData(PaginatedResponseData[ReportRowResponse]):
     total_hours_sum: float
     total_receso_count: float
+
+class ReportFullResponse(StandardResponse[ReportPaginatedData]):
+    pass
+
+class SedeListResponse(StandardResponse[PaginatedResponseData[str]]):
+    pass
+
+class AulaListResponse(StandardResponse[PaginatedResponseData[str]]):
+    pass

@@ -1,5 +1,5 @@
 from sqlalchemy import MetaData, text
-from app.database import engine
+from app.core.database import engine
 
 def cleanup_database():
     print("--- Iniciando limpieza total de Base de Datos ---")

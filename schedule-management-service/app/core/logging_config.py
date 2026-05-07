@@ -43,3 +43,4 @@ def setup_logging():
     logging.getLogger("uvicorn.error").handlers = [console_handler]
     logging.getLogger("uvicorn.access").handlers = [console_handler]
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING) # SQL logging se maneja por audit_logger
+    return root_logger

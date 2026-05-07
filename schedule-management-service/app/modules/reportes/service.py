@@ -45,7 +45,8 @@ def process_rpt_logic(
     fecha_init: date,
     fecha_end: date,
     target_docente: Optional[str] = None,
-    target_teacher_id: Optional[int] = None
+    target_teacher_id: Optional[int] = None,
+    xml_upload_id: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
     Lógica central de procesamiento de planillas — LÓGICA BINARIA.
@@ -86,7 +87,7 @@ def process_rpt_logic(
     # ------------------------------------------------------------------
     # 1. Cargar datos de contexto: sesiones + observaciones del rango
     # ------------------------------------------------------------------
-    all_obs, sessions = repository.fetch_context_data(db, fecha_init, fecha_end)
+    all_obs, sessions = repository.fetch_context_data(db, fecha_init, fecha_end, xml_upload_id)
 
     # Índice rápido: session_id → (date, start_time, end_time, teacher_id)
     session_info_by_id: Dict[int, tuple] = {
@@ -111,7 +112,7 @@ def process_rpt_logic(
     # ------------------------------------------------------------------
     def find_session_id_for_row(t_id, r_date, r_start, r_end) -> Optional[int]:
         """Mapea un bloque RPT → ScheduleSession.id del titular."""
-        if t_id is None:
+        if t_id is None or r_start is None or r_end is None:
             return None
         candidates = blocks_by_teacher_date.get((t_id, r_date), [])
         # Prioridad 1: tiempos exactos
@@ -170,7 +171,15 @@ def process_rpt_logic(
     rpt_to_teacher: Dict[int, Optional[int]] = {}
     for r in records:
         t_id = resolve_rpt_teacher_id(r.docente)
-        s_id = find_session_id_for_row(t_id, r.fecha_clase, r.hora_inicio, r.hora_fin)
+        
+        r_s = getattr(r, 'hora_inicio', None)
+        r_e = getattr(r, 'hora_fin', None)
+        if r_e is None and r_s is not None:
+            h_dictadas = float(getattr(r, 'horas_dictadas', 0))
+            total_mins = r_s.hour * 60 + r_s.minute + int(h_dictadas * 50)
+            r_e = time(int(total_mins // 60) % 24, int(total_mins % 60))
+            
+        s_id = find_session_id_for_row(t_id, getattr(r, 'fecha_clase', None), r_s, r_e)
         rpt_to_session[r.id] = s_id
         rpt_to_teacher[r.id] = t_id
 
@@ -182,14 +191,21 @@ def process_rpt_logic(
     # Tiempos mostrados = siempre los del RPT.
     # ==================================================================
     for r in records:
-        r_start      = r.hora_inicio
-        r_end        = r.hora_fin
-        r_date       = r.fecha_clase
+        r_start      = getattr(r, 'hora_inicio', None)
+        r_end        = getattr(r, 'hora_fin', None)
+        
+        if r_end is None and r_start is not None:
+            # Calcular hora_fin en base a horas_dictadas (1 hora dictada = 50 min)
+            h_dictadas = float(getattr(r, 'horas_dictadas', 0))
+            total_mins = r_start.hour * 60 + r_start.minute + int(h_dictadas * 50)
+            r_end = time(int(total_mins // 60) % 24, int(total_mins % 60))
+
+        r_date       = getattr(r, 'fecha_clase', None)
         r_teacher_id = rpt_to_teacher[r.id]
         r_session_id = rpt_to_session[r.id]
 
-        orig_hours  = float(r.horas_dictadas or 0)
-        orig_receso = float(r.receso or 0)
+        orig_hours  = float(getattr(r, 'horas_dictadas', 0) or 0)
+        orig_receso = float(getattr(r, 'receso', 0) or 0)
 
         # Observations que aplican a este bloque (solo por session_id exacto)
         relevant = [
@@ -214,7 +230,7 @@ def process_rpt_logic(
             net_hours  = orig_hours
             net_receso = orig_receso
 
-        print(f"  → replacement={has_replacement} absence={has_absence} → net_hours={net_hours}")
+        print(f"  > replacement={has_replacement} absence={has_absence} > net_hours={net_hours}")
 
         # ¿Incluir esta fila según el filtro de docente?
         r_docente_up   = (r.docente or "").strip().upper()
@@ -228,10 +244,10 @@ def process_rpt_logic(
         processed_data.append({
             "id":             r.id,
             "fecha_clase":    r_date,
-            "sede":           r.sede or "",
-            "ciclo":          r.ciclo or "",
+            "sede":           r.sede or "---",
+            "ciclo":          r.ciclo or "---",
             "docente":        r.docente or "",
-            "curso":          r.curso or "",
+            "curso":          r.curso or "---",
             "hora_inicio":    r_start,          # ← tiempos originales RPT
             "hora_fin":       r_end,             # ← tiempos originales RPT
             "horas_dictadas": max(0.0, round(net_hours, 2)),
@@ -289,10 +305,18 @@ def process_rpt_logic(
 
         # Prioridad 2 (fallback): overlap temporal si la obs tiene tiempos
         if not matching_rpt and o.start_time and o.end_time:
-            matching_rpt = [r for r in records
-                            if r.fecha_clase == o_date
-                            and calculate_overlap_minutes(r.hora_inicio, r.hora_fin,
-                                                          o.start_time, o.end_time) > 0]
+            matching_rpt = []
+            for r in records:
+                if getattr(r, 'fecha_clase', None) == o_date:
+                    r_s = getattr(r, 'hora_inicio', None)
+                    r_e = getattr(r, 'hora_fin', None)
+                    if r_e is None and r_s is not None:
+                        h_dictadas = float(getattr(r, 'horas_dictadas', 0))
+                        total_mins = r_s.hour * 60 + r_s.minute + int(h_dictadas * 50)
+                        r_e = time(int(total_mins // 60) % 24, int(total_mins % 60))
+                    
+                    if r_s and r_e and calculate_overlap_minutes(r_s, r_e, o.start_time, o.end_time) > 0:
+                        matching_rpt.append(r)
 
         print(
             f"[F2] obs.id={o.id} | session={o.session_id} | {o_date} | "
@@ -307,7 +331,7 @@ def process_rpt_logic(
                     injected_keys.add(fb_key)
                     mins = get_time_diff_minutes(o.start_time, o.end_time)
                     fb_hours = round(mins / 50.0, 2)
-                    print(f"  → FALLBACK sin RPT: horas={fb_hours}")
+                    print(f"  > FALLBACK sin RPT: horas={fb_hours}")
                     injected_records.append({
                         "id":             f"repl_fb_{o.id}",
                         "fecha_clase":    o_date,
@@ -336,36 +360,43 @@ def process_rpt_logic(
             # Usamos los valores exactos que se renderizarán en la fila.
             # Así, dos sub-sesiones de BD que forman el mismo bloque visual
             # no generarán dos filas idénticas para el reemplazante.
+            best_r_s = getattr(best_r, 'hora_inicio', None)
+            best_r_e = getattr(best_r, 'hora_fin', None)
+            if best_r_e is None and best_r_s is not None:
+                h_dictadas = float(getattr(best_r, 'horas_dictadas', 0))
+                total_mins = best_r_s.hour * 60 + best_r_s.minute + int(h_dictadas * 50)
+                best_r_e = time(int(total_mins // 60) % 24, int(total_mins % 60))
+
             dedup_key = (
                 repl_name_raw.strip().upper(),
-                best_r.fecha_clase,
-                best_r.hora_inicio,
-                best_r.hora_fin,
-                (best_r.ciclo or "").strip()
+                getattr(best_r, 'fecha_clase', None),
+                best_r_s,
+                best_r_e,
+                (getattr(best_r, 'ciclo', "") or "").strip()
             )
             if dedup_key in injected_keys:
-                print(f"  → SKIP VISUAL-DUPLICADO: {dedup_key}")
+                print(f"  > SKIP VISUAL-DUPLICADO: {dedup_key}")
                 continue
             injected_keys.add(dedup_key)
 
             # ✅ HORAS BINARIAS: 100% del bloque RPT
-            repl_hours  = float(best_r.horas_dictadas or 0)
-            repl_receso = float(best_r.receso or 0)
+            repl_hours  = float(getattr(best_r, 'horas_dictadas', 0) or 0)
+            repl_receso = float(getattr(best_r, 'receso', 0) or 0)
 
             print(
-                f"  → INJECT: rpt_id={best_r.id} "
-                f"[{best_r.hora_inicio}-{best_r.hora_fin}] "
-                f"horas={repl_hours} receso={repl_receso} → {repl_name_raw}"
+                f"  > INJECT: rpt_id={best_r.id} "
+                f"[{best_r_s}-{best_r_e}] "
+                f"horas={repl_hours} receso={repl_receso} > {repl_name_raw}"
             )
             injected_records.append({
                 "id":             f"repl_{best_r.id}_{o.id}",
-                "fecha_clase":    best_r.fecha_clase,
-                "sede":           best_r.sede or "",
-                "ciclo":          best_r.ciclo or "",
+                "fecha_clase":    getattr(best_r, 'fecha_clase', None),
+                "sede":           best_r.sede or "---",
+                "ciclo":          best_r.ciclo or "---",
                 "docente":        repl_name_raw or "---",
-                "curso":          best_r.curso or "",
-                "hora_inicio":    best_r.hora_inicio,   # ← tiempos del RPT titular
-                "hora_fin":       best_r.hora_fin,       # ← tiempos del RPT titular
+                "curso":          best_r.curso or "---",
+                "hora_inicio":    best_r_s,   # ← tiempos del RPT titular
+                "hora_fin":       best_r_e,       # ← tiempos del RPT titular
                 "horas_dictadas": round(repl_hours, 2),
                 "receso":         round(repl_receso, 2),
                 "is_replacement": True,
@@ -380,12 +411,147 @@ def process_rpt_logic(
             })
 
     processed_data.extend(injected_records)
-    result = sorted(processed_data, key=lambda x: (x["fecha_clase"], x["hora_inicio"]))
-    print(
-        f"[RPT-FIN] {len(result)} filas = "
-        f"{len(processed_data) - len(injected_records)} titulares + "
-        f"{len(injected_records)} reemplazos"
-    )
+    
+    # ------------------------------------------------------------------
+    # FASE 3 — CONSOLIDACIÓN DE BLOQUES CONTIGUOS Y RECESOS
+    # ------------------------------------------------------------------
+    consolidated: List[Dict[str, Any]] = []
+    
+    # Sort processed_data by date, teacher, sede, course, classroom, is_replacement, start_time
+    sorted_for_merge = sorted(processed_data, key=lambda x: (
+        x["fecha_clase"],
+        (x["docente"] or "").strip().upper(),
+        (x["sede"] or "").strip().upper(),
+        (x["curso"] or "").strip().upper(),
+        (x["ciclo"] or "").strip().upper(),
+        x["is_replacement"],
+        x["hora_inicio"]
+    ))
+
+    print("[RPT SESSION MERGE]")
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info("[RPT SESSION MERGE] Starting contiguous block consolidation.")
+
+    current_group: Optional[Dict[str, Any]] = None
+    merged_count = 0
+
+    for item in sorted_for_merge:
+        # Print [RPT XML BLOCK] for every raw block
+        print(f"[RPT XML BLOCK] Processing raw block: docente='{item['docente']}' | {item['hora_inicio']}-{item['hora_fin']} | curso='{item['curso']}' | ciclo='{item['ciclo']}' | hrs={item['horas_dictadas']}")
+        
+        if current_group is None:
+            current_group = dict(item)
+            current_group["receso"] = 0.0
+            continue
+            
+        # Check continuity conditions
+        same_date = current_group["fecha_clase"] == item["fecha_clase"]
+        same_docente = (current_group["docente"] or "").strip().upper() == (item["docente"] or "").strip().upper()
+        same_curso = (current_group["curso"] or "").strip().upper() == (item["curso"] or "").strip().upper()
+        same_ciclo = (current_group["ciclo"] or "").strip().upper() == (item["ciclo"] or "").strip().upper()
+        same_sede = (current_group["sede"] or "").strip().upper() == (item["sede"] or "").strip().upper()
+        same_repl = current_group["is_replacement"] == item["is_replacement"]
+        
+        # Calculate time difference in minutes between previous end and current start
+        gap_minutes = get_time_diff_minutes(current_group["hora_fin"], item["hora_inicio"])
+        
+        # We consolidate if they are consecutive or overlapping (gap <= 20 mins)
+        is_consecutive = gap_minutes <= 20
+        
+        if same_date and same_docente and same_curso and same_ciclo and same_sede and same_repl and is_consecutive:
+            prev_end = current_group["hora_fin"]
+            if gap_minutes < 0:
+                print(f"[RPT OVERLAP DETECTED] Overlap found for {item['docente']} between current {current_group['hora_inicio']}-{current_group['hora_fin']} and item {item['hora_inicio']}-{item['hora_fin']}")
+            
+            # Extend end time based on combined horas_dictadas to respect F+30 academic blocks
+            current_group["horas_dictadas"] += item["horas_dictadas"]
+            total_mins = current_group["hora_inicio"].hour * 60 + current_group["hora_inicio"].minute + int(current_group["horas_dictadas"] * 50)
+            current_group["hora_fin"] = time(int(total_mins // 60) % 24, int(total_mins % 60))
+            
+            print(f"[RPT XML MERGED] Merged blocks for {item['docente']}: {current_group['hora_inicio']}-{prev_end} with {item['hora_inicio']}-{item['hora_fin']} => new end {current_group['hora_fin']} | total hrs: {current_group['horas_dictadas']}")
+            logger.info(f"[RPT XML MERGED] Merging block for {current_group['docente']}: {current_group['hora_inicio']}->{prev_end} with {item['hora_inicio']}->{item['hora_fin']} => {current_group['hora_fin']}")
+            
+            # Merge observations if present
+            if item.get("observation"):
+                if not current_group.get("observation"):
+                    current_group["observation"] = item["observation"]
+                else:
+                    current_group["observation"]["type"] = ", ".join(sorted(set(filter(None, [current_group["observation"]["type"], item["observation"]["type"]]))))
+                    current_group["observation"]["description"] = " | ".join(sorted(set(filter(None, [current_group["observation"]["description"], item["observation"]["description"]]))))
+                    current_group["observation"]["ids"].extend(item["observation"]["ids"])
+            
+            merged_count += 1
+        else:
+            consolidated.append(current_group)
+            current_group = dict(item)
+            current_group["receso"] = 0.0
+            
+    if current_group is not None:
+        consolidated.append(current_group)
+
+    # Print [RPT FINAL CONSOLIDATED] for every consolidated block
+    for block in consolidated:
+        print(f"[RPT FINAL CONSOLIDATED] Block consolidated: {block['docente']} | {block['hora_inicio']}-{block['hora_fin']} | hrs={block['horas_dictadas']}")
+
+    # Set to keep track of applied breaks per teacher per day: (docente, fecha)
+    applied_breaks = set()
+
+    # Now calculate recess (receso) for each consolidated block based on official break windows
+    for block in consolidated:
+        docente = (block["docente"] or "").strip().upper()
+        fecha = block["fecha_clase"]
+        start_time = block["hora_inicio"]
+        end_time = block["hora_fin"]
+        
+        print(f"[RPT BREAK WINDOW] Evaluating block {start_time}-{end_time} on {fecha} for teacher '{docente}'")
+        
+        # Check matching criteria
+        crosses_break_1 = (
+            start_time < time(9, 40)
+            and end_time >= time(10, 0)
+        )
+
+        crosses_break_2 = (
+            start_time < time(10, 30)
+            and end_time >= time(10, 50)
+        )
+
+        reaches_final_cut = (
+            start_time < time(11, 40)
+            and end_time >= time(11, 40)
+        )
+        
+        matched_break = crosses_break_1 or crosses_break_2
+        matched_cut = reaches_final_cut
+        
+        if matched_break or matched_cut:
+            if matched_break:
+                print(f"[RPT BREAK MATCHED] Block {start_time}-{end_time} matches official break window.")
+            if matched_cut:
+                print(f"[RPT FINAL CUT] Block {start_time}-{end_time} reaches final cut 11:40.")
+                
+            teacher_day_key = (docente, fecha)
+            if teacher_day_key in applied_breaks:
+                print(f"[RPT SINGLE BREAK ENFORCED] Already applied break for {docente} on {fecha}. Skipping consecutive breaks.")
+                block["receso"] = 0.00
+            else:
+                block["receso"] = 0.33
+                applied_breaks.add(teacher_day_key)
+                print(f"[RPT BREAK APPLIED] Recess of 0.33 applied to block {start_time}-{end_time} for {docente} on {fecha}.")
+        else:
+            block["receso"] = 0.00
+            print(f"[RPT BREAK REJECTED] Block {start_time}-{end_time} does not match break criteria.")
+
+    print(f"[RPT FINAL BLOCKS]\ntotal_final_blocks: {len(consolidated)}")
+    logger.info(f"[RPT FINAL BLOCKS] total_final_blocks={len(consolidated)}")
+
+    total_dictadas = sum(b["horas_dictadas"] for b in consolidated)
+    total_receso = sum(b["receso"] for b in consolidated)
+    print(f"[RPT TOTAL HOURS]\ntotal_dictadas: {total_dictadas}\ntotal_receso: {total_receso}")
+    logger.info(f"[RPT TOTAL HOURS] total_dictadas={total_dictadas} total_receso={total_receso}")
+
+    result = sorted(consolidated, key=lambda x: (x["fecha_clase"], x["hora_inicio"]))
     return result
 
 
@@ -397,7 +563,8 @@ def get_planilla_data(
     sede: Optional[str] = None,
     aula: Optional[str] = None,
     page: int = 1,
-    limit: int = 50
+    limit: int = 50,
+    xml_upload_id: Optional[str] = None
 ):
     """Obtiene la data completa del reporte (JSON)."""
 
@@ -421,7 +588,7 @@ def get_planilla_data(
         replacement_session_ids = repository.fetch_replacement_sessions_ids(db, target_id or docente, docente)
 
     # 2. Obtener registros base de RPT
-    all_filtered_rpt = repository.fetch_rpt_records(db, fecha_inicio, fecha_fin, sede, aula)
+    all_filtered_rpt = repository.fetch_rpt_records(db, fecha_inicio, fecha_fin, sede, aula, xml_upload_id)
 
     if docente and docente != "Todos":
         doc_norm = normalize_name(docente)
@@ -446,9 +613,18 @@ def get_planilla_data(
                 for r in all_filtered_rpt:
                     if r.id in titular_ids:
                         continue
-                    if (r.fecha_clase == si_date
-                            and r.hora_inicio < si_end
-                            and r.hora_fin > si_start
+                        
+                    r_s = getattr(r, 'hora_inicio', None)
+                    r_e = getattr(r, 'hora_fin', None)
+                    if r_e is None and r_s is not None:
+                        h_dictadas = float(getattr(r, 'horas_dictadas', 0))
+                        total_mins = r_s.hour * 60 + r_s.minute + int(h_dictadas * 50)
+                        r_e = time(int(total_mins // 60) % 24, int(total_mins % 60))
+
+                    if (getattr(r, 'fecha_clase', None) == si_date
+                            and r_s and r_e
+                            and r_s < si_end
+                            and r_e > si_start
                             and any(n in (r.docente or "").upper() for n in names)):
                         repl_titular_recs.append(r)
                         titular_ids.add(r.id)
@@ -462,7 +638,7 @@ def get_planilla_data(
 
     # 3. Procesar lógica completa ANTES de paginar
     full_processed_list = process_rpt_logic(
-        db, records_to_process, fecha_inicio, fecha_fin, docente, target_id
+        db, records_to_process, fecha_inicio, fecha_fin, docente, target_id, xml_upload_id
     )
 
     # 4. Totales
@@ -498,15 +674,16 @@ def get_planilla_data(
 
     return {
         "success": True,
-        "data": result,
-        "total_records":      total_records,
-        "total_pages":        total_pages,
-        "current_page":       page,
-        "total_hours_sum":    round(total_hours_sum, 2),
-        "total_receso_count": round(total_receso_sum / 0.33, 1) if total_receso_sum > 0 else 0,
-        "total_horas_dictadas": round(total_hours_sum, 2),
-        "total_recesos":      round(total_receso_sum, 2),
-        "total_registros":    total_records
+        "data": {
+            "data": result,
+            "total": total_records,
+            "page": page,
+            "limit": limit,
+            "total_pages": total_pages,
+            "total_hours_sum": round(total_hours_sum, 2),
+            "total_receso_count": round(total_receso_sum / 0.33, 1) if total_receso_sum > 0 else 0
+        },
+        "error": None
     }
 
 

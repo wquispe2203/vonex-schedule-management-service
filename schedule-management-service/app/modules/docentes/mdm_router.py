@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from uuid import UUID
 from datetime import datetime, timezone, timedelta
-from app.database import get_db
+from app.core.database import get_db
 from app.dependencies.auth import require_permission
 from . import schemas, repository
 from app.models import Teacher, MatchReview, User
