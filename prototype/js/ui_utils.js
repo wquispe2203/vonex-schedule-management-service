@@ -32,3 +32,52 @@ export function calculateDurationMinutes(start, end) {
     const [h2, m2] = end.split(':').map(Number);
     return (h2 * 60 + m2) - (h1 * 60 + m1);
 }
+
+/**
+ * Extrae la lista de datos de una respuesta StandardResponse[PaginatedResponseData[T]]
+ * o StandardResponse[List[T]].
+ */
+export function extractList(response) {
+    if (!response || !response.data) return [];
+    
+    const payload = response.data;
+
+    // Caso 1: PaginatedResponseData está en response.data.data (doble anidación accidental o intencional)
+    if (payload.data && Array.isArray(payload.data.data)) {
+        return payload.data.data;
+    }
+
+    // Caso 2: PaginatedResponseData es el payload (response.data.data es la lista) - ESTÁNDAR ACTUAL
+    if (Array.isArray(payload.data)) {
+        return payload.data;
+    }
+
+    // Caso 3: El payload es la lista directamente (StandardResponse[List[T]]) - LEGACY
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    console.warn("[API_HELPER] Formato de lista inesperado:", response);
+    return [];
+}
+
+/**
+ * Extrae los metadatos de paginación de una respuesta.
+ */
+export function extractPagination(response) {
+    if (!response || !response.data) return null;
+    
+    const payload = response.data;
+
+    // Caso 1: Los metadatos están en response.data.data
+    if (payload.data && typeof payload.data === "object" && !Array.isArray(payload.data)) {
+        return payload.data;
+    }
+
+    // Caso 2: El payload mismo contiene los metadatos (ESTÁNDAR ACTUAL)
+    if (payload.total !== undefined || payload.total_pages !== undefined) {
+        return payload;
+    }
+
+    return null;
+}

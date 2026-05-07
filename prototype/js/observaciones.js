@@ -1,6 +1,7 @@
 import api from './api.js';
 import { ENDPOINTS, API_BASE_URL } from './config.js';
-import { getCalculatedTime, cleanCycleName, getCourseColor } from './ui_utils.js';
+import { getCalculatedTime, cleanCycleName, getCourseColor, extractList } from './ui_utils.js';
+import { loadRptPlanilla } from './reportes.js';
 
 // State
 let currentSessionForObs = null;
@@ -24,9 +25,17 @@ export async function loadSchedule() {
     }
 
     try {
-        const data = await api.authFetch(endpoint);
-        if (data.success) {
-            renderScheduleGrid(data.data, new Date(sDate + 'T00:00:00'));
+        const response = await api.authFetch(endpoint);
+        
+        // REGLA OBLIGATORIA: Log del response completo
+        console.log("[SCHEDULE] Response recibida:", response);
+
+        // ✅ USO DE HELPER CENTRALIZADO
+        const list = extractList(response);
+        console.log("[SCHEDULE] LIST:", list);
+
+        if (response.success && list.length > 0) {
+            renderScheduleGrid(list, new Date(sDate + 'T00:00:00'));
         }
     } catch (e) { console.error("Error loading schedule:", e); }
 }
@@ -231,26 +240,34 @@ export async function loadObsTeacherList() {
     const datalist = document.getElementById('teachers-datalist');
     if (!select) return;
     try {
-        const json = await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/teachers`);
-        const teachers = json.data || [];
+        const response = await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/teachers`);
+        
+        // REGLA OBLIGATORIA: Log del response completo
+        console.log("[OBS_TEACHERS] Response recibida:", response);
+
+        // ✅ USO DE HELPER CENTRALIZADO
+        const teachers = extractList(response);
+        console.log("[OBS_TEACHERS] LIST:", teachers);
 
         select.innerHTML = '<option value="">Selecciona un docente...</option>';
         if (datalist) datalist.innerHTML = '';
 
-        teachers.forEach(t => {
-            const fullName = `${t.last_name || ''}, ${t.first_name || ''}`.trim() || `Docente ${t.id}`;
-            const opt = document.createElement('option');
-            opt.value = t.id;
-            opt.textContent = fullName;
-            select.appendChild(opt);
+        if (Array.isArray(teachers) && teachers.length > 0) {
+            teachers.forEach(t => {
+                const fullName = `${t.last_name || ''}, ${t.first_name || ''}`.trim() || `Docente ${t.id}`;
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = fullName;
+                select.appendChild(opt);
 
-            if (datalist) {
-                const dOpt = document.createElement('option');
-                dOpt.value = fullName;
-                dOpt.setAttribute('data-id', t.id);
-                datalist.appendChild(dOpt);
-            }
-        });
+                if (datalist) {
+                    const dOpt = document.createElement('option');
+                    dOpt.value = fullName;
+                    dOpt.setAttribute('data-id', t.id);
+                    datalist.appendChild(dOpt);
+                }
+            });
+        }
     } catch (e) {
         console.error("Error loading teachers for obs:", e);
         select.innerHTML = '<option value="">Error al cargar</option>';
@@ -274,8 +291,14 @@ export async function searchClassesForObs() {
 
     try {
         const url = `${ENDPOINTS.HORARIOS.BASE}/sessions-for-obs?teacher_id=${teacherId}&start_date=${dateStart}&end_date=${dateEnd}`;
-        const json = await api.authFetch(url);
-        const sessions = json.data || [];
+        const response = await api.authFetch(url);
+        
+        // REGLA OBLIGATORIA: Log del response completo
+        console.log("[OBS_SESSIONS] Response recibida:", response);
+
+        // ✅ USO DE HELPER CENTRALIZADO
+        const sessions = extractList(response);
+        console.log("[OBS_SESSIONS] LIST:", sessions);
 
         if (tbody) {
             tbody.innerHTML = '';
@@ -520,7 +543,7 @@ export async function deleteObservation(obsId) {
     try {
         const data = await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/observations/${obsId}`, { method: 'DELETE' });
         if (data.success) {
-            if (typeof window.loadRptPlanilla === 'function') window.loadRptPlanilla(); 
+            if (typeof loadRptPlanilla === 'function') loadRptPlanilla(); 
             loadObsLogs();
         }
     } catch (e) { alert("Error al eliminar"); }
@@ -530,13 +553,21 @@ export async function loadObsLogs() {
     const tbody = document.getElementById('obs-logs-body');
     if (!tbody) return;
     try {
-        const data = await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/observations/logs?limit=50`);
+        const response = await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/observations/logs?limit=50`);
+        
+        // REGLA OBLIGATORIA: Log del response completo
+        console.log("[OBS_LOGS] Response recibida:", response);
+
+        // ✅ USO DE HELPER CENTRALIZADO
+        const logs = extractList(response);
+        console.log("[OBS_LOGS] LIST:", logs);
+        
         tbody.innerHTML = '';
-        if (!data.data.length) {
+        if (logs.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-slate-400 italic">No hay logs de incidencias</td></tr>';
             return;
         }
-        data.data.forEach(log => {
+        logs.forEach(log => {
             tbody.insertAdjacentHTML('beforeend', `
                 <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
                     <td class="px-4 py-3 font-medium">${log.fecha}</td>

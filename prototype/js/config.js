@@ -18,6 +18,8 @@ export const ENDPOINTS = {
         LIST: "/api/docentes",
         IMPORT: "/api/docentes/import-excel",
         SIN_ASIGNAR: "/api/docentes/sinasignar",
+        CONFLICTOS: "/api/docentes/conflictos",
+        RESOLVE_CONFLICT: "/api/docentes/resolve-conflict",
         ALL: "/api/docentes/all"
     },
     MDM: {

@@ -1,4 +1,6 @@
-import { API_BASE_URL } from './config.js';
+import { API_BASE_URL, ENDPOINTS } from './config.js';
+
+let isUnauthorized = false;
 
 const api = {
     getToken: () => localStorage.getItem('token'),
@@ -6,6 +8,11 @@ const api = {
     clearToken: () => localStorage.removeItem('token'),
 
     async authFetch(endpoint, options = {}) {
+        // 🚫 CORTE INMEDIATO DE REQUESTS (CLAVE PARA MATAR LA TORMENTA)
+        if (isUnauthorized) {
+            return Promise.reject(new Error("Blocked due to unauthorized state"));
+        }
+
         const token = this.getToken();
         
         // El merge de headers permite que el cliente pase su propio X-Request-ID
@@ -28,10 +35,16 @@ const api = {
             
             // 🚨 MANEJO GLOBAL DE 401 (UNAUTHORIZED)
             if (res.status === 401) {
-                this.clearToken();
-                console.error("[API] Sesión expirada o inválida (401)");
-                window.location.reload(); 
-                return;
+                // No redirigir si el error viene del endpoint de login (para permitir mostrar "Credenciales incorrectas")
+                const isLoginEndpoint = url.includes(ENDPOINTS.AUTH.LOGIN);
+                
+                if (!isUnauthorized && !isLoginEndpoint) {
+                    isUnauthorized = true;
+                    console.warn("[API] Sesión expirada o inválida (401) — redirigiendo a login");
+                    localStorage.clear();
+                    window.location.href = "/login";
+                }
+                return Promise.reject(new Error("Unauthorized"));
             }
 
             if (!res.ok) {

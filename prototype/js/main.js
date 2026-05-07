@@ -31,13 +31,17 @@ export function nav(sectionId) {
     const targetSection = document.getElementById(sectionId);
     if (targetSection) {
         targetSection.classList.add('active');
+        if (sectionId === 'upload') Handlers.initXmlUploadView();
         if (sectionId === 'usuarios-module') Handlers.loadUsuarios();
         if (sectionId === 'config-module') {
             Handlers.loadConfig('recess');
             Handlers.loadConfig('lunch');
         }
-        if (sectionId === 'docentes-module') Handlers.loadDocentesMaestra();
+        if (sectionId === 'docentes') {
+            Handlers.toggleDocentesTab('upload-excel');
+        }
         if (sectionId === 'horarios-visor-module') Handlers.loadSchedule();
+        if (sectionId === 'rpt-planilla') Handlers.initRPT();
     }
 }
 
@@ -52,23 +56,31 @@ const Handlers = {
     ...configMgmt,
     ...usuarios
 };
+// window.Handlers = Handlers; // Eliminado por política de modularidad pura
 
-document.addEventListener('DOMContentLoaded', () => {
+let isAuthenticated = false;
+
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('[BOOTSTRAP] Iniciando Schedule Management UI');
     
-    // 1. Verificar sesión y alternar UI
-    checkSession();
-
-    // 2. Inicializar Handlers de Módulos
-    setupDocentesHandlers();
+    // 1. Siempre inicializar delegación global y Auth (para permitir el login)
+    setupGlobalDelegation();
     setupAuth();
+
+    // 2. Verificar sesión
+    await checkSession();
+    
+    if (!isAuthenticated) {
+        console.warn("[MAIN] Usuario no autenticado. Interfaz de login activa.");
+        return; 
+    }
+
+    // 3. Inicializar Handlers de Módulos (Solo si está autenticado)
+    setupDocentesHandlers();
     if (upload.setupUploadHandlers) upload.setupUploadHandlers();
     if (docentesMgmt.setupDocentesUploadHandlers) docentesMgmt.setupDocentesUploadHandlers();
     
-    // 3. Delegation Central
-    setupGlobalDelegation();
-
-    // 4. Initial Load
+    // 4. Navegación inicial
     nav('upload');
 
     console.log('[BOOTSTRAP] Sistema listo');
@@ -82,6 +94,7 @@ async function checkSession() {
     if (!token) {
         if (loginUI) loginUI.classList.remove('hidden');
         if (appUI) appUI.style.display = 'none';
+        isAuthenticated = false;
         return;
     }
 
@@ -92,20 +105,22 @@ async function checkSession() {
     try {
         // Obtener info del usuario logueado
         const user = await api.authFetch(ENDPOINTS.AUTH.ME);
+        
         const nameDisplay = document.getElementById('current-username-display');
-        if (nameDisplay && user.full_name) {
-            nameDisplay.innerText = user.full_name;
+        if (nameDisplay && user.data?.full_name) {
+            nameDisplay.innerText = user.data.full_name;
         }
         
         // RBAC: Mostrar control de usuarios solo si es administrador
         const navUsers = document.getElementById('nav-btn-usuarios');
-        const isAdmin = user.roles?.some(r => r.name === 'ADMINISTRADOR');
+        const isAdmin = user.data?.roles?.some(r => r.name === 'ADMINISTRADOR');
         if (navUsers && isAdmin) navUsers.style.display = 'flex';
 
+        isAuthenticated = true;
     } catch (e) {
         console.error("[SESSION] Error validando sesión:", e);
-        // api.authFetch ya maneja el 401 recargando la página, 
-        // lo que disparará checkSession de nuevo sin token.
+        isAuthenticated = false;
+        // api.authFetch ya maneja el 401 redirigiendo a login
     }
 }
 
@@ -121,7 +136,7 @@ function setupGlobalDelegation() {
         if (!match) return;
         const fnName = match[1];
         
-        const fn = Handlers[fnName] || window[fnName];
+        const fn = Handlers[fnName];
         
         if (!fn) {
             console.error(`Handler no registrado: ${fnName} (Acción: ${actionString})`);

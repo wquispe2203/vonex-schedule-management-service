@@ -1,7 +1,6 @@
-// Configuración (Recesos y Almuerzos) Module - ES6
 import api from './api.js';
 import { ENDPOINTS } from './config.js';
-import { calculateDurationMinutes } from './ui_utils.js';
+import { calculateDurationMinutes, extractList } from './ui_utils.js';
 
 let currentConfigs = {
     recess: [],
@@ -11,9 +10,17 @@ let currentConfigs = {
 export async function loadConfig(type) {
     const endpoint = type === 'recess' ? 'recesos' : 'almuerzos';
     try {
-        const data = await api.authFetch(`${ENDPOINTS.CONFIG.BASE}/${endpoint}`);
-        if (data.success) {
-            currentConfigs[type] = data.data;
+        const response = await api.authFetch(`${ENDPOINTS.CONFIG.BASE}/${endpoint}`);
+        
+        // REGLA OBLIGATORIA: Log del response completo
+        console.log(`[CONFIG_${type.toUpperCase()}] Response recibida:`, response);
+
+        // ✅ USO DE HELPER CENTRALIZADO
+        const list = extractList(response);
+        console.log(`[CONFIG_${type.toUpperCase()}] LIST:`, list);
+
+        if (response.success && Array.isArray(list)) {
+            currentConfigs[type] = list;
             renderConfigTable(type);
         }
     } catch (e) { console.error("Error loading config:", e); }
@@ -112,13 +119,16 @@ export async function saveConfig() {
     const url = id ? `${ENDPOINTS.CONFIG.BASE}/${endpoint}/${id}` : `${ENDPOINTS.CONFIG.BASE}/${endpoint}`;
 
     try {
-        const data = await api.authFetch(url, {
+        const response = await api.authFetch(url, {
             method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
-        if (data.success) {
+        // REGLA OBLIGATORIA: Log del response completo
+        console.log(`[CONFIG_SAVE] Response recibida:`, response);
+
+        if (response.success) {
             closeConfigModal();
             loadConfig(type);
             alert("Configuración guardada con éxito");

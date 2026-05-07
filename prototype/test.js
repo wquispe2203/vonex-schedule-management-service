@@ -599,6 +599,11 @@
                                 ? '<span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">SÍ</span>'
                                 : '<span class="bg-slate-100 text-slate-500 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">NO</span>'}
                             </td>
+                            <td class="px-4 py-3 text-center">
+                                <button onclick="viewUploadReport('${u.id}')" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-chart-pie mr-1"></i> Reporte
+                                </button>
+                            </td>
                         `;
                         tbody.appendChild(tr);
                     });
@@ -611,6 +616,45 @@
 
         function changeHistoryPage(delta) {
             loadUploadHistory(currentHistoryPage + delta);
+        }
+
+        async function viewUploadReport(id) {
+            try {
+                const res = await authFetch(`${API_BASE_URL}/api/schedule/xml-uploads/${id}/report`);
+                const data = await res.json();
+                if (data.success && data.data) {
+                    const r = data.data;
+                    let html = `<div class="space-y-4">`;
+                    if (r.matched_exact) {
+                        html += `<div><h4 class="font-bold text-emerald-700 text-sm mb-1">✅ Coincidencia Exacta (${r.matched_exact.length})</h4>
+                                 <ul class="text-xs text-slate-600 list-disc pl-4 h-max max-h-32 overflow-y-auto">${r.matched_exact.map(t => `<li>${t}</li>`).join('')}</ul></div>`;
+                    }
+                    if (r.matched_fuzzy) {
+                        html += `<div><h4 class="font-bold text-amber-600 text-sm mb-1">⚠️ Coincidencia Fuzzy (${r.matched_fuzzy.length})</h4>
+                                 <ul class="text-xs text-slate-600 list-disc pl-4 h-max max-h-32 overflow-y-auto">${r.matched_fuzzy.map(t => `<li>${t.xml_name} &rarr; <span class="font-bold">${t.db_name}</span> (score: ${t.score})</li>`).join('')}</ul></div>`;
+                    }
+                    if (r.unmatched_new) {
+                        html += `<div><h4 class="font-bold text-indigo-600 text-sm mb-1">🆕 Nuevos / Sin Asignar (${r.unmatched_new.length})</h4>
+                                 <ul class="text-xs text-slate-600 list-disc pl-4 h-max max-h-32 overflow-y-auto">${r.unmatched_new.map(t => `<li>${t}</li>`).join('')}</ul></div>`;
+                    }
+                    if (!r.matched_exact && !r.matched_fuzzy && !r.unmatched_new) {
+                        html += `<div class="bg-slate-100 p-3 rounded text-sm font-mono whitespace-pre-wrap break-all">${JSON.stringify(r, null, 2)}</div>`;
+                    }
+                    html += `</div>`;
+                    
+                    document.getElementById('report-modal-body').innerHTML = html;
+                    document.getElementById('report-modal').classList.remove('hidden');
+                } else {
+                    alert("No hay reporte detallado para esta subida.");
+                }
+            } catch (e) {
+                console.error("Error loading report:", e);
+                alert("Error cargando el reporte.");
+            }
+        }
+
+        function closeReportModal() {
+            document.getElementById('report-modal').classList.add('hidden');
         }
 
         // RPT Planilla Logic
@@ -2068,6 +2112,8 @@
         global.openRegisterObsModal = openRegisterObsModal;
         global.changeRptPage = changeRptPage;
         global.changeHistoryPage = changeHistoryPage;
+        global.viewUploadReport = viewUploadReport;
+        global.closeReportModal = closeReportModal;
         global.loadCatalogs = loadCatalogs;
         global.renderConfigTable = renderConfigTable;
         global.updateFileName = updateFileName;

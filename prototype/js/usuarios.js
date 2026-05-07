@@ -1,6 +1,6 @@
-// Gestión de Usuarios Module - ES6
 import api from './api.js';
 import { ENDPOINTS } from './config.js';
+import { extractList } from './ui_utils.js';
 
 export async function loadUsuarios() {
     const tbody = document.getElementById('usuarios-body');
@@ -9,11 +9,18 @@ export async function loadUsuarios() {
 
     try {
         // authFetch ya devuelve el JSON parseado y lanza error si !res.ok
-        const json = await api.authFetch(ENDPOINTS.USERS.BASE);
-        const users = json.data || json || []; // Flexibilidad para diferentes formatos de respuesta
+        const response = await api.authFetch(ENDPOINTS.USERS.BASE);
+        
+        // REGLA OBLIGATORIA: Log del response completo
+        console.log("[USUARIOS] Response recibida:", response);
+
+        // ✅ USO DE HELPER CENTRALIZADO
+        const users = extractList(response);
+        console.log("[USUARIOS] LIST:", users);
+
         tbody.innerHTML = '';
 
-        if (users.length === 0) {
+        if (!Array.isArray(users) || users.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" class="py-12 text-center text-slate-400 italic">No hay otros usuarios registrados</td></tr>';
             return;
         }

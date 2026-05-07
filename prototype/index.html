@@ -167,8 +167,7 @@
                     </div>
 
                     <div id="drop-zone"
-                        class="border-2 border-dashed border-slate-300 rounded-2xl p-14 text-center hover:bg-indigo-50 hover:border-indigo-400 transition-all cursor-pointer group"
-                        data-action="document.getElementById('file-upload').click()">
+                        class="border-2 border-dashed border-slate-300 rounded-2xl p-14 text-center hover:bg-indigo-50 hover:border-indigo-400 transition-all cursor-pointer group">
                         <div
                             class="w-20 h-20 bg-indigo-100 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
@@ -279,12 +278,8 @@
                 <div class="mt-10 p-6 bg-white rounded-2xl shadow-sm border-2 border-indigo-200">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i> Historial de Subidas
+                            <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i> Historial de Subidas XML
                         </h3>
-                        <button data-action="loadUploadHistory()"
-                            class="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fa-solid fa-arrows-rotate"></i> Actualizar Historial
-                        </button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -292,16 +287,16 @@
                                 <tr class="bg-indigo-50/50">
                                     <th
                                         class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100">
-                                        Fecha y Hora</th>
+                                        Fecha / Proceso</th>
                                     <th
                                         class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100">
-                                        Archivo</th>
-                                    <th
-                                        class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100">
-                                        Rango</th>
+                                        Rango Planilla</th>
                                     <th
                                         class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100 text-center">
-                                        ¿Overwrite?</th>
+                                        Registros</th>
+                                    <th
+                                        class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100 text-center">
+                                        Estado</th>
                                 </tr>
                             </thead>
                             <tbody id="upload-history-body" class="divide-y divide-slate-100 text-sm">
@@ -664,7 +659,7 @@
             </div>
 
             <!-- RPT Planillas Section -->
-            <div id="rpt-planilla" class="section max-w-7xl mx-auto">
+            <div id="rpt-planilla" class="section max-w-none px-4 w-full">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">RPT Planillas</h2>
@@ -676,62 +671,48 @@
                     </button>
                 </div>
 
-                <!-- Enhanced Filters -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
-                        <div class="lg:col-span-1">
-                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Fecha
-                                Inicio</label>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8 w-full">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1fr_1fr_2.5fr_1.2fr_1.2fr_1fr] xl:grid-cols-[1fr_1fr_3fr_1.2fr_1.2fr_1fr] gap-4 items-end">
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Inicio</label>
                             <input type="date" id="rpt-fecha-inicio"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all text-sm">
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
                         </div>
-                        <div class="lg:col-span-1">
-                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Fecha
-                                Fin</label>
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Fin</label>
                             <input type="date" id="rpt-fecha-fin"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all text-sm">
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
                         </div>
-                        <div class="lg:col-span-2 flex flex-col">
-                            <label
-                                class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Docente</label>
-                            <div class="flex gap-2">
-                                <button data-action="navRptTeacher(-1)" title="Docente anterior"
-                                    class="px-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-indigo-600 transition-all shadow-sm">
-                                    <i class="fa-solid fa-chevron-left"></i>
-                                </button>
-                                <select id="rpt-filter-docente"
-                                    class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all text-sm">
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Docente</label>
+                            <div class="flex gap-1 w-full min-w-0 items-center">
+                                <button data-action="navRptTeacher(-1)" class="px-2 py-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-400 shrink-0"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                                <select id="rpt-filter-docente" class="flex-1 min-w-0 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm truncate" style="text-overflow: ellipsis;">
                                     <option value="Todos">Todos los Docentes</option>
                                 </select>
-                                <button data-action="navRptTeacher(1)" title="Siguiente docente"
-                                    class="px-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-indigo-600 transition-all shadow-sm">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </button>
+                                <button data-action="navRptTeacher(1)" class="px-2 py-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-400 shrink-0"><i class="fa-solid fa-chevron-right text-xs"></i></button>
                             </div>
                         </div>
-                        <div class="lg:col-span-1">
-                            <label
-                                class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Sede</label>
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Sede</label>
                             <select id="rpt-filter-sede" data-action="handleSedeChange"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all text-sm">
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
                                 <option value="Todas">Todas las Sedes</option>
                             </select>
                         </div>
-                        <div class="lg:col-span-1">
-                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Aula
-                                /
-                                Ciclo</label>
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Aula / Ciclo</label>
                             <select id="rpt-filter-aula" disabled data-action="loadRptPlanilla(1)"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 transition-all disabled:opacity-50 disabled:bg-slate-100 text-sm">
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm disabled:opacity-50">
                                 <option value="Todos">Todos</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="mt-6 flex justify-end">
-                        <button data-action="loadRptPlanilla(1)"
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-8 rounded-xl shadow-md shadow-indigo-600/20 transition-all flex items-center gap-2">
-                            <i class="fa-solid fa-filter"></i> Filtrar Resultados
-                        </button>
+                        <div>
+                            <button data-action="loadRptPlanilla(1)"
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-filter"></i> Filtrar
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -841,7 +822,7 @@
 
                 <!-- Sub-tabs -->
                 <div class="flex border-b border-slate-200 mb-8 overflow-x-auto">
-                    <button data-action="toggleDocentesTab('upload')" id="doc-tab-btn-upload"
+                    <button data-action="toggleDocentesTab('upload-excel')" id="doc-tab-btn-upload-excel"
                         class="doc-tab-btn px-8 py-4 text-sm font-black border-b-2 border-indigo-600 text-indigo-600 transition-all uppercase tracking-widest whitespace-nowrap">
                         <i class="fa-solid fa-file-excel mr-2"></i>Subir Docentes
                     </button>
@@ -869,13 +850,13 @@
                         <h3 class="text-lg font-bold text-slate-800 mb-2">Importar desde Excel</h3>
                         <p class="text-sm text-slate-500 mb-6">Columnas requeridas: <strong>DNI | APELLIDOS | NOMBRES |
                                 RAZON SOCIAL</strong></p>
-                        <div id="doc-drop-zone"
+                        <div id="doc-drop-zone" data-upload="docentes"
                             class="border-2 border-dashed border-slate-300 rounded-2xl p-10 text-center hover:bg-indigo-50 hover:border-indigo-400 transition-all cursor-pointer group mb-6">
                             <div
                                 class="w-16 h-16 bg-indigo-100 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                                 <i class="fa-solid fa-file-arrow-up text-2xl"></i>
                             </div>
-                            <p id="doc-file-name" class="font-bold text-slate-700">Arrastra tu Excel o haz clic aquí</p>
+                            <p id="doc-file-name" data-file-name class="font-bold text-slate-700">Arrastra tu Excel o haz clic aquí</p>
                             <p class="text-slate-400 text-xs mt-1">.xlsx / .xls</p>
                             <input type="file" id="doc-file-upload" class="hidden" accept=".xlsx,.xls">
                         </div>
@@ -953,20 +934,20 @@
                                 class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Buscar</label>
                             <input id="doc-search" type="text" placeholder="Nombre, apellido o DNI..."
                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500"
-                                onkeydown="if(event.key==='Enter') loadMaestra(1)">
+                                onkeydown="if(event.key==='Enter') Handlers.applyFilters()">
                         </div>
                         <div>
                             <label
                                 class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Estado
                                 (Manual)</label>
-                            <select id="doc-status-filter" data-action="loadDocentesMaestra"
+                            <select id="doc-status-filter" data-action="applyFilters()"
                                 class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500">
-                                <option value="">Todos</option>
+                                <option value="all">Todos</option>
                                 <option value="acts">Solo Activos</option>
                                 <option value="inacts">Solo Inactivos</option>
                             </select>
                         </div>
-                        <button data-action="loadMaestra(1)"
+                        <button id="btn-doc-filtrar" data-action="applyFilters()"
                             class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-all">
                             <i class="fa-solid fa-filter mr-1"></i> Filtrar
                         </button>
@@ -980,7 +961,13 @@
                             <i class="fa-solid fa-plus mr-1"></i> Nuevo
                         </button>
                     </div>
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                        <div id="doc-maestra-loading" class="hidden absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
+                            <div class="flex flex-col items-center">
+                                <i class="fa-solid fa-circle-notch fa-spin text-indigo-600 text-3xl mb-2"></i>
+                                <span class="text-xs font-bold text-indigo-900 uppercase tracking-widest">Cargando...</span>
+                            </div>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-slate-50 border-b border-slate-200">
@@ -1015,14 +1002,14 @@
                             <span class="text-xs text-slate-500">Total: <span id="doc-maestra-total"
                                     class="font-bold text-indigo-600">0</span></span>
                             <div class="flex gap-2">
-                                <button id="doc-maestra-prev" data-action="changeMaestraPage(-1)" disabled
+                                <button id="doc-maestra-prev" data-action="prevPage()" disabled
                                     class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white disabled:opacity-50">
                                     <i class="fa-solid fa-chevron-left"></i>
                                 </button>
                                 <span id="doc-maestra-indicator"
                                     class="text-xs font-bold text-slate-700 px-3 py-1.5 bg-white border border-slate-200 rounded-lg">1
                                     / 1</span>
-                                <button id="doc-maestra-next" data-action="changeMaestraPage(1)" disabled
+                                <button id="doc-maestra-next" data-action="nextPage()" disabled
                                     class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white disabled:opacity-50">
                                     <i class="fa-solid fa-chevron-right"></i>
                                 </button>
@@ -1048,22 +1035,13 @@
                                     <tr>
                                         <th
                                             class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
-                                            Apellidos</th>
+                                            Nombre Detectado (XML)</th>
                                         <th
                                             class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
-                                            Nombres</th>
-                                        <th
-                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
-                                            DNI</th>
-                                        <th
-                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
-                                            Razón Social</th>
+                                            Detalles DB</th>
                                         <th
                                             class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
-                                            Origen</th>
-                                        <th
-                                            class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter text-center">
-                                            Detecciones</th>
+                                            Motivo / Estado</th>
                                         <th
                                             class="px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-tighter">
                                             Último visto</th>
@@ -1298,7 +1276,7 @@
                         </div>
                     </div>
                     <div class="p-6 pt-0 flex gap-3">
-                        <button data-action="saveTeacher()"
+                        <button id="btn-save-teacher" data-action="saveTeacher()"
                             class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all">
                             <i class="fa-solid fa-floppy-disk mr-1"></i> Guardar
                         </button>
@@ -1826,6 +1804,19 @@
                     </div>
                 </div>
 
+                <!-- Modal: Reporte XML -->
+                <div id="report-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in duration-200">
+                        <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-chart-pie text-indigo-600 mr-2"></i> Reporte de Carga</h3>
+                            <button data-action="closeReportModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+                        </div>
+                        <div id="report-modal-body" class="p-6 overflow-y-auto bg-white flex-1">
+                            <!-- Inyectado via JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Modal: Reset Password (Admin) -->
                 <div id="reset-pwd-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
                     <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in duration-200">
@@ -1846,6 +1837,13 @@
             </div>
 
         </main>
+        <script type="module" src="js/ui_utils.js"></script>
+        <script type="module" src="js/upload.js"></script>
+        <script type="module" src="js/docentes_mgmt.js"></script>
+        <script type="module" src="js/reportes.js"></script>
+        <script type="module" src="js/observaciones.js"></script>
+        <script type="module" src="js/config_mgmt.js"></script>
+        <script type="module" src="js/usuarios.js"></script>
         <script type="module" src="js/main.js"></script>
     </body>
 </html>
