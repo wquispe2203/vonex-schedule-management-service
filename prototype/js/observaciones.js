@@ -6,29 +6,51 @@ import { getCalculatedTime, cleanCycleName, getCourseColor, extractList } from '
 let currentSessionForObs = null;
 let currentRowElementForObs = null;
 
+let obsInitPromise = null;
+
 // Mandatory Lifecycle Initialization
 export async function initObservaciones() {
-    console.log("[OBS MODULE INIT] Bootstrapping observations lifecycle.");
-    try {
-        // Set default dates if not present
-        const startEl = document.getElementById('obs-date-start');
-        const endEl = document.getElementById('obs-date-end');
-        if (startEl && !startEl.value) {
-            const curr = new Date();
-            const mondayDiff = curr.getDate() - curr.getDay() + (curr.getDay() === 0 ? -6 : 1);
-            const monday = new Date(new Date().setDate(mondayDiff));
-            const sunday = new Date(monday);
-            sunday.setDate(sunday.getDate() + 6);
-            
-            startEl.value = monday.toISOString().split('T')[0];
-            if (endEl) endEl.value = sunday.toISOString().split('T')[0];
-        }
-
-        await loadObsTeacherList();
-        console.log("[OBS MODULE READY] Lifecycle bootstrapped completely.");
-    } catch (error) {
-        console.error("[OBS ERROR] Failed to initialize module:", error);
+    if (obsInitPromise) {
+        console.log('[PROMISE LOCK REUSED] initObservaciones');
+        return obsInitPromise;
     }
+
+    console.log('[PROMISE LOCK ACQUIRED] initObservaciones');
+    let success = false;
+
+    obsInitPromise = (async () => {
+        console.log("[OBS MODULE INIT] Bootstrapping observations lifecycle.");
+        try {
+            // Set default dates if not present
+            const startEl = document.getElementById('obs-date-start');
+            const endEl = document.getElementById('obs-date-end');
+            if (startEl && !startEl.value) {
+                const curr = new Date();
+                const mondayDiff = curr.getDate() - curr.getDay() + (curr.getDay() === 0 ? -6 : 1);
+                const monday = new Date(new Date().setDate(mondayDiff));
+                const sunday = new Date(monday);
+                sunday.setDate(sunday.getDate() + 6);
+                
+                startEl.value = monday.toISOString().split('T')[0];
+                if (endEl) endEl.value = sunday.toISOString().split('T')[0];
+            }
+
+            await loadObsTeacherList();
+            success = true;
+            console.log("[PROMISE LOCK RELEASED] initObservaciones successfully initialized");
+            console.log("[OBS MODULE READY] Lifecycle bootstrapped completely.");
+        } catch (error) {
+            console.error("[PROMISE LOCK RESET] initObservaciones Critical Failure:", error);
+            throw error;
+        } finally {
+            if (!success) {
+                console.warn("[PROMISE LOCK RESET] Releasing failed initObservaciones promise.");
+                obsInitPromise = null;
+            }
+        }
+    })();
+
+    return obsInitPromise;
 }
 
 export function toggleObsTab(tabName) {

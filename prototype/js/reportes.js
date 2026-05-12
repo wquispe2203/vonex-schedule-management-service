@@ -5,40 +5,54 @@ import { extractList, extractPagination } from './ui_utils.js';
 
 let rptCurrentPage = 1;
 let isLoadingRpt = false;
-let rptInitialized = false;
+let rptInitPromise = null;
 
 export async function initRPT() {
-    if (rptInitialized) return;
-
-    console.log('[RPT INIT]');
-
-    try {
-        await loadRptFilters();
-        setupRptEvents();
-
-        // Set default dates if empty to prevent unnecessary alerts on load
-        const inicio = document.getElementById('rpt-fecha-inicio');
-        const fin = document.getElementById('rpt-fecha-fin');
-        if (inicio && fin && (!inicio.value || !fin.value)) {
-            const today = new Date();
-            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-            inicio.value = firstDay.toISOString().split('T')[0];
-            fin.value = today.toISOString().split('T')[0];
-        }
-
-        await loadRptPlanilla(1);
-        
-        // Mark as initialized only after complete successful initialization
-        rptInitialized = true;
-        console.log('[RPT FILTERS RENDERED]');
-        console.log('[RPT LAYOUT WIDTH]');
-        console.log('[RPT FILTER WIDTHS]');
-        console.log('[RPT FILTER OVERFLOW]');
-        console.log('[RPT RESPONSIVE OK]');
-    } catch (err) {
-        console.error("[RPT INIT] Error during initialization:", err);
-        rptInitialized = false;
+    if (rptInitPromise) {
+        console.log('[PROMISE LOCK REUSED] initRPT');
+        return rptInitPromise;
     }
+
+    console.log('[PROMISE LOCK ACQUIRED] initRPT');
+    let success = false;
+
+    rptInitPromise = (async () => {
+        console.log('[RPT INIT]');
+        try {
+            await loadRptFilters();
+            setupRptEvents();
+
+            // Set default dates if empty to prevent unnecessary alerts on load
+            const inicio = document.getElementById('rpt-fecha-inicio');
+            const fin = document.getElementById('rpt-fecha-fin');
+            if (inicio && fin && (!inicio.value || !fin.value)) {
+                const today = new Date();
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                inicio.value = firstDay.toISOString().split('T')[0];
+                fin.value = today.toISOString().split('T')[0];
+            }
+
+            await loadRptPlanilla(1);
+            
+            success = true;
+            console.log('[PROMISE LOCK RELEASED] initRPT successfully initialized');
+            console.log('[RPT FILTERS RENDERED]');
+            console.log('[RPT LAYOUT WIDTH]');
+            console.log('[RPT FILTER WIDTHS]');
+            console.log('[RPT FILTER OVERFLOW]');
+            console.log('[RPT RESPONSIVE OK]');
+        } catch (err) {
+            console.error("[PROMISE LOCK RESET] initRPT Critical Failure:", err);
+            throw err;
+        } finally {
+            if (!success) {
+                console.warn("[PROMISE LOCK RESET] Releasing failed initRPT promise.");
+                rptInitPromise = null; 
+            }
+        }
+    })();
+
+    return rptInitPromise;
 }
 
 export function setupRptEvents() {
