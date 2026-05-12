@@ -93,6 +93,8 @@ class Observation(Base):
     teacher_uid = Column(UUID(as_uuid=True), nullable=True)
     replacement_teacher_uid = Column(UUID(as_uuid=True), nullable=True)
     description = Column(Text, nullable=True)
+    start_time = Column(Time, nullable=True)
+    end_time = Column(Time, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     session = relationship("ScheduleSession", back_populates="observations")
     user = relationship("User", back_populates="observations")

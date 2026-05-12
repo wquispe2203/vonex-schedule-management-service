@@ -105,9 +105,6 @@ class ExportScheduleService:
 
         row_num = 2
         for s in sessions:
-            if s.is_break:
-                continue # Skip explicit break rows, they are computed in the class rows
-                
             teacher_name = f"{s.lesson.teacher.first_name} {s.lesson.teacher.last_name}" if s.lesson and s.lesson.teacher else ""
             course_name = cls._clean_subject_name(s.lesson.subject.name) if s.lesson and s.lesson.subject else ""
             class_name = s.lesson.class_group.name if s.lesson and s.lesson.class_group else ""

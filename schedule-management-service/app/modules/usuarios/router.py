@@ -32,6 +32,20 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
             headers={"WWW-Authenticate": "Bearer"}
         )
 
+@router.get("/dev-login", response_model=schemas.Token)
+def dev_login(db: Session = Depends(get_db)):
+    from app.core.config import settings
+    if not settings.is_development:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This endpoint is only available in development mode.")
+    
+    # Authenticate the first user (usually 'admin') silently
+    user = db.query(User).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="No users found in database to impersonate.")
+    
+    access_token = service.create_access_token(data={"sub": user.username})
+    return schemas.Token(access_token=access_token, token_type="bearer")
+
 # --- ENDPOINTS USUARIOS ---
 from typing import List
 from app.models.user import User

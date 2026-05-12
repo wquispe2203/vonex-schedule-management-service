@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, or_, and_, asc
-from app.models import RptPlanilla, Observation, ScheduleSession, Lesson, Teacher
+from app.models import RptPlanilla, Observation, ScheduleSession, Lesson, Teacher, Subject, ClassGroup
 from typing import List, Optional, Tuple
 from datetime import date
 
@@ -79,16 +79,20 @@ def fetch_context_data(db: Session, fecha_init: date, fecha_end: date, xml_uploa
         )
         u_ids = [u.id for u in active_uploads]
 
-    # Sessions con Lesson y ClassGroup para metadata
+    # Sessions con Lesson, Subject y ClassGroup para metadata completa (Sede, Ciclo, Curso)
     sess_query = (
         db.query(
             ScheduleSession.id, 
             ScheduleSession.session_date,
             ScheduleSession.start_time, 
             ScheduleSession.end_time, 
-            Lesson.teacher_id
+            Lesson.teacher_id,
+            Subject.name,
+            ClassGroup.name
         )
-        .join(Lesson)
+        .join(Lesson, ScheduleSession.lesson_id == Lesson.id)
+        .outerjoin(Subject, Lesson.subject_id == Subject.id)
+        .outerjoin(ClassGroup, Lesson.class_id == ClassGroup.id)
         .filter(
             ScheduleSession.session_date >= fecha_init, 
             ScheduleSession.session_date <= fecha_end

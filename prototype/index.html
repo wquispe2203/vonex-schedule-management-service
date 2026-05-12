@@ -647,6 +647,9 @@
                                         <th
                                             class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter">
                                             Observación</th>
+                                        <th
+                                            class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-tighter text-right">
+                                            Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody id="obs-logs-body" class="divide-y divide-slate-100 text-sm">
@@ -1581,7 +1584,8 @@
                                         de Incidencia</label>
                                     <select id="obs-form-type" data-action="handleObsTypeChange"
                                         class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
-                                        <option value="FALTA">FALTA</option>
+                                        <option value="NINGUNA">SIN INCIDENCIA</option>
+                                        <option value="FALTA" selected>FALTA</option>
                                         <option value="REEMPLAZO">REEMPLAZO</option>
                                     </select>
                                 </div>
@@ -1621,23 +1625,11 @@
                                     </label>
                                 </div>
 
-                                <!-- Manual Fields (Hidden by default) -->
-                                <div id="obs-replacement-manual-fields" class="hidden animate-in slide-in-from-left-2 duration-300 space-y-4">
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">Apellidos</label>
-                                            <input type="text" id="obs-form-replacement-last" placeholder="Ej: MOSTACERO..." 
-                                                   class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
-                                        </div>
-                                        <div>
-                                            <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">Nombres</label>
-                                            <input type="text" id="obs-form-replacement-first" placeholder="Ej: JORDY..." 
-                                                   class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
-                                        </div>
-                                    </div>
-                                    <p class="text-[10px] text-amber-600 font-bold uppercase tracking-tight italic">
-                                        * Este docente se registrará en la categoría "Sin Asignar".
-                                    </p>
+                                <!-- New External Teacher Name Input -->
+                                <div id="obs-replacement-external-container" class="mb-4">
+                                    <input type="text" id="obs-form-replacement-external-name" 
+                                           class="hidden w-full px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:outline-none focus:ring-amber-500 font-bold text-amber-900 text-sm placeholder:text-amber-400 shadow-sm animate-in slide-in-from-left-2 duration-300" 
+                                           placeholder="Apellidos y Nombres del docente externo">
                                 </div>
                                 <datalist id="teachers-datalist"></datalist>
                             </div>

@@ -75,6 +75,19 @@ def create_observation(payload: schemas.ObservationPayload, db: Session = Depend
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/observations/batch", response_model=schemas.StandardResponse[int])
+def create_observation_batch(payload: schemas.ObservationBatchPayload, db: Session = Depends(get_db), _ = Depends(require_permission("crear_observaciones"))):
+    try:
+        obs_list = [p.model_dump(exclude_unset=True) for p in payload.observations]
+        affected = payload.affected_session_ids or []
+        count = service.process_observation_batch(db, obs_list, affected)
+        return {"success": True, "data": count, "error": None}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.delete("/observations/{observation_id}", response_model=schemas.StandardResponse[UUID])
 def delete_observation(observation_id: UUID, db: Session = Depends(get_db), _ = Depends(require_permission("editar_observaciones"))):
     try:

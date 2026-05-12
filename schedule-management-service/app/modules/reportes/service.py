@@ -3,6 +3,10 @@ from typing import List, Optional, Dict, Any
 from datetime import date, datetime, time
 import pandas as pd
 import io
+import logging
+import re
+
+logger = logging.getLogger(__name__)
 from . import repository
 from app.models import RptPlanilla, Teacher, Observation
 from app.modules.docentes.service import resolve_teacher
@@ -89,10 +93,10 @@ def process_rpt_logic(
     # ------------------------------------------------------------------
     all_obs, sessions = repository.fetch_context_data(db, fecha_init, fecha_end, xml_upload_id)
 
-    # Índice rápido: session_id → (date, start_time, end_time, teacher_id)
+    # Índice rápido: session_id → (date, start_time, end_time, teacher_id, subject_name, class_group_name)
     session_info_by_id: Dict[int, tuple] = {
-        s_id: (s_d, s_s, s_e, s_ltid)
-        for s_id, s_d, s_s, s_e, s_ltid in sessions
+        row[0]: row
+        for row in sessions
     }
 
     # Índice: session_id → [Observation, ...]
@@ -102,44 +106,72 @@ def process_rpt_logic(
 
     # Índice espacial: (teacher_id, date) → lista de bloques {id, start, end}
     blocks_by_teacher_date: Dict[tuple, list] = {}
-    for s_id, s_date, s_start, s_end, s_t_id in sessions:
+    for s_id, s_date, s_start, s_end, s_t_id, s_subj, s_class in sessions:
         blocks_by_teacher_date.setdefault((s_t_id, s_date), []).append(
             {"id": s_id, "start": s_start, "end": s_end}
         )
 
+    # Nuevo Índice Espacial Absoluto para Observaciones por (Docente/Nombre, Fecha)
+    # Esto previene el escape geométrico si una observación multi-bloque se ató solo al primer session_id.
+    obs_by_teacher_date: Dict[tuple, list] = {}
+    for obs in all_obs:
+        s_info = session_info_by_id.get(obs.session_id)
+        if not s_info:
+            continue
+        o_date = s_info[1]
+        
+        # 1. Indexar por Titular ID
+        if obs.teacher_id:
+            obs_by_teacher_date.setdefault((obs.teacher_id, o_date), []).append(obs)
+            
+        # 2. Indexar por Nombre Normalizado del Titular (Resiliencia)
+        tit_names = id_to_names.get(obs.teacher_id, [])
+        for n in tit_names:
+            obs_by_teacher_date.setdefault((n.upper(), o_date), []).append(obs)
+            
+        # 3. Indexar por Reemplazante ID si existe (para que figure en su reporte)
+        if obs.replacement_teacher_id:
+            obs_by_teacher_date.setdefault((obs.replacement_teacher_id, o_date), []).append(obs)
+            
+        # 4. Indexar por Nombre del Reemplazante textual
+        if obs.replacement_teacher_name:
+            rn_clean = obs.replacement_teacher_name.strip().upper()
+            obs_by_teacher_date.setdefault((rn_clean, o_date), []).append(obs)
+
     # ------------------------------------------------------------------
     # 2. Helpers internos
     # ------------------------------------------------------------------
-    def find_session_id_for_row(t_id, r_date, r_start, r_end) -> Optional[int]:
-        """Mapea un bloque RPT → ScheduleSession.id del titular."""
+    def normalize_hours(val) -> float:
+        return round(float(val or 0), 2)
+
+    def find_session_ids_for_row(t_id, r_date, r_start, r_end) -> List[Any]:
+        """Mapea un bloque RPT a TODAS las ScheduleSession.id del titular que se solapan."""
         if t_id is None or r_start is None or r_end is None:
-            return None
+            return []
         candidates = blocks_by_teacher_date.get((t_id, r_date), [])
-        # Prioridad 1: tiempos exactos
-        for blk in candidates:
-            if blk["start"] == r_start and blk["end"] == r_end:
-                return blk["id"]
-        # Prioridad 2: inicio del RPT cae dentro del bloque
-        for blk in candidates:
-            if blk["start"] <= r_start < blk["end"]:
-                return blk["id"]
-        # Prioridad 3: bloque más cercano anterior
-        eligible = [b for b in candidates if b["start"] <= r_start]
-        if eligible:
-            return max(eligible, key=lambda b: b["start"])["id"]
-        return None
+        # Encontrar todas las sesiones que intersectan el rango temporal del RPT
+        return [
+            b["id"] for b in candidates
+            if b["start"] < r_end and b["end"] > r_start
+        ]
 
     def resolve_rpt_teacher_id(name: str) -> Optional[int]:
         name_upper = (name or "").strip().upper()
-        tid = name_to_id.get(name_upper)
+        name_clean = name_upper.replace(',', '').strip()
+        
+        # 1. Intentar exacto o sin comas
+        tid = name_to_id.get(name_upper) or name_to_id.get(name_clean)
         if tid:
             return tid
+            
+        # 2. Fallback iterativo resiliente
         for k, v in name_to_id.items():
-            if name_upper in k or k in name_upper:
+            k_clean = k.replace(',', '').strip()
+            if name_clean in k_clean or k_clean in name_clean:
                 return v
         return None
 
-    def obs_touches_block(o: Observation, r_start, r_end, r_session_id: Optional[int]) -> bool:
+    def obs_touches_block(o: Observation, r_start, r_end, r_session_id: Optional[Any]) -> bool:
         """
         ¿La observation aplica a este bloque RPT?
         - Con tiempos propios → verificar overlap temporal positivo.
@@ -166,9 +198,12 @@ def process_rpt_logic(
             return True
         return False
 
-    # Pre-calcular session_id y teacher_id de cada fila RPT (evita N+1 en loops)
-    rpt_to_session: Dict[int, Optional[int]] = {}
+    # ------------------------------------------------------------------
+    # Pre-calcular session_ids y teacher_id de cada fila RPT (evita N+1)
+    # ------------------------------------------------------------------
+    rpt_to_sessions: Dict[int, List[Any]] = {}
     rpt_to_teacher: Dict[int, Optional[int]] = {}
+    
     for r in records:
         t_id = resolve_rpt_teacher_id(r.docente)
         
@@ -179,326 +214,331 @@ def process_rpt_logic(
             total_mins = r_s.hour * 60 + r_s.minute + int(h_dictadas * 50)
             r_e = time(int(total_mins // 60) % 24, int(total_mins % 60))
             
-        s_id = find_session_id_for_row(t_id, getattr(r, 'fecha_clase', None), r_s, r_e)
-        rpt_to_session[r.id] = s_id
+        # CORRECCIÓN CRÍTICA: Recuperar TODAS las sesiones vinculadas
+        session_ids = find_session_ids_for_row(t_id, getattr(r, 'fecha_clase', None), r_s, r_e)
+        rpt_to_sessions[r.id] = session_ids
         rpt_to_teacher[r.id] = t_id
 
     processed_data: List[Dict[str, Any]] = []
+    used_obs_ids = set()  # Rastrear IDs de observaciones consumidas por bloques RPT existentes
 
     # ==================================================================
-    # FASE 1 — TITULARES
-    # Regla binaria: cualquier REEMPLAZO que toque el bloque → 0 horas.
-    # Tiempos mostrados = siempre los del RPT.
+    # FASE 1 — SPLIT GEOMÉTRICO Y VIRTUAL OVERLAYS (HARDENED)
     # ==================================================================
     for r in records:
-        r_start      = getattr(r, 'hora_inicio', None)
-        r_end        = getattr(r, 'hora_fin', None)
+        r_start = getattr(r, 'hora_inicio', None)
+        r_end   = getattr(r, 'hora_fin', None)
         
         if r_end is None and r_start is not None:
-            # Calcular hora_fin en base a horas_dictadas (1 hora dictada = 50 min)
             h_dictadas = float(getattr(r, 'horas_dictadas', 0))
             total_mins = r_start.hour * 60 + r_start.minute + int(h_dictadas * 50)
             r_end = time(int(total_mins // 60) % 24, int(total_mins % 60))
-
+            
         r_date       = getattr(r, 'fecha_clase', None)
-        r_teacher_id = rpt_to_teacher[r.id]
-        r_session_id = rpt_to_session[r.id]
-
-        orig_hours  = float(getattr(r, 'horas_dictadas', 0) or 0)
-        orig_receso = float(getattr(r, 'receso', 0) or 0)
-
-        # Observations que aplican a este bloque (solo por session_id exacto)
-        relevant = [
-            o for o in obs_by_session.get(r_session_id, [])
-            if obs_touches_block(o, r_start, r_end, r_session_id)
-        ] if r_session_id else []
-
-        print(
-            f"[F1] {r.docente} | {r_date} [{r_start}-{r_end}] | "
-            f"session_id={r_session_id} | "
-            f"obs=[{', '.join(str(o.id)+':'+o.type for o in relevant)}]"
-        )
-
-        # LÓGICA BINARIA
-        has_replacement = any(o.type == 'REEMPLAZO' for o in relevant)
-        has_absence     = any(o.type in ('FALTA', 'VACACIONES', 'DESCANSO_MEDICO') for o in relevant)
-
-        if has_replacement or has_absence:
-            net_hours  = 0.0
-            net_receso = 0.0
-        else:
-            net_hours  = orig_hours
-            net_receso = orig_receso
-
-        print(f"  > replacement={has_replacement} absence={has_absence} > net_hours={net_hours}")
-
-        # ¿Incluir esta fila según el filtro de docente?
-        r_docente_up   = (r.docente or "").strip().upper()
-        r_doc_no_comma = r_docente_up.replace(',', '').strip()
-        if not matches_target(r_docente_up, r_doc_no_comma, r_teacher_id):
-            continue
-
-        block_obs_list = [{"id": o.id, "type": o.type, "description": o.description or ""} for o in relevant]
-        block_repls    = [o.replacement_teacher_name or "" for o in relevant if o.type == 'REEMPLAZO']
-
-        processed_data.append({
-            "id":             r.id,
-            "fecha_clase":    r_date,
-            "sede":           r.sede or "---",
-            "ciclo":          r.ciclo or "---",
-            "docente":        r.docente or "",
-            "curso":          r.curso or "---",
-            "hora_inicio":    r_start,          # ← tiempos originales RPT
-            "hora_fin":       r_end,             # ← tiempos originales RPT
-            "horas_dictadas": max(0.0, round(net_hours, 2)),
-            "receso":         max(0.0, round(net_receso, 2)),
-            "is_replacement": False,
-            "titular_original": None,
-            "observation": {
-                "type": ", ".join(sorted(set(x["type"] for x in block_obs_list))),
-                "discount_type": "",
-                "has_discount_impact": has_absence,
-                "replacement_teacher_name": ", ".join(sorted(set(block_repls))),
-                "description": " | ".join(sorted(set(
-                    x["description"] for x in block_obs_list if x["description"]
-                ))),
-                "ids": [x["id"] for x in block_obs_list]
-            } if block_obs_list else None
-        })
-
-    # ==================================================================
-    # FASE 2 — REEMPLAZANTES
-    # Regla binaria: una fila por (rpt_id, session_id).
-    # Horas y recesos = 100% del bloque RPT del titular.
-    # Tiempos = los del RPT titular (no los de la Observation).
-    # ==================================================================
-    injected_keys: set = set()       # (rpt_id, session_id) ya inyectado
-    injected_records: List[Dict[str, Any]] = []
-
-    for o in all_obs:
-        if o.type != 'REEMPLAZO':
-            continue
-
-        repl_name_raw = o.replacement_teacher_name or ""
-        repl_name_up  = repl_name_raw.strip().upper()
-        repl_tid      = o.replacement_teacher_id or name_to_id.get(repl_name_up)
-        repl_no_comma = repl_name_up.replace(',', '').strip()
-
-        if not matches_target(repl_name_up, repl_no_comma, repl_tid):
-            continue
-
-        # Resolver fecha y titular a partir del session_id de la observation
-        o_teacher_id = o.teacher_id
-        o_date       = fecha_init  # fallback
-        s_info = session_info_by_id.get(o.session_id)
-        if s_info:
-            o_date = s_info[0]
-            if not o_teacher_id:
-                o_teacher_id = s_info[3]
-
-        true_titular_name = id_to_names.get(o_teacher_id, ["S/D"])[0]
-
-        # Buscar el/los bloques RPT del TITULAR que corresponden a esta sesión
-        # Prioridad 1: match exacto por session_id
-        matching_rpt = [r for r in records
-                        if r.fecha_clase == o_date and rpt_to_session[r.id] == o.session_id]
-
-        # Prioridad 2 (fallback): overlap temporal si la obs tiene tiempos
-        if not matching_rpt and o.start_time and o.end_time:
-            matching_rpt = []
-            for r in records:
-                if getattr(r, 'fecha_clase', None) == o_date:
-                    r_s = getattr(r, 'hora_inicio', None)
-                    r_e = getattr(r, 'hora_fin', None)
-                    if r_e is None and r_s is not None:
-                        h_dictadas = float(getattr(r, 'horas_dictadas', 0))
-                        total_mins = r_s.hour * 60 + r_s.minute + int(h_dictadas * 50)
-                        r_e = time(int(total_mins // 60) % 24, int(total_mins % 60))
+        r_teacher_id = rpt_to_teacher.get(r.id)
+        r_sess_ids   = rpt_to_sessions.get(r.id, [])
+        
+        # Identificar TODAS las observaciones que tocan este bloque recolectando de múltiples sesiones
+        relevant = []
+        seen_obs_in_block = set()
+        # AHORA: Cosecha espacial absoluta. Buscar en todas las observaciones registradas
+        # para este docente o nombre ese día, y filtrar por intersección geométrica.
+        candidates = []
+        if r_teacher_id:
+            candidates = obs_by_teacher_date.get((r_teacher_id, r_date), [])
+            
+        # Fallback Resiliente por Nombre Textual (por si el mapeo de IDs no cuadró)
+        r_doc_clean = (r.docente or "").strip().upper().replace(',', '').strip()
+        if r_doc_clean:
+            for c_obs in obs_by_teacher_date.get((r_doc_clean, r_date), []):
+                if c_obs not in candidates:
+                    candidates.append(c_obs)
                     
-                    if r_s and r_e and calculate_overlap_minutes(r_s, r_e, o.start_time, o.end_time) > 0:
-                        matching_rpt.append(r)
+        for o in candidates:
+            if o.id not in seen_obs_in_block and obs_touches_block(o, r_start, r_end, None):
+                relevant.append(o)
+                seen_obs_in_block.add(o.id)
 
-        print(
-            f"[F2] obs.id={o.id} | session={o.session_id} | {o_date} | "
-            f"reemplazante={repl_name_raw} | matching_rpt={[r.id for r in matching_rpt]}"
-        )
+        orig_h = normalize_hours(getattr(r, 'horas_dictadas', 0))
+        block_tit_h = 0.0
+        block_repl_h = 0.0
+        block_absent_h = 0.0
 
-        if not matching_rpt:
-            # Fallback absoluto: sin fila RPT de referencia
-            if o.start_time and o.end_time:
-                fb_key = (f"fb_{o.id}", o.session_id)
-                if fb_key not in injected_keys:
-                    injected_keys.add(fb_key)
-                    mins = get_time_diff_minutes(o.start_time, o.end_time)
-                    fb_hours = round(mins / 50.0, 2)
-                    print(f"  > FALLBACK sin RPT: horas={fb_hours}")
-                    injected_records.append({
-                        "id":             f"repl_fb_{o.id}",
-                        "fecha_clase":    o_date,
-                        "sede":           "S/D",
-                        "ciclo":          "S/D",
-                        "docente":        repl_name_raw or "---",
-                        "curso":          "S/D",
-                        "hora_inicio":    o.start_time,
-                        "hora_fin":       o.end_time,
-                        "horas_dictadas": fb_hours,
+        # -- CASO SIMPLE: Sin observaciones
+        if not relevant:
+            titular_name_up = (r.docente or "").strip().upper()
+            titular_no_comma = titular_name_up.replace(',', '').strip()
+            
+            if matches_target(titular_name_up, titular_no_comma, r_teacher_id):
+                processed_data.append({
+                    "id":             r.id,
+                    "fecha_clase":    r_date,
+                    "sede":           r.sede or "---",
+                    "ciclo":          r.ciclo or "---",
+                    "docente":        r.docente or "",
+                    "curso":          r.curso or "---",
+                    "hora_inicio":    r_start,
+                    "hora_fin":       r_end,
+                    "horas_dictadas": normalize_hours(r.horas_dictadas),
+                    "receso":         0.0,
+                    "is_replacement": False,
+                    "titular_original": None,
+                    "observation":    None,
+                    "obs_type":       "NORMAL"
+                })
+            print(f"[RPT CONSERVATION CHECK] Teacher={r.docente} | Original={orig_h} Derived={orig_h} | Status=OK (No Obs)")
+            continue
+
+        # -- CASO COMPLEJO: Fragmentación Geométrica del bloque
+        # Sanitizar timestamps para evitar errores en el sorteador de boundaries
+        boundaries = set()
+        if r_start: boundaries.add(r_start)
+        if r_end: boundaries.add(r_end)
+        
+        for o in relevant:
+            o_s = o.start_time or r_start
+            o_e = o.end_time or r_end
+            if r_start and o_s and r_start < o_s < r_end:
+                boundaries.add(o_s)
+            if r_end and o_e and r_start < o_e < r_end:
+                boundaries.add(o_e)
+        
+        sorted_bounds = sorted(list(boundaries))
+        print(f"[RPT GEOMETRIC SPLIT] {r.docente} | Block {r_start}-{r_end} sliced into {len(sorted_bounds)-1} segments.")
+
+        for i in range(len(sorted_bounds) - 1):
+            seg_s = sorted_bounds[i]
+            seg_e = sorted_bounds[i+1]
+            
+            mins = get_time_diff_minutes(seg_s, seg_e)
+            if mins <= 0:
+                continue
+            # Normalización explícita de payroll
+            seg_hours = normalize_hours(mins / 50.0)
+            
+            active_repl = None
+            active_abs  = None
+            
+            for o in relevant:
+                o_s = o.start_time or r_start
+                o_e = o.end_time or r_end
+                # Overlap inclusion check
+                if o_s <= seg_s and o_e >= seg_e:
+                    if o.type == 'REEMPLAZO':
+                        active_repl = o
+                    elif o.type in ('FALTA', 'VACACIONES', 'DESCANSO_MEDICO'):
+                        active_abs = o
+            
+            winner = active_repl or active_abs
+            if winner:
+                used_obs_ids.add(winner.id)
+                if winner.type == 'REEMPLAZO':
+                    block_repl_h += seg_hours
+                else:
+                    block_absent_h += seg_hours
+            else:
+                block_tit_h += seg_hours
+            
+            # A) Registrar para el TITULAR
+            tit_name_up = (r.docente or "").strip().upper()
+            tit_no_comma = tit_name_up.replace(',', '').strip()
+            
+            if matches_target(tit_name_up, tit_no_comma, r_teacher_id):
+                tit_hours = 0.0 if winner else seg_hours
+                
+                obs_meta = None
+                if winner:
+                    obs_meta = {
+                        "type": winner.type,
+                        "discount_type": getattr(winner, 'discount_type', 'SIMPLE') or 'SIMPLE',
+                        "has_discount_impact": winner.type != 'REEMPLAZO',
+                        "replacement_teacher_name": winner.replacement_teacher_name if winner.type == 'REEMPLAZO' else None,
+                        "description": winner.description or "",
+                        "ids": [winner.id]
+                    }
+                
+                processed_data.append({
+                    "id":             r.id,
+                    "fecha_clase":    r_date,
+                    "sede":           r.sede or "---",
+                    "ciclo":          r.ciclo or "---",
+                    "docente":        r.docente or "",
+                    "curso":          r.curso or "---",
+                    "hora_inicio":    seg_s,
+                    "hora_fin":       seg_e,
+                    "horas_dictadas": tit_hours,
+                    "receso":         0.0,
+                    "is_replacement": False,
+                    "titular_original": None,
+                    "observation":    obs_meta,
+                    "obs_type":       winner.type if winner else "NORMAL"
+                })
+            
+            # B) Registrar para el REEMPLAZANTE (si aplica)
+            if active_repl:
+                rn_raw = active_repl.replacement_teacher_name or "DOCENTE EXTERNO"
+                rn_up  = rn_raw.strip().upper()
+                rn_no  = rn_up.replace(',', '').strip()
+                rn_tid = active_repl.replacement_teacher_id or name_to_id.get(rn_up)
+                
+                if matches_target(rn_up, rn_no, rn_tid):
+                    true_tit = id_to_names.get(r_teacher_id, [r.docente or "S/D"])[0]
+                    processed_data.append({
+                        "id":             f"repl_{r.id}_{active_repl.id}",
+                        "fecha_clase":    r_date,
+                        "sede":           r.sede or "---",
+                        "ciclo":          r.ciclo or "---",
+                        "docente":        rn_raw,
+                        "curso":          r.curso or "---",
+                        "hora_inicio":    seg_s,
+                        "hora_fin":       seg_e,
+                        "horas_dictadas": seg_hours,
                         "receso":         0.0,
                         "is_replacement": True,
-                        "titular_original": true_titular_name,
+                        "titular_original": true_tit,
                         "observation": {
-                            "id": o.id, "type": "REEMPLAZO",
-                            "discount_type": o.discount_type,
+                            "id": active_repl.id,
+                            "type": "REEMPLAZO",
+                            "discount_type": getattr(active_repl, 'discount_type', 'SIMPLE') or 'SIMPLE',
                             "has_discount_impact": False,
-                            "replacement_teacher_name": "",
-                            "description": f"Reemplazando a {true_titular_name}: {o.description or ''}"
-                        }
+                            "replacement_teacher_name": rn_raw,
+                            "description": f"Reemplazo a {r.docente}: {active_repl.description or ''}",
+                            "ids": [active_repl.id]
+                        },
+                        "obs_type": "REEMPLAZO"
                     })
+
+        # C) CÁLCULO DE CONSERVACIÓN MATEMÁTICA POR BLOQUE
+        derived_h = normalize_hours(block_tit_h + block_repl_h + block_absent_h)
+        drift = abs(orig_h - derived_h)
+        c_status = "OK" if drift <= 0.01 else "FAIL"
+        print(f"[RPT CONSERVATION CHECK] Teacher={r.docente} | Original={orig_h} Derived={derived_h} (Tit={block_tit_h}, Repl={block_repl_h}, Abs={block_absent_h}) | Status={c_status}")
+
+    # ==================================================================
+    # FASE 2 — FALLBACK OBSERVACIONES FLOTANTES
+    # ==================================================================
+    for o in all_obs:
+        if o.type != 'REEMPLAZO' or o.id in used_obs_ids:
             continue
+            
+        rn_raw = o.replacement_teacher_name or "DOCENTE EXTERNO"
+        rn_up  = rn_raw.strip().upper()
+        rn_no  = rn_up.replace(',', '').strip()
+        rn_tid = o.replacement_teacher_id or name_to_id.get(rn_up)
+        
+        if not matches_target(rn_up, rn_no, rn_tid):
+            continue
+            
+        if not o.start_time or not o.end_time:
+            continue
+            
+        fallback_date = fecha_init
+        f_sede = "S/D"
+        f_ciclo = "S/D"
+        f_curso = "S/D"
+        
+        s_info = session_info_by_id.get(o.session_id)
+        if s_info:
+            fallback_date = s_info[1]
+            s_subj = s_info[5]
+            s_class = s_info[6]
+            
+            if s_subj:
+                f_curso = re.sub(r'\(.*?\)', '', str(s_subj)).strip()
+            
+            if s_class:
+                class_str = str(s_class)
+                c_match = re.search(r'\((.*?)\)', class_str)
+                ext_code = c_match.group(1).strip() if c_match else class_str.strip()
+                f_ciclo = ext_code
+                
+                c_code = ext_code.split('/')[0].strip()
+                if len(c_code) >= 2:
+                    pen_char = c_code[-2].upper()
+                    sed_map = {
+                        '1': 'LIMA CERCADO', '2': 'SJL BASADRE', '3': 'INDEPENDENCIA',
+                        '4': '2 DE MAYO', '5': 'CONSTITUCION', '6': 'CRESPO Y CASTILLO',
+                        '8': 'SANTA ANITA', '9': 'COMAS', 'Z': 'PUENTE PIEDRA',
+                        'Y': 'SJL LOS JARDINES', 'X': 'VMT'
+                    }
+                    f_sede = sed_map.get(pen_char, "DESCONOCIDA")
 
-        for best_r in matching_rpt:
-            # ✅ DEDUPLICACIÓN SEMÁNTICA/VISUAL:
-            # Usamos los valores exactos que se renderizarán en la fila.
-            # Así, dos sub-sesiones de BD que forman el mismo bloque visual
-            # no generarán dos filas idénticas para el reemplazante.
-            best_r_s = getattr(best_r, 'hora_inicio', None)
-            best_r_e = getattr(best_r, 'hora_fin', None)
-            if best_r_e is None and best_r_s is not None:
-                h_dictadas = float(getattr(best_r, 'horas_dictadas', 0))
-                total_mins = best_r_s.hour * 60 + best_r_s.minute + int(h_dictadas * 50)
-                best_r_e = time(int(total_mins // 60) % 24, int(total_mins % 60))
+        f_mins = get_time_diff_minutes(o.start_time, o.end_time)
+        if f_mins <= 0:
+            continue
+        f_hours = normalize_hours(f_mins / 50.0)
+        
+        true_tit = id_to_names.get(o.teacher_id, ["S/D"])[0]
+        
+        processed_data.append({
+            "id":             f"repl_fb_{o.id}",
+            "fecha_clase":    fallback_date,
+            "sede":           f_sede,
+            "ciclo":          f_ciclo,
+            "docente":        rn_raw,
+            "curso":          f_curso,
+            "hora_inicio":    o.start_time,
+            "hora_fin":       o.end_time,
+            "horas_dictadas": f_hours,
+            "receso":         0.0,
+            "is_replacement": True,
+            "titular_original": true_tit,
+            "observation": {
+                "id": o.id,
+                "type": "REEMPLAZO",
+                "discount_type": getattr(o, 'discount_type', 'SIMPLE') or 'SIMPLE',
+                "has_discount_impact": False,
+                "replacement_teacher_name": rn_raw,
+                "description": f"Reemplazo Flotante de {true_tit}: {o.description or ''}",
+                "ids": [o.id]
+            },
+            "obs_type": "REEMPLAZO"
+        })
 
-            dedup_key = (
-                repl_name_raw.strip().upper(),
-                getattr(best_r, 'fecha_clase', None),
-                best_r_s,
-                best_r_e,
-                (getattr(best_r, 'ciclo', "") or "").strip()
-            )
-            if dedup_key in injected_keys:
-                print(f"  > SKIP VISUAL-DUPLICADO: {dedup_key}")
-                continue
-            injected_keys.add(dedup_key)
-
-            # ✅ HORAS BINARIAS: 100% del bloque RPT
-            repl_hours  = float(getattr(best_r, 'horas_dictadas', 0) or 0)
-            repl_receso = float(getattr(best_r, 'receso', 0) or 0)
-
-            print(
-                f"  > INJECT: rpt_id={best_r.id} "
-                f"[{best_r_s}-{best_r_e}] "
-                f"horas={repl_hours} receso={repl_receso} > {repl_name_raw}"
-            )
-            injected_records.append({
-                "id":             f"repl_{best_r.id}_{o.id}",
-                "fecha_clase":    getattr(best_r, 'fecha_clase', None),
-                "sede":           best_r.sede or "---",
-                "ciclo":          best_r.ciclo or "---",
-                "docente":        repl_name_raw or "---",
-                "curso":          best_r.curso or "---",
-                "hora_inicio":    best_r_s,   # ← tiempos del RPT titular
-                "hora_fin":       best_r_e,       # ← tiempos del RPT titular
-                "horas_dictadas": round(repl_hours, 2),
-                "receso":         round(repl_receso, 2),
-                "is_replacement": True,
-                "titular_original": true_titular_name,
-                "observation": {
-                    "id": o.id, "type": "REEMPLAZO",
-                    "discount_type": o.discount_type,
-                    "has_discount_impact": False,
-                    "replacement_teacher_name": "",
-                    "description": f"Reemplazando a {true_titular_name}: {o.description or ''}"
-                }
-            })
-
-    processed_data.extend(injected_records)
-    
     # ------------------------------------------------------------------
     # FASE 3 — CONSOLIDACIÓN DE BLOQUES CONTIGUOS Y RECESOS
     # ------------------------------------------------------------------
     consolidated: List[Dict[str, Any]] = []
     
     # Sort processed_data by date, teacher, sede, course, classroom, is_replacement, start_time
-    sorted_for_merge = sorted(processed_data, key=lambda x: (
-        x["fecha_clase"],
-        (x["docente"] or "").strip().upper(),
-        (x["sede"] or "").strip().upper(),
-        (x["curso"] or "").strip().upper(),
-        (x["ciclo"] or "").strip().upper(),
-        x["is_replacement"],
-        x["hora_inicio"]
-    ))
-
-    print("[RPT SESSION MERGE]")
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.info("[RPT SESSION MERGE] Starting contiguous block consolidation.")
-
-    current_group: Optional[Dict[str, Any]] = None
-    merged_count = 0
-
-    for item in sorted_for_merge:
-        # Print [RPT XML BLOCK] for every raw block
-        print(f"[RPT XML BLOCK] Processing raw block: docente='{item['docente']}' | {item['hora_inicio']}-{item['hora_fin']} | curso='{item['curso']}' | ciclo='{item['ciclo']}' | hrs={item['horas_dictadas']}")
-        
-        if current_group is None:
-            current_group = dict(item)
-            current_group["receso"] = 0.0
-            continue
-            
-        # Check continuity conditions
-        same_date = current_group["fecha_clase"] == item["fecha_clase"]
-        same_docente = (current_group["docente"] or "").strip().upper() == (item["docente"] or "").strip().upper()
-        same_curso = (current_group["curso"] or "").strip().upper() == (item["curso"] or "").strip().upper()
-        same_ciclo = (current_group["ciclo"] or "").strip().upper() == (item["ciclo"] or "").strip().upper()
-        same_sede = (current_group["sede"] or "").strip().upper() == (item["sede"] or "").strip().upper()
-        same_repl = current_group["is_replacement"] == item["is_replacement"]
-        
-        # Calculate time difference in minutes between previous end and current start
-        gap_minutes = get_time_diff_minutes(current_group["hora_fin"], item["hora_inicio"])
-        
-        # We consolidate if they are consecutive or overlapping (gap <= 20 mins)
-        is_consecutive = gap_minutes <= 20
-        
-        if same_date and same_docente and same_curso and same_ciclo and same_sede and same_repl and is_consecutive:
-            prev_end = current_group["hora_fin"]
-            if gap_minutes < 0:
-                print(f"[RPT OVERLAP DETECTED] Overlap found for {item['docente']} between current {current_group['hora_inicio']}-{current_group['hora_fin']} and item {item['hora_inicio']}-{item['hora_fin']}")
-            
-            # Extend end time based on combined horas_dictadas to respect F+30 academic blocks
-            current_group["horas_dictadas"] += item["horas_dictadas"]
-            total_mins = current_group["hora_inicio"].hour * 60 + current_group["hora_inicio"].minute + int(current_group["horas_dictadas"] * 50)
-            current_group["hora_fin"] = time(int(total_mins // 60) % 24, int(total_mins % 60))
-            
-            print(f"[RPT XML MERGED] Merged blocks for {item['docente']}: {current_group['hora_inicio']}-{prev_end} with {item['hora_inicio']}-{item['hora_fin']} => new end {current_group['hora_fin']} | total hrs: {current_group['horas_dictadas']}")
-            logger.info(f"[RPT XML MERGED] Merging block for {current_group['docente']}: {current_group['hora_inicio']}->{prev_end} with {item['hora_inicio']}->{item['hora_fin']} => {current_group['hora_fin']}")
-            
-            # Merge observations if present
-            if item.get("observation"):
-                if not current_group.get("observation"):
-                    current_group["observation"] = item["observation"]
-                else:
-                    current_group["observation"]["type"] = ", ".join(sorted(set(filter(None, [current_group["observation"]["type"], item["observation"]["type"]]))))
-                    current_group["observation"]["description"] = " | ".join(sorted(set(filter(None, [current_group["observation"]["description"], item["observation"]["description"]]))))
-                    current_group["observation"]["ids"].extend(item["observation"]["ids"])
-            
-            merged_count += 1
-        else:
-            consolidated.append(current_group)
-            current_group = dict(item)
-            current_group["receso"] = 0.0
-            
-    if current_group is not None:
-        consolidated.append(current_group)
+    from app.services.session_consolidator import consolidate_sessions
+    consolidated = consolidate_sessions(
+        processed_data,
+        date_key="fecha_clase",
+        start_time_key="hora_inicio",
+        end_time_key="hora_fin",
+        hours_key="horas_dictadas",
+        group_fields=["docente", "sede", "curso", "ciclo", "is_replacement", "obs_type"],
+        module_tag="RPT"
+    )
+    
+    # Initialize receso default before window validation
+    for c in consolidated:
+        if "receso" not in c:
+            c["receso"] = 0.0
 
     # Print [RPT FINAL CONSOLIDATED] for every consolidated block
     for block in consolidated:
         print(f"[RPT FINAL CONSOLIDATED] Block consolidated: {block['docente']} | {block['hora_inicio']}-{block['hora_fin']} | hrs={block['horas_dictadas']}")
 
+    # [RPT BREAK SHIFT] Garantizar orden temporal estricto por docente antes de evaluar recesos
+    consolidated.sort(key=lambda x: (x["fecha_clase"], (x["docente"] or "").strip().upper(), x["hora_inicio"]))
+    
+    # Construir índice temporal por día para detección de continuidad pedagógica
+    timeline_by_day: Dict[tuple, list] = {}
+    for b in consolidated:
+        k = ((b["docente"] or "").strip().upper(), b["fecha_clase"])
+        timeline_by_day.setdefault(k, []).append(b)
+
     # Set to keep track of applied breaks per teacher per day: (docente, fecha)
     applied_breaks = set()
 
-    # Now calculate recess (receso) for each consolidated block based on official break windows
     for block in consolidated:
+        # [RPT BREAK SHIELD] Si el bloque ya posee crédito por transferencia previa, blindarlo de sobre-escritura
+        if float(block.get("receso", 0.0)) > 0.0:
+            print(f"[RPT BREAK SHIELD] Block already possesses transferred recess credit. Safeguarding value.")
+            continue
+
         docente = (block["docente"] or "").strip().upper()
         fecha = block["fecha_clase"]
         start_time = block["hora_inicio"]
@@ -506,23 +546,61 @@ def process_rpt_logic(
         
         print(f"[RPT BREAK WINDOW] Evaluating block {start_time}-{end_time} on {fecha} for teacher '{docente}'")
         
-        # Check matching criteria
-        crosses_break_1 = (
-            start_time < time(9, 40)
-            and end_time >= time(10, 0)
-        )
+        # [RPT BREAK WEEKEND BLOCK] Sábado (5) y Domingo (6) JAMÁS generan receso
+        if fecha.weekday() in (5, 6):
+            print(f"[RPT BREAK WEEKEND BLOCK] Weekend detected ({fecha}). No recess is allowed.")
+            block["receso"] = 0.0
+            continue
+        
+        # Identificar el siguiente bloque cronológico para evaluar continuidad
+        teacher_key = (docente, fecha)
+        day_blocks = timeline_by_day.get(teacher_key, [])
+        try:
+            curr_idx = day_blocks.index(block)
+            has_next = (curr_idx < len(day_blocks) - 1)
+            next_b = day_blocks[curr_idx + 1] if has_next else None
+            next_start = next_b["hora_inicio"] if next_b else None
+        except ValueError:
+            next_start = None
 
-        crosses_break_2 = (
-            start_time < time(10, 30)
-            and end_time >= time(10, 50)
-        )
+        # Validar ventana razonable de continuidad (Máximo 13:00 hrs para tramo mañana/mediodía)
+        LIMIT_CONTINUITY = time(13, 0)
+        is_within_window = False
+        if next_start:
+            if next_start <= LIMIT_CONTINUITY:
+                is_within_window = True
+                print(f"[RPT BREAK CONTINUITY] Next start {next_start} is within pedagogical stretch (<= 13:00). Accepted.")
+            else:
+                print(f"[RPT BREAK INVALID GAP] Next start {next_start} falls outside pedagogical stretch (> 13:00). Split shift detected. Gap invalid.")
 
+        # -- REGLA 1: Receso 09:40 - 10:00 --
+        crosses_break_1 = (start_time < time(9, 40) and end_time >= time(10, 0))
+        is_prev_1 = False
+        if end_time == time(9, 40) and is_within_window:
+            is_prev_1 = True
+            print(f"[RPT BREAK PREVIOUS BLOCK] [RPT BREAK ACCEPTED] Block {start_time}-{end_time} ends at 09:40 and teacher has valid continuous load. Shifting recess.")
+
+        # -- REGLA 2: Receso 10:30 - 10:50 --
+        crosses_break_2 = (start_time < time(10, 30) and end_time >= time(10, 50))
+        is_prev_2 = False
+        if end_time == time(10, 30) and is_within_window:
+            is_prev_2 = True
+            print(f"[RPT BREAK PREVIOUS BLOCK] [RPT BREAK ACCEPTED] Block {start_time}-{end_time} ends at 10:30 and teacher has valid continuous load. Shifting recess.")
+
+        # -- REGLA 3: Receso 11:20 - 11:40 --
+        crosses_break_3 = (start_time < time(11, 20) and end_time >= time(11, 40))
+        is_prev_3 = False
+        if end_time == time(11, 20) and is_within_window:
+            is_prev_3 = True
+            print(f"[RPT BREAK PREVIOUS BLOCK] [RPT BREAK ACCEPTED] Block {start_time}-{end_time} ends at 11:20 and teacher has valid continuous load. Shifting recess.")
+
+        # Mantener la regla histórica legacy del "Final Cut" de 11:40 por compatibilidad
         reaches_final_cut = (
             start_time < time(11, 40)
             and end_time >= time(11, 40)
         )
         
-        matched_break = crosses_break_1 or crosses_break_2
+        matched_break = crosses_break_1 or is_prev_1 or crosses_break_2 or is_prev_2 or crosses_break_3 or is_prev_3
         matched_cut = reaches_final_cut
         
         if matched_break or matched_cut:
@@ -536,9 +614,55 @@ def process_rpt_logic(
                 print(f"[RPT SINGLE BREAK ENFORCED] Already applied break for {docente} on {fecha}. Skipping consecutive breaks.")
                 block["receso"] = 0.00
             else:
-                block["receso"] = 0.33
                 applied_breaks.add(teacher_day_key)
-                print(f"[RPT BREAK APPLIED] Recess of 0.33 applied to block {start_time}-{end_time} for {docente} on {fecha}.")
+                
+                # Log explicit prioritization mode
+                if start_time == time(8, 0):
+                    print(f"[RPT BREAK PRIORITY BLOCK] Recess successfully assigned to morning anchor block ({start_time}-{end_time}).")
+                else:
+                    print(f"[RPT BREAK FALLBACK BLOCK] No early anchor found. Recess assigned to earliest continuous candidate ({start_time}-{end_time}).")
+                
+                # -- NUEVA LOGICA DE TRANSFERENCIA POR OBSERVACIONES --
+                if float(block.get("horas_dictadas", 0.0)) <= 0.0:
+                    # El docente original tiene una FALTA o REEMPLAZO aquí.
+                    # No cobra el receso de forma nativa.
+                    block["receso"] = 0.0
+                    o_type = block.get("obs_type")
+                    print(f"[RPT BREAK VOID] Titular {docente} has 0 dictacted hours ({o_type}). Skipping physical credit.")
+                    
+                    if o_type == "REEMPLAZO":
+                        # Intentar transferir el crédito al docente que realmente cubrió este bloque físico
+                        found_trf = False
+                        for target in consolidated:
+                            # Solo filas del reemplazante generadas en Fase 2
+                            if not target.get("is_replacement"): continue
+                            if target["fecha_clase"] != fecha: continue
+                            
+                            # Protección: ¿El reemplazante ya tiene un receso asignado hoy?
+                            tgt_name = (target["docente"] or "").strip().upper()
+                            tgt_key = (tgt_name, fecha)
+                            if tgt_key in applied_breaks:
+                                # Si el reemplazante ya tiene receso asignado en otro bloque, se respeta el límite de 1 por día.
+                                continue
+                                
+                            # Evaluar si el rango temporal del reemplazo cubre el bloque detonante
+                            t_start = target["hora_inicio"]
+                            t_end = target["hora_fin"]
+                            
+                            # Verificación de inclusión temporal (o solapamiento)
+                            if t_start <= start_time and t_end >= end_time:
+                                # Otorgar crédito y protegerlo
+                                target["receso"] = 0.33
+                                applied_breaks.add(tgt_key)
+                                print(f"[RPT BREAK TRANSFER] Successfully transferred 0.33 recess from {docente} to replacement {tgt_name} on block {t_start}-{t_end}.")
+                                found_trf = True
+                                break
+                        if not found_trf:
+                            print(f"[RPT BREAK TRANSFER FAILED] Could not find available replacement row for block {start_time}-{end_time} to receive credit.")
+                else:
+                    # Caso normal: el docente trabajó físicamente sus horas.
+                    block["receso"] = 0.33
+                    print(f"[RPT BREAK APPLIED] Recess of 0.33 applied to block {start_time}-{end_time} for {docente} on {fecha}.")
         else:
             block["receso"] = 0.00
             print(f"[RPT BREAK REJECTED] Block {start_time}-{end_time} does not match break criteria.")

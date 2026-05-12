@@ -1,217 +1,35 @@
 import api from './api.js';
 import { ENDPOINTS, API_BASE_URL } from './config.js';
 import { getCalculatedTime, cleanCycleName, getCourseColor, extractList } from './ui_utils.js';
-import { loadRptPlanilla } from './reportes.js';
 
 // State
 let currentSessionForObs = null;
 let currentRowElementForObs = null;
 
-// --- HORARIOS (Schedule) logic ---
-
-export async function loadSchedule() {
-    const type = document.getElementById('schedule-filter-type')?.value;
-    const targetId = document.getElementById('schedule-filter-target')?.value;
-    const sDate = document.getElementById('schedule-start-date')?.value;
-    const eDate = document.getElementById('schedule-end-date')?.value;
-
-    if (!targetId || !sDate || !eDate) return;
-
-    let endpoint = "";
-    if (type === 'teacher') {
-        endpoint = `${ENDPOINTS.HORARIOS.BASE}/teacher/${targetId}?start_date=${sDate}&end_date=${eDate}`;
-    } else {
-        endpoint = `${ENDPOINTS.HORARIOS.BASE}/classroom/${targetId}?start_date=${sDate}&end_date=${eDate}`;
-    }
-
+// Mandatory Lifecycle Initialization
+export async function initObservaciones() {
+    console.log("[OBS MODULE INIT] Bootstrapping observations lifecycle.");
     try {
-        const response = await api.authFetch(endpoint);
-        
-        // REGLA OBLIGATORIA: Log del response completo
-        console.log("[SCHEDULE] Response recibida:", response);
-
-        // ✅ USO DE HELPER CENTRALIZADO
-        const list = extractList(response);
-        console.log("[SCHEDULE] LIST:", list);
-
-        if (response.success && list.length > 0) {
-            renderScheduleGrid(list, new Date(sDate + 'T00:00:00'));
-        }
-    } catch (e) { console.error("Error loading schedule:", e); }
-}
-
-export async function exportSchedule() {
-    const type = document.getElementById('schedule-filter-type')?.value;
-    const targetId = document.getElementById('schedule-filter-target')?.value;
-    const sDate = document.getElementById('schedule-start-date')?.value;
-    const eDate = document.getElementById('schedule-end-date')?.value;
-
-    if (!targetId || !sDate || !eDate) return alert("Por favor selecciona los filtros primero antes de exportar.");
-
-    const btn = document.getElementById('export-excel-btn');
-    if (btn) {
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
-        btn.disabled = true;
-    }
-
-    try {
-        const endpoint = `${ENDPOINTS.HORARIOS.BASE}/export?type=${type}&target_id=${targetId}&start_date=${sDate}&end_date=${eDate}`;
-        // Pedimos rawResponse para poder manejar el blob
-        const res = await api.authFetch(endpoint, { rawResponse: true });
-
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-        a.download = `horarios_export_${todayStr}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-    } catch (e) {
-        alert("Error descargando el archivo Excel: " + e.message);
-    } finally {
-        if (btn) {
-            btn.innerHTML = '<i class="fa-solid fa-download"></i> Exportar a Excel';
-            btn.disabled = false;
-        }
-    }
-}
-
-function renderScheduleGrid(sessions, mondayDate) {
-    const filterType = document.getElementById('schedule-filter-type');
-    if (!filterType) return;
-    const type = filterType.value;
-    const summaryPanel = document.getElementById('schedule-teacher-summary');
-
-    if (type === 'teacher') {
-        if (summaryPanel) summaryPanel.classList.remove('hidden');
-        renderTeacherAgenda(sessions, mondayDate);
-    } else {
-        if (summaryPanel) summaryPanel.classList.add('hidden');
-        renderClassroomCalendar(sessions, mondayDate);
-    }
-}
-
-function renderTeacherAgenda(sessions, startDate) {
-    const tbody = document.getElementById('schedule-grid-body');
-    const hourHeader = document.getElementById('schedule-header-hour');
-    if (hourHeader) hourHeader.classList.add('hidden');
-
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
-    if (!sessions || sessions.length === 0) {
-        tbody.innerHTML = `<tr class="border-b border-slate-200"><td colspan="5" class="p-12 text-center text-slate-400 font-medium italic">No hay clases programadas para este docente en el rango seleccionado.</td></tr>`;
-        return;
-    }
-
-    // Dynamic Range
-    const daysInRange = [];
-    let currDay = new Date(startDate);
-    const endDateStr = document.getElementById('schedule-end-date')?.value;
-    const endDate = new Date(endDateStr + 'T00:00:00');
-
-    while (currDay <= endDate) {
-        daysInRange.push(currDay.toISOString().split('T')[0]);
-        currDay.setDate(currDay.getDate() + 1);
-        if (daysInRange.length > 31) break;
-    }
-
-    const grouped = {};
-    daysInRange.forEach(d => grouped[d] = []);
-    sessions.forEach(s => {
-        if (grouped[s.date]) grouped[s.date].push(s);
-    });
-
-    const tr = document.createElement('tr');
-    tr.className = "align-top";
-
-    daysInRange.forEach(dateStr => {
-        const td = document.createElement('td');
-        td.className = "p-3 border-r border-slate-200 min-w-[220px] bg-slate-50/10";
-
-        const daySessions = grouped[dateStr].sort((a, b) => (a.start_time || "").localeCompare(b.start_time || ""));
-        let html = "";
-        
-        daySessions.forEach(s => {
-            const timeRange = getCalculatedTime(s.start_time, s.end_time, s.subject || "");
-            const cleanedSubject = s.is_break ? (s.subject || "RECESO") : (s.subject || "").replace(/\s*\([^)]*\)$/, '').trim();
-            const cardColor = getCourseColor(s.subject, 'teacher');
+        // Set default dates if not present
+        const startEl = document.getElementById('obs-date-start');
+        const endEl = document.getElementById('obs-date-end');
+        if (startEl && !startEl.value) {
+            const curr = new Date();
+            const mondayDiff = curr.getDate() - curr.getDay() + (curr.getDay() === 0 ? -6 : 1);
+            const monday = new Date(new Date().setDate(mondayDiff));
+            const sunday = new Date(monday);
+            sunday.setDate(sunday.getDate() + 6);
             
-            html += `
-                <div class="mb-3 ${cardColor} border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center text-center transition-all hover:scale-105 border-b-4">
-                    <div class="font-black text-sm leading-tight uppercase tracking-tight text-slate-900">${cleanedSubject}</div>
-                    <div class="text-[11px] font-bold text-slate-600 mt-2 bg-white/50 px-3 py-1 rounded-full">${timeRange}</div>
-                    <div class="mt-2 text-[10px] font-black opacity-60 uppercase">${cleanCycleName(s.class_group)}</div>
-                </div>
-            `;
-        });
-
-        if (daySessions.length === 0) {
-            html = `<div class="h-64 flex items-center justify-center text-slate-300 italic text-xs uppercase tracking-widest">Sin Actividad</div>`;
+            startEl.value = monday.toISOString().split('T')[0];
+            if (endEl) endEl.value = sunday.toISOString().split('T')[0];
         }
-        td.innerHTML = html;
-        tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
-}
 
-function renderClassroomCalendar(sessions, startDate) {
-    const tbody = document.getElementById('schedule-grid-body');
-    const hourHeader = document.getElementById('schedule-header-hour');
-    if (hourHeader) hourHeader.classList.remove('hidden');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
-    const timeBlocks = {};
-    sessions.forEach(s => {
-        if (!timeBlocks[s.start_time]) {
-            timeBlocks[s.start_time] = { start_time: s.start_time, end_time: s.end_time, is_break: s.is_break, days: {} };
-        }
-        timeBlocks[s.start_time].days[s.date] = s;
-    });
-
-    const sortedStartTimes = Object.keys(timeBlocks).sort();
-    const daysInRange = [];
-    let curr = new Date(startDate);
-    const endDate = new Date(document.getElementById('schedule-end-date')?.value + 'T00:00:00');
-    while (curr <= endDate) {
-        daysInRange.push(curr.toISOString().split('T')[0]);
-        curr.setDate(curr.getDate() + 1);
-        if (daysInRange.length > 31) break;
+        await loadObsTeacherList();
+        console.log("[OBS MODULE READY] Lifecycle bootstrapped completely.");
+    } catch (error) {
+        console.error("[OBS ERROR] Failed to initialize module:", error);
     }
-
-    sortedStartTimes.forEach(time => {
-        const block = timeBlocks[time];
-        const tr = document.createElement('tr');
-        tr.className = "border-b border-slate-200";
-        let rowHtml = `<td class="px-2 py-2 font-black text-slate-800 text-center border-r border-slate-200 bg-slate-50/50">
-                        <div class="text-sm">${block.start_time}</div>
-                        <div class="text-[10px] text-slate-400 font-bold">${block.end_time}</div></td>`;
-
-        daysInRange.forEach(dateStr => {
-            const session = block.days[dateStr];
-            if (session && session.subject) {
-                const cardColor = getCourseColor(session.subject, 'classroom');
-                rowHtml += `<td class="p-1 border-r border-slate-200 align-middle h-20">
-                            <div class="${cardColor} border rounded-lg p-2 shadow-sm h-full flex flex-col items-center justify-center text-center transition-all hover:scale-105">
-                                <div class="font-black text-[10px] leading-tight uppercase tracking-tighter">${session.subject}</div>
-                                <div class="text-[9px] font-bold opacity-80 mt-1">${session.start_time} - ${session.end_time}</div>
-                                <div class="text-[8px] font-black mt-1 uppercase tracking-tighter opacity-60 truncate w-full">${session.teacher || ""}</div>
-                            </div></td>`;
-            } else {
-                rowHtml += `<td class="p-1 border-r border-slate-200 bg-slate-50/20"></td>`;
-            }
-        });
-        tr.innerHTML = rowHtml;
-        tbody.appendChild(tr);
-    });
 }
-
-// --- OBSERVACIONES (Observations) logic ---
 
 export function toggleObsTab(tabName) {
     const regTab = document.getElementById('obs-tab-register');
@@ -239,15 +57,17 @@ export async function loadObsTeacherList() {
     const select = document.getElementById('obs-filter-docente');
     const datalist = document.getElementById('teachers-datalist');
     if (!select) return;
+    
+    console.log("[OBS FETCH] Querying active instructional staff via HORARIOS API...");
+    
     try {
         const response = await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/teachers`);
         
-        // REGLA OBLIGATORIA: Log del response completo
-        console.log("[OBS_TEACHERS] Response recibida:", response);
+        console.log("[OBS RESPONSE] Data received:", response);
 
         // ✅ USO DE HELPER CENTRALIZADO
         const teachers = extractList(response);
-        console.log("[OBS_TEACHERS] LIST:", teachers);
+        console.log(`[OBS REPLACEMENT TEACHERS] Scanning system for validated instructional personnel. Total Candidates: ${teachers.length}`);
 
         select.innerHTML = '<option value="">Selecciona un docente...</option>';
         if (datalist) datalist.innerHTML = '';
@@ -267,10 +87,15 @@ export async function loadObsTeacherList() {
                     datalist.appendChild(dOpt);
                 }
             });
+            console.log(`[OBS REPLACEMENT FILTERED] Successfully resolved and hydrated replacement datalists with ${teachers.length} verified entities.`);
+            console.log(`[OBS FILTER RESULT] Found and injected ${teachers.length} potential candidates.`);
+        } else {
+            console.warn("[OBS EMPTY STATE] No actionable instructional personnel identified in scope.");
+            select.innerHTML = '<option value="">No hay docentes activos</option>';
         }
     } catch (e) {
-        console.error("Error loading teachers for obs:", e);
-        select.innerHTML = '<option value="">Error al cargar</option>';
+        console.error("[OBS ERROR] Failed loading teachers for obs:", e);
+        select.innerHTML = '<option value="">Error al cargar docentes</option>';
     }
 }
 
@@ -286,6 +111,8 @@ export async function searchClassesForObs() {
         alert("Por favor completa todos los filtros de búsqueda.");
         return;
     }
+    
+    console.log(`[OBS FETCH] Triggering session lookup for Docente=${teacherName} Range=${dateStart} to ${dateEnd}`);
 
     if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-12 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i> Buscando clases...</td></tr>';
 
@@ -293,17 +120,16 @@ export async function searchClassesForObs() {
         const url = `${ENDPOINTS.HORARIOS.BASE}/sessions-for-obs?teacher_id=${teacherId}&start_date=${dateStart}&end_date=${dateEnd}`;
         const response = await api.authFetch(url);
         
-        // REGLA OBLIGATORIA: Log del response completo
-        console.log("[OBS_SESSIONS] Response recibida:", response);
+        console.log("[OBS RESPONSE] Grouped sessions dataset acquired:", response);
 
         // ✅ USO DE HELPER CENTRALIZADO
         const sessions = extractList(response);
-        console.log("[OBS_SESSIONS] LIST:", sessions);
 
         if (tbody) {
             tbody.innerHTML = '';
             if (sessions.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-12 text-center text-slate-400 italic">No se encontraron clases en este rango para este docente.</td></tr>';
+                console.log("[OBS EMPTY STATE] Filter constraints produced zero target sessions.");
+                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-12 text-center text-slate-400 italic">No se encontraron sesiones en este rango de fechas.</td></tr>';
                 return;
             }
 
@@ -341,6 +167,7 @@ export async function searchClassesForObs() {
                 `;
                 tbody.appendChild(tr);
             });
+            console.log(`[OBS RENDER] Successfully rendered ${sessions.length} interactive scheduling entities.`);
         }
     } catch (e) { console.error("Error searching classes:", e); }
 }
@@ -363,8 +190,19 @@ export function openRegisterObsModal(session, rowElement) {
     document.querySelector('input[name="obs-block-mode"][value="full"]').checked = true;
     document.getElementById('obs-form-type').value = 'FALTA';
     document.getElementById('obs-form-discount').value = 'SIMPLE';
-    document.getElementById('obs-form-replacement-last').value = '';
-    document.getElementById('obs-form-replacement-first').value = '';
+    
+    // Clear replacement elements
+    const searchInput = document.getElementById('obs-form-replacement-search');
+    if (searchInput) {
+        searchInput.value = '';
+        searchInput.disabled = false;
+    }
+    const isNewCheck = document.getElementById('obs-form-replacement-is-new');
+    if (isNewCheck) isNewCheck.checked = false;
+    
+    const infoBox = document.getElementById('obs-replacement-external-info');
+    if (infoBox) infoBox.classList.add('hidden');
+
     document.getElementById('obs-form-description').value = '';
 
     toggleObsBlockMode(true);
@@ -376,11 +214,12 @@ export function toggleObsBlockMode(isFull) {
     const splitCont = document.getElementById('obs-split-mode-container');
     if (!singleCont || !splitCont) return;
 
-    if (isFull) {
+    if (isFull === true || isFull === 'full') {
         singleCont.classList.remove('hidden');
         splitCont.classList.add('hidden');
         handleObsTypeChange();
     } else {
+        console.log("[OBS SPLIT BLOCK] Attempting to decompose composite academic block into discrete temporal durations.");
         singleCont.classList.add('hidden');
         splitCont.classList.remove('hidden');
         renderPedagogicalSlots();
@@ -395,11 +234,13 @@ function renderPedagogicalSlots() {
     const end = currentSessionForObs.end_time;
     const slots = splitIntoPedagogicalHours(start, end);
 
+    console.log(`[OBS LESSON GENERATED] Academic segmentator derived ${slots.length} elemental entities from temporal span ${start} to ${end}.`);
+
     container.innerHTML = `<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Desglose: ${slots.length} h. pedagógicas</p>`;
 
     slots.forEach((slot, idx) => {
         const slotDiv = document.createElement('div');
-        slotDiv.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3 mb-2";
+        slotDiv.className = "obs-slot-item bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3 mb-2";
         slotDiv.innerHTML = `
             <div class="flex justify-between items-center">
                 <span class="text-xs font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded">Hora ${idx + 1}: ${slot.start} - ${slot.end}</span>
@@ -409,10 +250,12 @@ function renderPedagogicalSlots() {
                     <option value="REEMPLAZO">REEMPLAZO</option>
                 </select>
             </div>
-            <div id="slot-replacement-container-${idx}" class="hidden mt-2 pt-2 border-t border-slate-100">
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" class="obs-slot-replacement-last w-full px-3 py-2 bg-amber-50 border border-amber-100 rounded-lg text-xs" list="teachers-datalist" placeholder="Apellidos...">
-                    <input type="text" class="obs-slot-replacement-first w-full px-3 py-2 bg-amber-50 border border-amber-100 rounded-lg text-xs" placeholder="Nombres...">
+            <div id="slot-replacement-container-${idx}" class="hidden mt-2 pt-2 border-t border-slate-100 space-y-2">
+                <input type="search" class="obs-slot-replacement-search w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs" list="teachers-datalist" placeholder="Buscar reemplazo...">
+                <input type="text" class="obs-slot-replacement-external-name hidden w-full px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 placeholder:text-amber-400" placeholder="Apellidos y Nombres del docente externo">
+                <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                    <input type="checkbox" class="obs-slot-replacement-is-new w-3 h-3 text-indigo-600" data-idx="${idx}" data-action="toggleSlotNewTeacherMode">
+                    <label class="text-[9px] font-bold text-slate-500 uppercase">¿Docente externo?</label>
                 </div>
             </div>
             <input type="hidden" class="obs-slot-start" value="${slot.start}">
@@ -427,6 +270,47 @@ export function toggleSlotReplacement(e) {
     const value = e.target.value;
     const container = document.getElementById(`slot-replacement-container-${idx}`);
     if (container) container.classList.toggle('hidden', value !== 'REEMPLAZO');
+}
+
+export function toggleSlotNewTeacherMode(e) {
+    const idx = e.target.getAttribute('data-idx');
+    const isChecked = e.target.checked;
+    const container = document.getElementById(`slot-replacement-container-${idx}`);
+    if (container) {
+        const search = container.querySelector('.obs-slot-replacement-search');
+        const extName = container.querySelector('.obs-slot-replacement-external-name');
+        if (search) {
+            search.classList.toggle('hidden', isChecked);
+            if (isChecked) search.value = '';
+        }
+        if (extName) {
+            extName.classList.toggle('hidden', !isChecked);
+            if (!isChecked) extName.value = '';
+        }
+    }
+}
+
+export function toggleNewTeacherMode() {
+    const isNew = document.getElementById('obs-form-replacement-is-new')?.checked;
+    const searchInput = document.getElementById('obs-form-replacement-search');
+    const extNameInput = document.getElementById('obs-form-replacement-external-name');
+    
+    if (searchInput) {
+        searchInput.classList.toggle('hidden', !!isNew);
+        if (isNew) searchInput.value = '';
+    }
+    if (extNameInput) {
+        extNameInput.classList.toggle('hidden', !isNew);
+        if (!isNew) extNameInput.value = '';
+    }
+}
+
+function getTeacherIdFromSearch(searchValue) {
+    if (!searchValue) return null;
+    const dl = document.getElementById('teachers-datalist');
+    if (!dl) return null;
+    const option = Array.from(dl.options).find(o => o.value === searchValue);
+    return option ? option.getAttribute('data-id') : null;
 }
 
 function splitIntoPedagogicalHours(startTime, endTime) {
@@ -467,71 +351,140 @@ export async function saveObservation() {
     const teacherId = currentSessionForObs?.teacher_id;
 
     let payloads = [];
+    const sessionIds = currentSessionForObs?.session_ids || (sessionId ? [sessionId] : []);
+    
+    if (sessionIds.length === 0) return alert("⚠️ Error fatal: Bloque sin identificador de sesión.");
+
     if (isFullBlock) {
         const type = document.getElementById('obs-form-type').value;
         const discount = document.getElementById('obs-form-discount').value;
-        const replLast = document.getElementById('obs-form-replacement-last').value;
-        const replFirst = document.getElementById('obs-form-replacement-first').value;
         const description = document.getElementById('obs-form-description').value;
+        
+        const isExternal = document.getElementById('obs-form-replacement-is-new')?.checked || false;
+        const searchVal = document.getElementById('obs-form-replacement-search')?.value;
+        const extNameVal = document.getElementById('obs-form-replacement-external-name')?.value;
+        const replId = type === 'REEMPLAZO' && !isExternal ? getTeacherIdFromSearch(searchVal) : null;
 
-        const sessionIds = currentSessionForObs.session_ids || [sessionId];
-        sessionIds.forEach(sid => {
-            payloads.push({
-                session_id: sid,
-                teacher_id: teacherId,
-                type,
-                discount_type: discount,
-                replacement_last_name: type === 'REEMPLAZO' ? replLast : null,
-                replacement_first_name: type === 'REEMPLAZO' ? replFirst : null,
-                description,
-                start_time: currentSessionForObs.start_time,
-                end_time: currentSessionForObs.end_time
+        if (type === 'REEMPLAZO' && !isExternal && !replId) {
+            return alert("Debe seleccionar un docente válido del buscador.");
+        }
+        if (type === 'REEMPLAZO' && isExternal && (!extNameVal || extNameVal.trim().length < 5)) {
+            return alert("Para docentes externos es obligatorio ingresar sus Apellidos y Nombres.");
+        }
+
+        // Solo empujar payloads si NO es NINGUNA
+        if (type !== 'NINGUNA') {
+            sessionIds.forEach(sid => {
+                payloads.push({
+                    session_id: sid,
+                    teacher_id: teacherId,
+                    type,
+                    discount_type: discount,
+                    replacement_teacher_id: replId,
+                    replacement_teacher_name: isExternal ? extNameVal.trim() : null,
+                    replacement_is_external: isExternal,
+                    description,
+                    start_time: currentSessionForObs.start_time,
+                    end_time: currentSessionForObs.end_time
+                });
             });
-        });
+        }
     } else {
-        const slotDivs = document.getElementById('obs-split-mode-container').querySelectorAll('.bg-white.border');
-        slotDivs.forEach((div, idx) => {
+        const slotDivs = document.getElementById('obs-split-mode-container').querySelectorAll('.obs-slot-item');
+        console.log(`[OBS PARTIAL ABSENCE] Analyzing ${slotDivs.length} segmented instances for partial incidence injection.`);
+        
+        for (let i = 0; i < slotDivs.length; i++) {
+            const div = slotDivs[i];
             const type = div.querySelector('.obs-slot-type').value;
-            if (type === 'NINGUNA') return;
+            if (type === 'NINGUNA') continue;
+
+            const isExt = div.querySelector('.obs-slot-replacement-is-new')?.checked || false;
+            const sVal = div.querySelector('.obs-slot-replacement-search')?.value;
+            const extNameVal = div.querySelector('.obs-slot-replacement-external-name')?.value;
+            const rId = type === 'REEMPLAZO' && !isExt ? getTeacherIdFromSearch(sVal) : null;
+
+            if (type === 'REEMPLAZO' && !isExt && !rId) {
+                alert(`Hora ${i + 1}: Debe seleccionar un docente válido del buscador.`);
+                return;
+            }
+            if (type === 'REEMPLAZO' && isExt) {
+                if (!extNameVal || extNameVal.trim().length < 5) {
+                    alert(`Hora ${i + 1}: Es obligatorio ingresar los Apellidos y Nombres del docente externo.`);
+                    return;
+                }
+                payloads.push({
+                    session_id: sessionIds[0] || sessionId,
+                    teacher_id: teacherId,
+                    type,
+                    discount_type: 'SIMPLE',
+                    replacement_teacher_id: null,
+                    replacement_teacher_name: extNameVal.trim(),
+                    replacement_is_external: true,
+                    description: `Desglosado (Hora ${i + 1})`,
+                    start_time: div.querySelector('.obs-slot-start').value,
+                    end_time: div.querySelector('.obs-slot-end').value
+                });
+                continue;
+            }
 
             payloads.push({
-                session_id: sessionId,
+                session_id: sessionIds[0] || sessionId,
                 teacher_id: teacherId,
                 type,
                 discount_type: 'SIMPLE',
-                replacement_last_name: type === 'REEMPLAZO' ? div.querySelector('.obs-slot-replacement-last').value : null,
-                replacement_first_name: type === 'REEMPLAZO' ? div.querySelector('.obs-slot-replacement-first').value : null,
-                description: `Desglosado (Hora ${idx + 1})`,
+                replacement_teacher_id: rId,
+                replacement_teacher_name: null,
+                replacement_is_external: false,
+                description: `Desglosado (Hora ${i + 1})`,
                 start_time: div.querySelector('.obs-slot-start').value,
                 end_time: div.querySelector('.obs-slot-end').value
             });
-        });
+        }
     }
 
-    if (payloads.length === 0) return alert("No hay incidencias para registrar.");
-    if (payloads.some(p => !p.session_id)) return alert("⚠️ Error: Session ID no válido.");
+    // Permitir limpiar bloque completo si no quedan incidencias
+    if (payloads.length === 0) {
+        if (!confirm("Ha configurado el bloque sin incidencias activas. Esto ELIMINARÁ definitivamente cualquier falta o reemplazo registrado previamente para estas horas. ¿Desea proceder?")) {
+            return;
+        }
+    }
+
+    if (payloads.length > 0 && payloads.some(p => !p.session_id)) {
+        return alert("⚠️ Error fatal: Faltan IDs de sesión en los segmentos.");
+    }
 
     try {
-        const promises = payloads.map(p => api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/observations`, {
+        await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/observations/batch`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(p)
-        }));
+            body: JSON.stringify({ 
+                observations: payloads,
+                affected_session_ids: sessionIds
+            })
+        });
 
-        await Promise.all(promises);
-        
+        console.log(`[OBS BATCH SAVED] Propagated successfully across ${sessionIds.length} sessions.`);
         closeObsRegisterModal();
+        
         const row = currentRowElementForObs;
         if (row) {
             const actionCell = row.querySelector('.action-cell');
-            const types = [...new Set(payloads.map(p => p.type))];
-            const label = types.length > 1 ? 'FALTA/REEMP' : types[0];
-            let badgeColor = label === 'REEMPLAZO' ? 'bg-amber-50 text-amber-700 border-amber-200' : (label === 'FALTA/REEMP' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-rose-50 text-rose-700 border-rose-200');
-            if (actionCell) actionCell.innerHTML = `<span class="${badgeColor} px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-tighter border shadow-sm"><i class="fa-solid fa-circle-check mr-1 text-[8px]"></i> ${label}</span>`;
+            if (payloads.length === 0) {
+                // Restaurar botón Registrar
+                if (actionCell) actionCell.innerHTML = `<button data-action="registerObs" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg transition-colors"><i class="fa-solid fa-plus-circle mr-1"></i> Registrar</button>`;
+            } else {
+                const types = [...new Set(payloads.map(p => p.type))];
+                const label = types.length > 1 ? 'FALTA/REEMP' : types[0];
+                let badgeColor = label === 'REEMPLAZO' ? 'bg-amber-50 text-amber-700 border-amber-200' : (label === 'FALTA/REEMP' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-rose-50 text-rose-700 border-rose-200');
+                if (actionCell) actionCell.innerHTML = `<span class="${badgeColor} px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-tighter border shadow-sm"><i class="fa-solid fa-circle-check mr-1 text-[8px]"></i> ${label}</span>`;
+            }
         } else {
             searchClassesForObs();
         }
-    } catch (e) { alert("Error de conexión"); }
+    } catch (e) { 
+        console.error("[OBS BATCH PERSISTENCE ERROR]", e);
+        alert("Error de conexión o persistencia al guardar las incidencias."); 
+    }
 }
 
 export function closeObsRegisterModal() {
@@ -543,7 +496,7 @@ export async function deleteObservation(obsId) {
     try {
         const data = await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/observations/${obsId}`, { method: 'DELETE' });
         if (data.success) {
-            if (typeof loadRptPlanilla === 'function') loadRptPlanilla(); 
+            // Decoupled from cross-module refreshes to enforce pure modular bounds
             loadObsLogs();
         }
     } catch (e) { alert("Error al eliminar"); }
@@ -553,14 +506,12 @@ export async function loadObsLogs() {
     const tbody = document.getElementById('obs-logs-body');
     if (!tbody) return;
     try {
+        console.log("[OBS FETCH] Fetching recent transaction logs...");
         const response = await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/observations/logs?limit=50`);
-        
-        // REGLA OBLIGATORIA: Log del response completo
-        console.log("[OBS_LOGS] Response recibida:", response);
+        console.log("[OBS RESPONSE] Activity logs stream retrieved.", response);
 
         // ✅ USO DE HELPER CENTRALIZADO
         const logs = extractList(response);
-        console.log("[OBS_LOGS] LIST:", logs);
         
         tbody.innerHTML = '';
         if (logs.length === 0) {
@@ -568,19 +519,24 @@ export async function loadObsLogs() {
             return;
         }
         logs.forEach(log => {
+            let typeBadge = 'bg-rose-100 text-rose-700';
+            if (log.type === 'REEMPLAZO') typeBadge = 'bg-amber-100 text-amber-700';
+            
             tbody.insertAdjacentHTML('beforeend', `
                 <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
-                    <td class="px-4 py-3 font-medium">${log.fecha}</td>
-                    <td class="px-4 py-3 font-bold">${log.docente}</td>
-                    <td class="px-4 py-3"><span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[10px] font-black uppercase">${log.tipo}</span></td>
-                    <td class="px-4 py-3 text-xs text-slate-500">${log.descripcion || '---'}</td>
-                    <td class="px-4 py-3 text-xs font-mono">${log.usuario || 'SISTEMA'}</td>
+                    <td class="px-4 py-3 text-xs font-medium text-slate-600">${log.date_record || '---'}</td>
+                    <td class="px-4 py-3 text-xs font-mono">${log.user || 'SISTEMA'}</td>
+                    <td class="px-4 py-3 font-bold text-slate-800">${log.teacher_affected || 'N/A'}</td>
+                    <td class="px-4 py-3"><span class="${typeBadge} px-2 py-0.5 rounded text-[10px] font-black uppercase">${log.type}</span></td>
+                    <td class="px-4 py-3 font-bold text-indigo-600">${log.class_date || 'N/A'}</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">${log.description || '---'}</td>
                     <td class="px-4 py-3 text-right">
-                        <button data-action="deleteObservation('${log.id}')" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash"></i></button>
+                        <button data-action="deleteObservation('${log.id}')" class="text-slate-300 hover:text-rose-600 p-1 transition-colors" title="Eliminar"><i class="fa-solid fa-trash text-sm"></i></button>
                     </td>
                 </tr>
             `);
         });
-    } catch (e) { console.error("Error logs:", e); }
+        console.log(`[OBS RENDER] Visualized ${logs.length} audited interaction entries.`);
+    } catch (e) { console.error("[OBS ERROR] Event stream rendering fault:", e); }
 }
 

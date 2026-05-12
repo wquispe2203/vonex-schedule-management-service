@@ -101,11 +101,10 @@ def sync_teacher_id_by_name(db: Session, teacher_id: Any, normalized_name: str) 
     except Exception as e:
         raise RuntimeError(f"Error syncing teacher observations: {str(e)}")
 
-def fetch_observation_by_session_type(db: Session, session_id: Any, obs_type: str, start_time: Optional[datetime.time] = None) -> Optional[Observation]:
+def fetch_observation_by_slot(db: Session, session_id: Any, obs_type: str, start_time: Any = None) -> Optional[Observation]:
     try:
         query = db.query(Observation).filter(
-            Observation.session_id == session_id,
-            Observation.type == obs_type
+            Observation.session_id == session_id
         )
         if start_time:
             query = query.filter(Observation.start_time == start_time)
@@ -113,7 +112,7 @@ def fetch_observation_by_session_type(db: Session, session_id: Any, obs_type: st
     except Exception as e:
         raise RuntimeError(f"Error fetching observation by session: {str(e)}")
 
-def save_observation(db: Session, is_new: bool, obs: Observation) -> Observation:
+def save_observation(db: Session, is_new: bool, obs: Observation, auto_commit: bool = True) -> Observation:
     """Consolida Inserts y Updates resolviendo COMMIT estricto, anexando Auditoría Post-Commit."""
     try:
         if is_new:
@@ -122,11 +121,14 @@ def save_observation(db: Session, is_new: bool, obs: Observation) -> Observation
         else:
             accion_audit = "UPDATE"
             
-        db.commit()
-        db.refresh(obs)
+        if auto_commit:
+            db.commit()
+            db.refresh(obs)
+        else:
+            db.flush()
         
         # Auditoria Integrada
-        print("🔥 AUDITORIA OBSERVACIONES EJECUTADA")
+        print("AUDITORIA OBSERVACIONES EJECUTADA")
         try:
             obs_dict = {c.name: getattr(obs, c.name) for c in obs.__table__.columns}
             json_despues = jsonable_encoder(obs_dict)
@@ -141,18 +143,19 @@ def save_observation(db: Session, is_new: bool, obs: Observation) -> Observation
             registro_id=obs.id, 
             datos_antes=None, 
             datos_despues=json_despues,
-            usuario_id=1
+            usuario_id=obs.user_id
         )
         return obs
     except Exception as e:
-        db.rollback()
+        if auto_commit:
+            db.rollback()
         raise RuntimeError(f"Database error saving observation: {str(e)}")
 
-def update_observation(db: Session, obs: Observation) -> Observation:
+def update_observation(db: Session, obs: Observation, auto_commit: bool = True) -> Observation:
     """Wrapper explícito para UPDATES según requerimiento de auditoría."""
-    return save_observation(db, is_new=False, obs=obs)
+    return save_observation(db, is_new=False, obs=obs, auto_commit=auto_commit)
 
-def delete_observation(db: Session, obs_id: Any) -> bool:
+def delete_observation(db: Session, obs_id: Any, auto_commit: bool = True) -> bool:
     try:
         obs = db.query(Observation).filter(Observation.id == obs_id).first()
         if not obs:
@@ -166,10 +169,13 @@ def delete_observation(db: Session, obs_id: Any) -> bool:
             json_antes = {"error": "Fallo serialización"}
 
         db.delete(obs)
-        db.commit()
+        if auto_commit:
+            db.commit()
+        else:
+            db.flush()
         
         # Auditoria Integrada
-        print("🔥 AUDITORIA OBSERVACIONES EJECUTADA")
+        print("AUDITORIA OBSERVACIONES EJECUTADA")
         create_audit_log(
             db=db, 
             accion="DELETE", 
@@ -177,7 +183,7 @@ def delete_observation(db: Session, obs_id: Any) -> bool:
             registro_id=obs_id, 
             datos_antes=json_antes, 
             datos_despues=None,
-            usuario_id=1
+            usuario_id=obs.user_id
         )
         return True
     except Exception as e:

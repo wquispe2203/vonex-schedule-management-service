@@ -7,10 +7,10 @@ T = TypeVar("T")
 
 class ReportObservationSchema(BaseModel):
     type: str
-    discount_type: str
-    has_discount_impact: bool
-    replacement_teacher_name: str
-    description: str
+    discount_type: Optional[str] = "SIMPLE"
+    has_discount_impact: Optional[bool] = False
+    replacement_teacher_name: Optional[str] = None
+    description: Optional[str] = ""
     ids: List[UUID] = []
 
 class ReportRowResponse(BaseModel):

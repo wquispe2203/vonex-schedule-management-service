@@ -14,9 +14,14 @@ class ObservationPayload(BaseModel):
     replacement_teacher_name: Optional[str] = None
     replacement_last_name: Optional[str] = None
     replacement_first_name: Optional[str] = None
+    replacement_is_external: Optional[bool] = False
     description: Optional[str] = ""
     start_time: Optional[str] = None
     end_time: Optional[str] = None
+
+class ObservationBatchPayload(BaseModel):
+    observations: List[ObservationPayload]
+    affected_session_ids: Optional[List[UUID]] = None
 
 # Salidas (Responses)
 class ObservationResponse(BaseModel):

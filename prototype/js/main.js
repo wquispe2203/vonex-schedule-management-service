@@ -5,6 +5,7 @@ import * as upload from './upload.js';
 import * as docentesMgmt from './docentes_mgmt.js';
 import * as reportes from './reportes.js';
 import * as observaciones from './observaciones.js';
+import * as horarios from './horarios.js';
 import * as configMgmt from './config_mgmt.js';
 import * as usuarios from './usuarios.js';
 import { ENDPOINTS } from './config.js';
@@ -40,8 +41,9 @@ export function nav(sectionId) {
         if (sectionId === 'docentes') {
             Handlers.toggleDocentesTab('upload-excel');
         }
-        if (sectionId === 'horarios-visor-module') Handlers.loadSchedule();
+        if (sectionId === 'schedule') Handlers.initSchedule();
         if (sectionId === 'rpt-planilla') Handlers.initRPT();
+        if (sectionId === 'observations') Handlers.initObservaciones();
     }
 }
 
@@ -53,6 +55,7 @@ const Handlers = {
     ...docentesMgmt,
     ...reportes,
     ...observaciones,
+    ...horarios,
     ...configMgmt,
     ...usuarios
 };
@@ -87,7 +90,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function checkSession() {
-    const token = api.getToken();
+    let token = api.getToken();
+    
+    // [DEV AUTH ENABLED] Silent fallback for local development
+    if (!token && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        try {
+            console.log('[DEV AUTH RESTORED] Attempting dev token hydration...');
+            const devResp = await fetch(`${API_BASE_URL}${ENDPOINTS.USERS.BASE}/dev-login`);
+            if (devResp.ok) {
+                const devData = await devResp.json();
+                localStorage.setItem('token', devData.access_token);
+                token = devData.access_token;
+                console.log('[DEV TOKEN HYDRATED] Successfully injected development context.');
+            }
+        } catch(e) {
+            console.warn('[DEV AUTH] Hydration failed. Proceeding normally.');
+        }
+    }
+
     const loginUI = document.getElementById('login-container');
     const appUI = document.getElementById('app-container');
 
