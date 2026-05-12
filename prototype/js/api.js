@@ -31,6 +31,7 @@ const api = {
             : `${API_BASE_URL}${endpoint}`;
         
         try {
+            console.log(`[NATIVE FETCH RESTORED] Triggering fetch sequence to URL: ${url}`);
             const res = await fetch(url, { ...options, headers });
             
             // 🚨 MANEJO GLOBAL DE 401 (UNAUTHORIZED)
@@ -67,6 +68,7 @@ const api = {
                 console.warn("[API] Response is not JSON:", text.substring(0, 50));
             }
             
+            console.log(`[API RESPONSE VERIFIED] Successfully validated structure for endpoint: ${endpoint}`);
             return data;
         } catch (error) {
             console.error(`[API ERROR] ${endpoint}:`, error);

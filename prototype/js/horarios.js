@@ -57,16 +57,61 @@ export async function fillTargetSelect() {
         select.innerHTML = `<option value="">Seleccione un ${type === 'teacher' ? 'Docente' : 'Aula'}...</option>`;
 
         if (Array.isArray(items) && items.length > 0) {
+            // [TEACHER PAYLOAD NORMALIZED] Safe extraction and parsing of contracts
+            let normalizedCount = 0;
+            
             items.forEach(item => {
                 const opt = document.createElement('option');
-                opt.value = item.id;
+                
                 if (type === 'teacher') {
-                    opt.textContent = `${item.last_name || ''}, ${item.first_name || ''}`.trim();
+                    let finalId = "";
+                    let displayName = "";
+                    
+                    if (typeof item === 'object' && item !== null) {
+                        finalId = item.id || item.uid || "";
+                        const rawLast = (item.last_name || item.lastName || item.apellidos || '').trim();
+                        const rawFirst = (item.first_name || item.firstName || item.nombres || '').trim();
+                        
+                        if (rawLast || rawFirst) {
+                            displayName = `${rawLast}${rawLast && rawFirst ? ', ' : ''}${rawFirst}`;
+                        } else if (item.full_name || item.fullName || item.name) {
+                            displayName = (item.full_name || item.fullName || item.name || '').trim();
+                        }
+                    } else if (typeof item === 'string') {
+                        finalId = item;
+                        displayName = item;
+                    }
+
+                    // Sanitized Fallback
+                    displayName = displayName.replace(/^,|,$/g, '').trim();
+                    if (!displayName || displayName === '.') {
+                        displayName = "Docente Sin Nombre Asignado";
+                    }
+                    
+                    opt.value = finalId;
+                    opt.textContent = displayName;
+                    normalizedCount++;
                 } else {
-                    opt.textContent = item.name || 'Sin Nombre';
+                    // Safe parsing for classrooms / items
+                    let classId = "";
+                    let className = "Sin Nombre";
+                    if (typeof item === 'object' && item !== null) {
+                        classId = item.id || "";
+                        className = item.name || item.aula || "Sin Nombre";
+                    } else if (typeof item === 'string') {
+                        classId = item;
+                        className = item;
+                    }
+                    opt.value = classId;
+                    opt.textContent = className;
                 }
+                
                 select.appendChild(opt);
             });
+            
+            if (type === 'teacher') {
+                console.log(`[TEACHER PAYLOAD NORMALIZED] Successfully mapped and sanitized ${normalizedCount} teacher records for drop-down injection.`);
+            }
         } else {
             select.innerHTML = `<option value="">No se encontraron datos para ${type}</option>`;
         }
@@ -76,30 +121,55 @@ export async function fillTargetSelect() {
     }
 }
 
+let scheduleInitPromise = null;
+
 /**
  * @description Handles the entry to the module, setting default dates and trigger select population.
  */
 export async function initSchedule() {
-    console.log("[HORARIOS INIT] Starting module initialization");
-    
-    const startEl = document.getElementById('schedule-start-date');
-    const endEl = document.getElementById('schedule-end-date');
-
-    if (startEl && !startEl.value) {
-        // Pre-fill current week by default
-        const curr = new Date();
-        const day = curr.getDay(); 
-        // Shift back to Monday
-        const diff = curr.getDate() - day + (day === 0 ? -6 : 1); 
-        const monday = new Date(curr.setDate(diff));
-        const sunday = new Date(monday);
-        sunday.setDate(sunday.getDate() + 6);
-
-        startEl.value = monday.toISOString().split('T')[0];
-        if (endEl) endEl.value = sunday.toISOString().split('T')[0];
+    if (scheduleInitPromise) {
+        console.log('[PROMISE LOCK REUSED] initSchedule');
+        return scheduleInitPromise;
     }
 
-    await fillTargetSelect();
+    console.log('[PROMISE LOCK ACQUIRED] initSchedule');
+    let success = false;
+
+    scheduleInitPromise = (async () => {
+        console.log("[HORARIOS INIT] Starting module initialization");
+        try {
+            const startEl = document.getElementById('schedule-start-date');
+            const endEl = document.getElementById('schedule-end-date');
+
+            if (startEl && !startEl.value) {
+                // Pre-fill current week by default
+                const curr = new Date();
+                const day = curr.getDay(); 
+                // Shift back to Monday
+                const diff = curr.getDate() - day + (day === 0 ? -6 : 1); 
+                const monday = new Date(curr.setDate(diff));
+                const sunday = new Date(monday);
+                sunday.setDate(sunday.getDate() + 6);
+
+                startEl.value = monday.toISOString().split('T')[0];
+                if (endEl) endEl.value = sunday.toISOString().split('T')[0];
+            }
+
+            await fillTargetSelect();
+            success = true;
+            console.log('[PROMISE LOCK RELEASED] initSchedule successfully initialized');
+        } catch (err) {
+            console.error("[PROMISE LOCK RESET] initSchedule Critical Failure:", err);
+            throw err;
+        } finally {
+            if (!success) {
+                console.warn("[PROMISE LOCK RESET] Releasing failed initSchedule promise.");
+                scheduleInitPromise = null;
+            }
+        }
+    })();
+
+    return scheduleInitPromise;
 }
 
 export async function loadSchedule() {

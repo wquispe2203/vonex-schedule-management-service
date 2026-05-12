@@ -178,3 +178,5 @@ def create_app() -> FastAPI:
 
     # ROOT CAUSE FIX: Retornar EXPRESAMENTE la instancia ASGI, no el módulo 'app'
     return application
+
+app = create_app()

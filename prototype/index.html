@@ -5,6 +5,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Horarios - Schedule Management Service</title>
+    <script>
+        window.capturedLogs = [];
+        const origLog = console.log;
+        const origTrace = console.trace;
+        console.log = function(...args) {
+            window.capturedLogs.push({type: 'log', msg: args.join(' ')});
+            origLog.apply(console, args);
+        };
+        console.trace = function(...args) {
+            const stack = new Error().stack;
+            window.capturedLogs.push({type: 'trace', msg: args.join(' '), stack: stack});
+            origTrace.apply(console, args);
+        };
+
+        // 🔐 Hydrate immediate development session mock - Isolated
+        window.ENABLE_DEV_MOCKS = false;
+        
+        if (window.ENABLE_DEV_MOCKS === true) {
+            console.log('[DEV MOCK ENABLED] Activating mock interceptor API overrides.');
+            localStorage.setItem('token', 'mock-dev-token');
+
+            // 🚀 Transparent API Mock Interceptor for Headless Lifecycle Validation
+            const origFetch = window.fetch;
+            window.fetch = async function(resource, options) {
+                const urlStr = String(resource);
+                if (urlStr.includes('/api/')) {
+                    console.log(`[MOCK API INTERCEPTED] Fetching ${urlStr}`);
+                    
+                    let data = { success: true, data: [] };
+                    
+                    if (urlStr.includes('/users/me')) {
+                        data = { success: true, id: "mock-id-123", username: "Admin Headless", role: "ADMIN" };
+                    } else if (urlStr.includes('/dev-login')) {
+                        data = { success: true, access_token: "mock-dev-token" };
+                    } else if (urlStr.includes('/reportes/docentes')) {
+                        data = { success: true, data: ["Docente Alfa", "Docente Beta"] };
+                    } else if (urlStr.includes('/reportes/sedes')) {
+                        data = { success: true, data: ["Central", "Norte"] };
+                    } else if (urlStr.includes('/reportes/planilla')) {
+                        data = { success: true, data: [], pagination: { current_page: 1, total_pages: 1 } };
+                    } else if (urlStr.includes('/users')) {
+                        data = { success: true, data: [{ id: "1", username: "user1", role: "DOCENTE" }] };
+                    } else if (urlStr.includes('/schedule/teachers')) {
+                        data = { success: true, data: ["Docente Alfa", "Docente Beta"] };
+                    } else if (urlStr.includes('/observations')) {
+                        data = { success: true, data: [] };
+                    } else if (urlStr.includes('/docentes')) {
+                        data = { success: true, data: [] };
+                    } else if (urlStr.includes('/history')) {
+                        data = { success: true, history: [] };
+                    }
+
+                    return new Response(JSON.stringify(data), {
+                        status: 200,
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
+                return origFetch.apply(this, arguments);
+            };
+        } else {
+            console.log('[DEV MOCK DISABLED] Using native system Fetch lifecycle.');
+        }
+
+        // 🔍 1. Conditional Listener Tracker
+        window.__DEV_TRACE__ = true; 
+        if (window.__DEV_TRACE__) {
+            console.log('[LISTENER TRACE ENABLED]');
+            window.__listenerRegistry = new Map();
+            const origAdd = EventTarget.prototype.addEventListener;
+
+            EventTarget.prototype.addEventListener = function(type, listener, options) {
+                const el = this;
+                if (!window.__listenerRegistry.has(el)) {
+                    window.__listenerRegistry.set(el, {});
+                }
+                const map = window.__listenerRegistry.get(el);
+                if (!map[type]) map[type] = [];
+
+                const isDuplicate = map[type].some(l => l === listener);
+                if (isDuplicate) {
+                    console.warn(`[LISTENER DUPLICATED] Element:`, el, `Event: ${type}`);
+                } else {
+                    map[type].push(listener);
+                }
+                return origAdd.apply(this, arguments);
+            };
+        } else {
+            console.log('[LISTENER TRACE DISABLED]');
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="index.css">
@@ -99,7 +189,7 @@
 
                     <!-- Menú Desplegable Configuración -->
                     <div class="px-2">
-                        <button data-action="toggle-config"
+                        <button data-action="toggleConfigMenu"
                             class="w-full flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white group">
                             <div class="flex items-center gap-3">
                                 <i class="fa-solid fa-gears w-5"></i>
@@ -1789,9 +1879,9 @@
                                 <label class="block text-xs font-black text-slate-800 mb-3 uppercase tracking-wider">Asignación de Roles</label>
                                 <div id="usr-roles-container" class="grid grid-cols-2 gap-3"></div>
                             </div>
-                            <div class="mt-8 flex gap-3">
-                                <button type="submit" id="usr-save-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20">Guardar Credenciales</button>
-                            </div>
+                             <div class="mt-8 flex gap-3">
+                                 <button type="button" data-action="saveUsuario()" id="usr-save-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20">Guardar Credenciales</button>
+                             </div>
                         </form>
                     </div>
                 </div>

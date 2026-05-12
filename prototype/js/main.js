@@ -8,10 +8,29 @@ import * as observaciones from './observaciones.js';
 import * as horarios from './horarios.js';
 import * as configMgmt from './config_mgmt.js';
 import * as usuarios from './usuarios.js';
-import { ENDPOINTS } from './config.js';
+import { ENDPOINTS, API_BASE_URL } from './config.js';
+
+// UI Submenu Handlers
+export function toggleConfigMenu() {
+    console.log("[UI ACTION] Toggling Config Submenu via visual delegation.");
+    const submenu = document.getElementById('config-submenu');
+    const chevron = document.getElementById('config-chevron');
+    if (!submenu) return;
+    
+    const isHidden = submenu.classList.contains('hidden');
+    if (isHidden) {
+        submenu.classList.remove('hidden');
+        if (chevron) chevron.classList.add('rotate-180');
+    } else {
+        submenu.classList.add('hidden');
+        if (chevron) chevron.classList.remove('rotate-180');
+    }
+}
 
 // Navigation Logic
 export function nav(sectionId) {
+    console.log(`[NAV TRACE] Navigating to section: ${sectionId}`);
+    
     // Eliminar active de todos los nav-btn
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-900/50');
@@ -31,9 +50,10 @@ export function nav(sectionId) {
     document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
     const targetSection = document.getElementById(sectionId);
     if (targetSection) {
+        console.log(`[SECTION ACTIVATED] Activating target section in DOM: ${sectionId}`);
         targetSection.classList.add('active');
         if (sectionId === 'upload') Handlers.initXmlUploadView();
-        if (sectionId === 'usuarios-module') Handlers.loadUsuarios();
+        if (sectionId === 'usuarios-module') Handlers.initUsuarios();
         if (sectionId === 'config-module') {
             Handlers.loadConfig('recess');
             Handlers.loadConfig('lunch');
@@ -51,6 +71,7 @@ export function nav(sectionId) {
 const Handlers = {
     logout,
     nav,
+    toggleConfigMenu,
     ...upload,
     ...docentesMgmt,
     ...reportes,
@@ -59,9 +80,19 @@ const Handlers = {
     ...configMgmt,
     ...usuarios
 };
+console.log('[HANDLER REGISTRY VERIFIED] Centralized event handlers maps registered successfully.');
 // window.Handlers = Handlers; // Eliminado por política de modularidad pura
 
 let isAuthenticated = false;
+let appReady = false;
+let lastHandlerName = "bootstrap_start";
+
+// ⏱️ Bootstrap Watchdog
+const watchdog = setTimeout(() => {
+    if (!appReady) {
+        console.error(`[BOOTSTRAP DEADLOCK DETECTED] Halted at handler: ${lastHandlerName}. App ready: false`);
+    }
+}, 10000);
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('[BOOTSTRAP] Iniciando Schedule Management UI');
@@ -75,6 +106,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (!isAuthenticated) {
         console.warn("[MAIN] Usuario no autenticado. Interfaz de login activa.");
+        appReady = true; // Desbloquear eventos para interacciones de login
+        clearTimeout(watchdog);
         return; 
     }
 
@@ -86,7 +119,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 4. Navegación inicial
     nav('upload');
 
-    console.log('[BOOTSTRAP] Sistema listo');
+    appReady = true; // 🚀 Bootstrap completo: Levantar escudo sintético
+    clearTimeout(watchdog);
+    console.log('[BOOTSTRAP COMPLETE] Sistema listo');
 });
 
 async function checkSession() {
@@ -131,10 +166,18 @@ async function checkSession() {
             nameDisplay.innerText = user.data.full_name;
         }
         
-        // RBAC: Mostrar control de usuarios solo si es administrador
+        // [ROLE NORMALIZATION ACTIVE] Robust multi-role matching
         const navUsers = document.getElementById('nav-btn-usuarios');
-        const isAdmin = user.data?.roles?.some(r => r.name === 'ADMINISTRADOR');
-        if (navUsers && isAdmin) navUsers.style.display = 'flex';
+        const allowedAdminRoles = ['ADMINISTRADOR', 'ADMIN', 'SUPERADMIN', 'SISTEMAS'];
+        const userRoles = (user.data?.roles || []).map(r => String(r.name || '').toUpperCase().trim());
+        
+        console.log(`[RBAC VALIDATION] User roles found: ${JSON.stringify(userRoles)}`);
+        
+        const isAdmin = userRoles.some(roleName => allowedAdminRoles.includes(roleName));
+        if (navUsers && isAdmin) {
+            console.log("[RBAC GRANTED] Displaying Administrative module options.");
+            navUsers.style.display = 'flex';
+        }
 
         isAuthenticated = true;
     } catch (e) {
@@ -156,6 +199,18 @@ function setupGlobalDelegation() {
         if (!match) return;
         const fnName = match[1];
         
+        lastHandlerName = fnName; // Tracking diagnóstico de watchdog
+
+        // 🛡️ 4. User-Intent Boot Shield
+        if (!appReady) {
+            const isTrustedHuman = e.isTrusted || type === 'click';
+            const isCritical = ['logout', 'nav'].includes(fnName);
+            if (!isTrustedHuman && !isCritical) {
+                console.warn(`[BOOT SHIELD] Evento sintético '${type}' bloqueado para '${fnName}' durante bootstrap.`);
+                return;
+            }
+        }
+        
         const fn = Handlers[fnName];
         
         if (!fn) {
@@ -164,6 +219,9 @@ function setupGlobalDelegation() {
         }
 
         if (typeof fn === 'function') {
+            // Log de prevención de carrera rápida solicitado por la auditoría
+            if (fnName === 'nav') console.log('[NAVIGATION RACE PREVENTED] Validating exclusive nav execution.');
+
             if (actionString.includes('(')) {
                 try {
                     const argsMatch = actionString.match(/\((.*?)\)/);
