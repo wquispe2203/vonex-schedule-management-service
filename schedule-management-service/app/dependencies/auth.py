@@ -12,6 +12,8 @@ import traceback
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/users/login")
 
+from app.core.observability import security_logger, log_event, set_user_id
+
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -22,18 +24,16 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id_str: str = payload.get("sub")
         if user_id_str is None:
-            print("[AUTH] Token sin claim 'sub'")
+            log_event(security_logger, "WARNING", "[AUTH FAILED]", "Token missing sub claim")
             raise credentials_exception
         
-        # Log para debug (Solo en desarrollo)
-        print(f"[AUTH] Validando sub: {user_id_str}")
-        
         user_id = UUID(user_id_str)
+        set_user_id(user_id) # Set for observability context
     except JWTError as e:
-        print(f"[AUTH] JWT Error: {str(e)}")
+        log_event(security_logger, "WARNING", "[AUTH FAILED]", f"JWT Error: {str(e)}")
         raise credentials_exception
     except ValueError as e:
-        print(f"[AUTH] UUID Format Error: {user_id_str} no es un UUID válido. {str(e)}")
+        log_event(security_logger, "WARNING", "[AUTH FAILED]", f"UUID Format Error: {user_id_str}")
         raise credentials_exception
 
     try:
@@ -42,19 +42,17 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         ).filter(User.id == user_id).first()
         
         if user is None:
-            print(f"[AUTH] Usuario no encontrado en DB: {user_id}")
+            log_event(security_logger, "WARNING", "[AUTH FAILED]", f"User not found: {user_id}")
             raise credentials_exception
         
         if not user.is_active:
-            print(f"[AUTH] Usuario inactivo: {user.username}")
+            log_event(security_logger, "WARNING", "[AUTH FAILED]", f"Inactive user: {user.username}")
             raise credentials_exception
             
         return user
     except Exception as e:
-        print(f"!!! [AUTH] ERROR CRITICO en get_current_user: {str(e)}")
-        traceback.print_exc()
+        log_event(security_logger, "ERROR", "[AUTH CRITICAL]", str(e), {"stack": traceback.format_exc()})
         raise e
-
 
 def get_current_active_user(current_user: User = Depends(get_current_user)):
     if not current_user.is_active:
@@ -62,45 +60,53 @@ def get_current_active_user(current_user: User = Depends(get_current_user)):
     return current_user
 
 def require_permission(permission_code: str):
-    """
-    Dependency generator para RBAC con auditoría detallada.
-    """
     def permission_checker(
         request: Request,
         current_user: User = Depends(get_current_active_user),
         db: Session = Depends(get_db)
     ):
-        # 0. BYPASS SUPERADMIN (Prioridad Máxima)
+        # 0. BYPASS SUPERADMIN
+        is_protected_access = any(role.is_protected for role in current_user.roles)
         user_role_names = [role.name.upper() for role in current_user.roles]
+        
+        if is_protected_access:
+            log_event(security_logger, "INFO", "[RBAC ACTION EXECUTED]", f"Access granted (Protected) to {permission_code}", {
+                "user": current_user.username,
+                "role_bypass": "protected_flag"
+            })
+            return current_user
+            
         if "SUPERADMIN" in user_role_names:
-            print(f"[AUTH] ACCESO TOTAL (BYPASS): {current_user.username} [SUPERADMIN]")
+            log_event(security_logger, "INFO", "[RBAC ACTION EXECUTED]", f"Access granted (Superadmin) to {permission_code}", {
+                "user": current_user.username,
+                "role_bypass": "string_match"
+            })
             return current_user
 
         user_permissions = []
         for role in current_user.roles:
             user_permissions.extend([p.code for p in role.permissions])
         
-        # Log base para stdout
-        log_msg = f"[AUTH] Usuario: {current_user.username} | Roles: {user_role_names} | Intentando: {permission_code} | Path: {request.url.path}"
-        
-        # 1. Validación Granular (SIN BYPASS)
+        # 1. Validación Granular
         if permission_code not in user_permissions:
-            print(f"{log_msg} | Resultado: DENY (403)")
+            log_event(security_logger, "WARNING", "[RBAC DENIED]", f"Missing permission: {permission_code}", {
+                "user": current_user.username,
+                "roles": user_role_names,
+                "path": request.url.path
+            })
             
-            # Auditoría en DB para acceso denegado
-            audit = AuditLog(
-                usuario_id=current_user.id,
-                accion=f"403_DENY_{permission_code}"
-            )
-            db.add(audit)
-            db.commit()
+            audit = AuditLog(usuario_id=current_user.id, accion=f"403_DENY_{permission_code}")
+            db.add(audit); db.commit()
 
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Permiso requerido insuficiente: {permission_code}"
             )
             
-        print(f"{log_msg} | Resultado: ALLOW")
+        log_event(security_logger, "INFO", "[RBAC ACTION EXECUTED]", f"Permission verified: {permission_code}", {
+            "user": current_user.username,
+            "path": request.url.path
+        })
         return current_user
         
     return permission_checker

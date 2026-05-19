@@ -56,8 +56,8 @@ def consolidate_sessions(
         end_val = item.get(end_time_key)
         hours_val = item.get(hours_key, 0.0)
         
-        log_context = f"docente='{item.get('docente','N/A')}' | {start_val}-{end_val} | curso='{item.get('curso','N/A')}' | ciclo='{item.get('ciclo','N/A')}' | hrs={hours_val}"
-        print(f"[{module_tag} XML BLOCK] Processing raw block: {log_context}")
+        # log_context = f"docente='{item.get('docente','N/A')}' | {start_val}-{end_val} | curso='{item.get('curso','N/A')}' | ciclo='{item.get('ciclo','N/A')}' | hrs={hours_val}"
+        # print(f"[{module_tag} XML BLOCK] Processing raw block: {log_context}")
         
         if current_group is None:
             current_group = dict(item)
@@ -96,7 +96,7 @@ def consolidate_sessions(
             prev_end = c_end
             
             if gap_minutes < 0:
-                print(f"[{module_tag} OVERLAP DETECTED] Overlap found for {item.get('docente','N/A')} between current {current_group.get(start_time_key)}-{prev_end} and item {i_start}-{item.get(end_time_key)}")
+                logger.info(f"[{module_tag} OVERLAP DETECTED] Overlap found for {item.get('docente','N/A')} between current {current_group.get(start_time_key)}-{prev_end} and item {i_start}-{item.get(end_time_key)}")
             
             # Perform Merge
             current_group[hours_key] = float(current_group.get(hours_key, 0)) + float(hours_val)
@@ -114,7 +114,7 @@ def consolidate_sessions(
                 new_end = time(int(total_mins // 60) % 24, int(total_mins % 60))
                 current_group[end_time_key] = new_end
             
-            print(f"[{module_tag} XML MERGED] Merged blocks for {item.get('docente','N/A')}: {c_start}-{prev_end} with {i_start}-{end_val} => new end {new_end} | total hrs: {current_group[hours_key]}")
+            # print(f"[{module_tag} XML MERGED] Merged blocks for {item.get('docente','N/A')}: {c_start}-{prev_end} with {i_start}-{end_val} => new end {new_end} | total hrs: {current_group[hours_key]}")
             logger.info(f"[{module_tag} XML MERGED] Merging block: {c_start}->{prev_end} with {i_start}->{end_val} => {new_end}")
             
             # Merge Observations if they exist
@@ -147,8 +147,8 @@ def consolidate_sessions(
         consolidated.append(current_group)
         
     # Log final consolidation stats
-    for b in consolidated:
-        print(f"[{module_tag} FINAL CONSOLIDATED] Block consolidated: {b.get('docente','N/A')} | {b.get(start_time_key)}-{b.get(end_time_key)} | hrs={b.get(hours_key)}")
+    # for b in consolidated:
+    #     print(f"[{module_tag} FINAL CONSOLIDATED] Block consolidated: {b.get('docente','N/A')} | {b.get(start_time_key)}-{b.get(end_time_key)} | hrs={b.get(hours_key)}")
     
     # Tag requested for Schedule module specifically
     if module_tag == "SCHEDULE":

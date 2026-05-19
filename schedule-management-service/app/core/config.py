@@ -18,8 +18,14 @@ class Settings(BaseSettings):
     
     # --- CORS ---
     BACKEND_CORS_ORIGINS: List[str] = Field(
-        default=["http://localhost:5500", "http://127.0.0.1:5500"],
-        env="CORS_ORIGINS"
+        default=[
+            "http://localhost:5500", 
+            "http://127.0.0.1:5500",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000"
+        ],
+        env="CORS_ALLOWED_ORIGINS",
+        validation_alias="CORS_ALLOWED_ORIGINS"
     )
 
     model_config = SettingsConfigDict(

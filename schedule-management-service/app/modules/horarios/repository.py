@@ -14,7 +14,6 @@ def fetch_all_teachers(db: Session) -> List[Teacher]:
         .filter(
             XmlUpload.status == "COMPLETED",
             Teacher.status == "ACTIVO",
-            Teacher.dni.isnot(None),
             Teacher.merged_into_id.is_(None)
         )
         .distinct()
@@ -26,7 +25,7 @@ def fetch_all_classes(db: Session) -> List[ClassGroup]:
     """Fetches only active classes/classrooms present in valid COMPLETED XML schedules."""
     return (
         db.query(ClassGroup)
-        .join(Lesson, ClassGroup.id == Lesson.class_group_id)
+        .join(Lesson, ClassGroup.id == Lesson.class_id)
         .join(ScheduleSession, Lesson.id == ScheduleSession.lesson_id)
         .join(XmlUpload, ScheduleSession.xml_upload_id == XmlUpload.id)
         .filter(XmlUpload.status == "COMPLETED")

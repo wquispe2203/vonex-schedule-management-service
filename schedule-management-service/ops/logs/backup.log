@@ -1,0 +1,5 @@
+{"timestamp": "2026-05-14T17:36:14.824118Z", "level": "INFO", "action": "[BACKUP START]", "message": "Starting backup for database: schedule_db"}
+{"timestamp": "2026-05-14T17:36:15.796452Z", "level": "INFO", "action": "[BACKUP PROGRESS]", "message": "Compressing backup file"}
+{"timestamp": "2026-05-14T17:36:15.813230Z", "level": "INFO", "action": "[BACKUP CHECKSUM VERIFIED]", "message": "SHA256: 2a79b2702f752f6bb161193c3f0e888392a11430e0d8d5d6e9ed70d89d6b4e02"}
+{"timestamp": "2026-05-14T17:36:15.813382Z", "level": "INFO", "action": "[BACKUP SUCCESS]", "message": "Backup completed: schedule_db_20260514_173614Z.sql.gz"}
+{"timestamp": "2026-05-14T17:36:15.813551Z", "level": "INFO", "action": "[BACKUP ROTATION]", "message": "Starting rotation of old backups"}

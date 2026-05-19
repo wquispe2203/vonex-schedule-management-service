@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<timetable>
+<teachers>
+    <teacher id="T_GOLDEN_2" firstname="DOCENTE" lastname="RECESO" short="G2"/>
+</teachers>
+<subjects>
+    <subject id="S1" name="FISICA" short="FIS"/>
+</subjects>
+<classrooms>
+    <classroom id="C1" name="AULA 102" short="102"/>
+</classrooms>
+<classes>
+    <class id="CL1" name="SEC1B" short="1B"/>
+</classes>
+<lessons>
+    <lesson id="L1" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="4" teacherids="T_GOLDEN_2"/>
+</lessons>
+<cards>
+    <!-- Bloque 1: 08:00 - 09:40 -->
+    <card lessonid="L1" classroomids="C1" period="1" days="10000" weeks=""/>
+    <card lessonid="L1" classroomids="C1" period="2" days="10000" weeks=""/>
+    <!-- Bloque 2: 10:00 - 11:40 -->
+    <card lessonid="L1" classroomids="C1" period="4" days="10000" weeks=""/>
+    <card lessonid="L1" classroomids="C1" period="5" days="10000" weeks=""/>
+</cards>
+<periods>
+    <period name="1" short="1" period="1" starttime="08:00" endtime="08:50"/>
+    <period name="2" short="2" period="2" starttime="08:50" endtime="09:40"/>
+    <period name="3" short="R" period="3" starttime="09:40" endtime="10:00"/> <!-- RECESO -->
+    <period name="4" short="4" period="4" starttime="10:00" endtime="10:50"/>
+    <period name="5" short="5" period="5" starttime="10:50" endtime="11:40"/>
+</periods>
+</timetable>

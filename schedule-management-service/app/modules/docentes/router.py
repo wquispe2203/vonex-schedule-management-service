@@ -28,6 +28,7 @@ from .service import (
     get_matching_preview,
     resolve_conflict,
     undo_conflict,
+    bulk_delete_excel_teachers,
 )
 
 from . import schemas
@@ -46,7 +47,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(
     prefix="/api/rpt-planilla/docentes", 
     tags=["Docentes"],
-    dependencies=[Depends(require_permission("ver_docentes"))]
+    dependencies=[Depends(require_permission("ver_rpt"))]
 )
 
 
@@ -120,7 +121,7 @@ def merge_teachers_endpoint(payload: Dict[str, Any], db: Session = Depends(get_d
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router_mgmt.put("/{teacher_id}", response_model=schemas.DocenteStandardResponse)
+@router_mgmt.put("/{teacher_id:uuid}", response_model=schemas.DocenteStandardResponse)
 def update_teacher(teacher_id: UUID, payload: TeacherUpdate, db: Session = Depends(get_db)):
     try:
         if not payload.dni or payload.dni.strip() == "":
@@ -138,7 +139,7 @@ def update_teacher(teacher_id: UUID, payload: TeacherUpdate, db: Session = Depen
 class StatusUpdate(BaseModel):
     is_active: bool
 
-@router_mgmt.patch("/{teacher_id}/estado", response_model=schemas.DocenteStandardResponse)
+@router_mgmt.patch("/{teacher_id:uuid}/estado", response_model=schemas.DocenteStandardResponse)
 def patch_teacher_status(teacher_id: UUID, payload: StatusUpdate, db: Session = Depends(get_db)):
     """Actualiza manualmente el estado is_active (v3.10)."""
     try:
@@ -150,12 +151,37 @@ def patch_teacher_status(teacher_id: UUID, payload: StatusUpdate, db: Session = 
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router_mgmt.get("/{teacher_id}/actividad", response_model=schemas.StandardResponse[Dict[str, bool]])
+@router_mgmt.get("/{teacher_id:uuid}/actividad", response_model=schemas.StandardResponse[Dict[str, bool]])
 def get_teacher_activity(teacher_id: UUID, db: Session = Depends(get_db)):
     """Verifica si el docente tiene carga académica o reemplazos (v3.10)."""
     try:
         info = get_teacher_activity_info(db, teacher_id)
         return {"success": True, "data": info, "error": None}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router_mgmt.get("/razones-sociales", response_model=StandardResponse[List[str]])
+def get_unique_razones_sociales(db: Session = Depends(get_db)):
+    try:
+        import re
+        results = db.query(distinct(Teacher.razon_social)).filter(
+            Teacher.razon_social.isnot(None),
+            Teacher.razon_social != "",
+            Teacher.merged_into_id.is_(None)
+        ).all()
+        
+        unique_set = set()
+        for r in results:
+            if r[0]:
+                parts = re.split(r'\s*-\s*|\s*,\s*|\s*;\s*', r[0])
+                for p in parts:
+                    p_clean = p.strip().upper()
+                    if p_clean:
+                        unique_set.add(p_clean)
+                        
+        values = sorted(list(unique_set))
+        return {"success": True, "data": values, "error": None}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -284,7 +310,7 @@ def resolve_conflict_endpoint(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router_mgmt.delete("/resolve-conflict/{override_id}", response_model=schemas.StandardResponse[Dict[str, Any]])
+@router_mgmt.delete("/resolve-conflict/{override_id:uuid}", response_model=schemas.StandardResponse[Dict[str, Any]])
 def delete_conflict_override(
     override_id: UUID,
     db: Session = Depends(get_db)
@@ -296,7 +322,7 @@ def delete_conflict_override(
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-@router_mgmt.delete("/sinasignar/{sid}", response_model=schemas.StandardResponse[None], status_code=200)
+@router_mgmt.delete("/sinasignar/{sid:uuid}", response_model=schemas.StandardResponse[None], status_code=200)
 def delete_sinasignar_endpoint(sid: UUID, db: Session = Depends(get_db)):
     try:
         delete_sinasignar_item(db, sid)
@@ -369,4 +395,29 @@ def matching_preview_endpoint(db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"[matching_preview] Error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router_mgmt.post("/bulk-delete-excel", response_model=StandardResponse[Dict[str, Any]])
+def bulk_delete_excel_teachers_endpoint(
+    db: Session = Depends(get_db),
+    current_user: Any = Depends(get_current_active_user)
+):
+    """
+    Ruta administrativa reservada para SUPERADMIN que realiza el Reset Operativo Controlado.
+    Elimina docentes importados por Excel, sesiones históricas de marzo, lecciones, rpt_planilla y observaciones de forma transaccional.
+    """
+    user_role_names = [role.name.upper() for role in current_user.roles]
+    if "SUPERADMIN" not in user_role_names and "SISTEMAS" not in user_role_names:
+        raise HTTPException(
+            status_code=403,
+            detail="Operación restringida exclusivamente para SUPERADMIN o SISTEMAS."
+        )
+    
+    try:
+        res = bulk_delete_excel_teachers(db, current_user.username)
+        return res
+    except Exception as e:
+        logger.error(f"[bulk_delete_excel] Error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
 

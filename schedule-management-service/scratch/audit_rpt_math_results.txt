@@ -1,0 +1,199 @@
+====================================================
+      FORENSIC MATHEMATICAL AUDIT: RPT PLANILLAS     
+====================================================
+Total physical RptPlanilla records in March 2026: 4819
+DB Persisted Totals: dictadas=8034.00
+API Returned Totals: total_hours_sum=8081.40, total_receso_count=1049.0, total_blocks=4501
+
+Decimal Distribution in persisted 'horas_dictadas' in DB:
+  - Decimal part .00: 4819 records
+
+Decimal Distribution in API consolidated 'horas_dictadas':
+  - Decimal part .00: 4467 records
+  - Decimal part .20: 9 records
+  - Decimal part .40: 7 records
+  - Decimal part .60: 13 records
+  - Decimal part .80: 5 records
+
+Examples of consolidated blocks causing decimals:
+  - Docente: 'SAAVEDRA LEANO, DAN NEIL SANTIAGO', Sede: 'INDEPENDENCIA', Curso: 'INGLES', Fecha: 2026-03-05, Timing: 13:30:00-14:10:00, Horas: 0.8
+  - Docente: 'MARIA MERCEDES MAURICIO ALMEIDA', Sede: 'INDEPENDENCIA', Curso: 'INGLES', Fecha: 2026-03-05, Timing: 14:10:00-14:20:00, Horas: 0.2
+  - Docente: 'SUAREZ ZAVALA, JAIME ORLANDO', Sede: 'INDEPENDENCIA', Curso: 'RAZ. VERBAL', Fecha: 2026-03-06, Timing: 18:30:00-20:00:00, Horas: 1.8
+  - Docente: 'VLADIMIR ENVER ESQUIVEL CARHUAZ', Sede: 'INDEPENDENCIA', Curso: 'RAZ. VERBAL', Fecha: 2026-03-06, Timing: 20:00:00-20:10:00, Horas: 0.2
+  - Docente: 'MALLQUI PAYANO, ANDREE ALEXANDER', Sede: 'INDEPENDENCIA', Curso: 'QUIMICA', Fecha: 2026-03-11, Timing: 08:00:00-10:00:00, Horas: 7.199999999999999
+  - Docente: 'ADRIAN FELICIANO JAIME ASENCIO', Sede: 'INDEPENDENCIA', Curso: 'QUIMICA', Fecha: 2026-03-11, Timing: 10:00:00-10:30:00, Horas: 0.6
+  - Docente: 'MALLQUI PAYANO, ANDREE ALEXANDER', Sede: 'INDEPENDENCIA', Curso: 'QUIMICA', Fecha: 2026-03-11, Timing: 10:50:00-13:30:00, Horas: 9.4
+  - Docente: 'OCAMPO FERMIN, PORFILIO NESTOR', Sede: 'SANTA ANITA', Curso: 'ARITMETICA', Fecha: 2026-03-12, Timing: 09:40:00-10:00:00, Horas: 0.4
+  - Docente: 'JAVIER ASCENCION TASAICO CASAS', Sede: 'SANTA ANITA', Curso: 'ARITMETICA', Fecha: 2026-03-12, Timing: 10:00:00-10:30:00, Horas: 0.6
+  - Docente: 'OCAMPO ZELA, GUILLERMO', Sede: 'SJL BASADRE', Curso: 'FISICA', Fecha: 2026-03-12, Timing: 10:30:00-10:50:00, Horas: 0.4
+
+====================================================
+     STEP-BY-STEP RECONSTRUCTION FOR 5 TEACHERS      
+====================================================
+
+>>> Teacher: CARLOS DANIEL PALOMINO LESCANO
+Total database records: 97
+Total consolidated blocks: 97
+Summary: Persisted Hours=107.00
+Summary: Processed Hours=102.60, Processed Recess=4.95
+
+  Block #1:
+    - Date: 2026-03-02
+    - Sede: LIMA CERCADO, Curso: INGLES, Ciclo: SMSEL1025P1B
+    - Timing: 08:00:00 to 08:50:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.00
+
+  Block #2:
+    - Date: 2026-03-02
+    - Sede: LIMA CERCADO, Curso: INGLES, Ciclo: SMINT1025P1C
+    - Timing: 08:50:00 to 09:40:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.33
+
+  Block #3:
+    - Date: 2026-03-02
+    - Sede: LIMA CERCADO, Curso: INGLES, Ciclo: SMREP0126P1B
+    - Timing: 09:40:00 to 10:30:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.00
+
+>>> Teacher: NILTON CESAR CASTILLO JAYME
+Total database records: 75
+Total consolidated blocks: 72
+Summary: Persisted Hours=86.00
+Summary: Processed Hours=86.00, Processed Recess=3.96
+
+  Block #1:
+    - Date: 2026-03-04
+    - Sede: SJL BASADRE, Curso: CIVICA, Ciclo: SMINT1025P2A
+    - Timing: 08:00:00 to 08:50:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.00
+
+  Block #2:
+    - Date: 2026-03-04
+    - Sede: SJL BASADRE, Curso: CIVICA, Ciclo: SMREP0126P2C
+    - Timing: 08:50:00 to 09:40:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.33
+
+  Block #3:
+    - Date: 2026-03-04
+    - Sede: SJL BASADRE, Curso: CIVICA, Ciclo: SMINT1025P2B
+    - Timing: 09:40:00 to 10:30:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.00
+
+>>> Teacher: VICTOR ANGEL CARDENAS HUAYTAYA
+Total database records: 73
+Total consolidated blocks: 69
+Summary: Persisted Hours=93.00
+Summary: Processed Hours=93.00, Processed Recess=4.29
+
+  Block #1:
+    - Date: 2026-03-02
+    - Sede: LIMA CERCADO, Curso: CIVICA, Ciclo: SMINT1025P1C
+    - Timing: 08:00:00 to 08:50:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.00
+
+  Block #2:
+    - Date: 2026-03-02
+    - Sede: LIMA CERCADO, Curso: CIVICA, Ciclo: SMSEL1025P1B
+    - Timing: 08:50:00 to 09:40:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.33
+
+  Block #3:
+    - Date: 2026-03-02
+    - Sede: LIMA CERCADO, Curso: CIVICA, Ciclo: SMSAN1025P1A
+    - Timing: 09:40:00 to 10:30:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.00
+
+>>> Teacher: DAN NEIL SANTIAGO SAAVEDRA LEANO
+Total database records: 70
+Total consolidated blocks: 70
+Summary: Persisted Hours=70.00
+Summary: Processed Hours=70.00, Processed Recess=3.63
+
+  Block #1:
+    - Date: 2026-03-02
+    - Sede: SJL LOS JARDINES, Curso: INGLES, Ciclo: SMSAN0126PYA
+    - Timing: 08:00:00 to 08:50:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.00
+
+  Block #2:
+    - Date: 2026-03-02
+    - Sede: SJL LOS JARDINES, Curso: CIVICA, Ciclo: SMSAN0126PYA
+    - Timing: 08:50:00 to 09:40:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.33
+
+  Block #3:
+    - Date: 2026-03-02
+    - Sede: SJL LOS JARDINES, Curso: INGLES, Ciclo: SMANU0126PYA
+    - Timing: 09:40:00 to 10:30:00
+    - Raw Minutes: 50 mins
+    - Academic Hours Formula: 50 mins / 50 = 1.0000 academic hours
+    - Processed/Normalized Hours: 1.00 academic hours
+    - Recess Value: 0.00
+
+>>> Teacher: SHEILLA EVELYN BARRETO GONZALES
+Total database records: 69
+Total consolidated blocks: 62
+Summary: Persisted Hours=101.00
+Summary: Processed Hours=97.00, Processed Recess=4.29
+
+  Block #1:
+    - Date: 2026-03-02
+    - Sede: SJL LOS JARDINES, Curso: LENGUAJE, Ciclo: SMANU0126PYA
+    - Timing: 11:40:00 to 13:20:00
+    - Raw Minutes: 100 mins
+    - Academic Hours Formula: 100 mins / 50 = 2.0000 academic hours
+    - Processed/Normalized Hours: 2.00 academic hours
+    - Recess Value: 0.00
+    - Observation: {'type': 'REEMPLAZO', 'discount_type': 'SIMPLE', 'has_discount_impact': False, 'replacement_teacher_name': 'ABANTO HERRERA, DANIEL DAVID', 'description': '', 'ids': [UUID('c365d98f-c14e-4d7d-abc1-fad6aeeafa9f')]}
+
+  Block #2:
+    - Date: 2026-03-02
+    - Sede: SJL LOS JARDINES, Curso: LENGUAJE, Ciclo: SMSAN0126PYA
+    - Timing: 14:20:00 to 16:00:00
+    - Raw Minutes: 100 mins
+    - Academic Hours Formula: 100 mins / 50 = 2.0000 academic hours
+    - Processed/Normalized Hours: 2.00 academic hours
+    - Recess Value: 0.00
+    - Observation: {'type': 'REEMPLAZO', 'discount_type': 'SIMPLE', 'has_discount_impact': False, 'replacement_teacher_name': 'ABANTO HERRERA, DANIEL DAVID', 'description': '', 'ids': [UUID('31bc8ed4-2b66-48f0-8f32-286eda6555e9')]}
+
+  Block #3:
+    - Date: 2026-03-03
+    - Sede: LIMA CERCADO, Curso: LENGUAJE, Ciclo: SMSEL1025P1A
+    - Timing: 08:00:00 to 09:40:00
+    - Raw Minutes: 100 mins
+    - Academic Hours Formula: 100 mins / 50 = 2.0000 academic hours
+    - Processed/Normalized Hours: 2.00 academic hours
+    - Recess Value: 0.33

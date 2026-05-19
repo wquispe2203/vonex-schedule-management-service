@@ -31,6 +31,20 @@ export function toggleConfigMenu() {
 export function nav(sectionId) {
     console.log(`[NAV TRACE] Navigating to section: ${sectionId}`);
     
+    // --- RBAC ROUTE GUARD ENFORCEMENT ---
+    const requiredPerm = api.RBAC_MODULE_MAP[sectionId];
+    const targetSection = document.getElementById(sectionId);
+
+    if (!targetSection) {
+        console.error(`[NAV ERROR] Target container not found in DOM for: ${sectionId}`);
+        return fallbackNavigation();
+    }
+
+    if (requiredPerm && !api.hasPermission(requiredPerm)) {
+        console.warn(`[VIEW ACCESS DENIED] User attempts unauthorized route direct binding to: ${sectionId}`);
+        return fallbackNavigation();
+    }
+
     // Eliminar active de todos los nav-btn
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-900/50');
@@ -48,23 +62,88 @@ export function nav(sectionId) {
     });
 
     document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-    const targetSection = document.getElementById(sectionId);
-    if (targetSection) {
-        console.log(`[SECTION ACTIVATED] Activating target section in DOM: ${sectionId}`);
-        targetSection.classList.add('active');
-        if (sectionId === 'upload') Handlers.initXmlUploadView();
-        if (sectionId === 'usuarios-module') Handlers.initUsuarios();
-        if (sectionId === 'config-module') {
-            Handlers.loadConfig('recess');
-            Handlers.loadConfig('lunch');
-        }
-        if (sectionId === 'docentes') {
-            Handlers.toggleDocentesTab('upload-excel');
-        }
-        if (sectionId === 'schedule') Handlers.initSchedule();
-        if (sectionId === 'rpt-planilla') Handlers.initRPT();
-        if (sectionId === 'observations') Handlers.initObservaciones();
+    
+    console.log(`[SECTION ACTIVATED] Activating target section in DOM: ${sectionId}`);
+    targetSection.classList.add('active');
+    
+    // --- SELECTIVE BOOTSTRAP & INITIALIZATION ---
+    // Only invoke module setup logic if permission is granted to avoid background API overhead
+    if (sectionId === 'upload' && api.hasPermission('subir_xml')) Handlers.initXmlUploadView();
+    if (sectionId === 'usuarios-module' && api.hasPermission('gestionar_usuarios')) Handlers.initUsuarios();
+    if (sectionId === 'config-module' && api.hasPermission('gestionar_configuracion')) {
+        Handlers.loadConfig('recess');
+        Handlers.loadConfig('lunch');
     }
+    if (sectionId === 'docentes' && api.hasPermission('ver_docentes')) {
+        Handlers.toggleDocentesTab('upload-excel');
+    }
+    if (sectionId === 'schedule' && api.hasPermission('ver_horarios')) Handlers.initSchedule();
+    if (sectionId === 'rpt-planilla' && api.hasPermission('ver_rpt')) Handlers.initRPT();
+    if (sectionId === 'observations' && api.hasPermission('ver_observaciones')) Handlers.initObservaciones();
+}
+
+// --- NAVIGATION FALLBACK ROUTINE ---
+function fallbackNavigation() {
+    console.log("[NAVIGATION FALLBACK] Searching appropriate visual baseline module...");
+    const orderedPriorities = ['upload', 'schedule', 'observations', 'rpt-planilla', 'docentes', 'usuarios-module'];
+    
+    for (const modId of orderedPriorities) {
+        const code = api.RBAC_MODULE_MAP[modId];
+        if (api.hasPermission(code) && document.getElementById(modId)) {
+            console.log(`[RBAC DEFAULT ROUTE] Selecting authorized fallback: ${modId}`);
+            nav(modId);
+            return;
+        }
+    }
+    console.error("[NAV FATAL] Current security matrix completely locked user out of all valid module surfaces.");
+}
+
+// --- VISIBILITY ENGINE DISPATCH ---
+export function applyRBACUIFilters() {
+    console.log("[RBAC VISIBILITY ENGINE] Commencing user matrix UI gating sweep.");
+    
+    // 1. Scan Annotated [data-perm] elements
+    document.querySelectorAll('[data-perm]').forEach(node => {
+        const code = node.getAttribute('data-perm');
+        const grant = api.hasPermission(code);
+        
+        if (grant) {
+            node.classList.remove('hidden');
+            node.removeAttribute('hidden');
+            node.removeAttribute('disabled');
+            node.removeAttribute('aria-hidden');
+        } else {
+            node.classList.add('hidden');
+            node.setAttribute('hidden', '');
+            node.setAttribute('aria-hidden', 'true');
+            if (['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(node.tagName)) {
+                node.setAttribute('disabled', '');
+            }
+        }
+    });
+
+    // 2. Explicit Map-Driven Safeguards (Fallback coverage)
+    for (const [elId, code] of Object.entries(api.RBAC_VIEW_MAP)) {
+        const node = document.getElementById(elId);
+        if (!node) continue;
+        
+        const grant = api.hasPermission(code);
+        if (grant) {
+            node.classList.remove('hidden');
+            node.removeAttribute('hidden');
+            node.removeAttribute('disabled');
+            node.removeAttribute('aria-hidden');
+        } else {
+            node.classList.add('hidden');
+            node.setAttribute('hidden', '');
+            node.setAttribute('aria-hidden', 'true');
+            if (['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(node.tagName)) {
+                node.setAttribute('disabled', '');
+            }
+        }
+    }
+    
+    console.log("[RBAC UI FILTER APPLIED] View synchronization completed successfully.");
 }
 
 // Registro Central de Handlers
@@ -111,10 +190,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return; 
     }
 
-    // 3. Inicializar Handlers de Módulos (Solo si está autenticado)
+    // 3. Inicializar Handlers de Módulos (Solo si está autenticado y posee permisos mínimos)
     setupDocentesHandlers();
-    if (upload.setupUploadHandlers) upload.setupUploadHandlers();
-    if (docentesMgmt.setupDocentesUploadHandlers) docentesMgmt.setupDocentesUploadHandlers();
+    if (upload.setupXmlUploadHandlers && api.hasPermission('subir_xml')) upload.setupXmlUploadHandlers();
+    if (docentesMgmt.setupDocentesUploadHandlers && api.hasPermission('ver_docentes')) docentesMgmt.setupDocentesUploadHandlers();
     
     // 4. Navegación inicial
     nav('upload');
@@ -127,8 +206,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function checkSession() {
     let token = api.getToken();
     
-    // [DEV AUTH ENABLED] Silent fallback for local development
-    if (!token && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    // Hardening: detect corrupt/partially hydrated session tokens
+    if (token === "undefined" || token === "null") {
+        console.warn("[SESSION DESTRUCT] Corrupt token detected. Resetting session context.");
+        api.clearToken();
+        localStorage.removeItem('currentUser');
+        token = null;
+    }
+    
+    const explicitLogout = sessionStorage.getItem('explicit_logout') === 'true';
+    
+    // [DEV AUTH ENABLED] Silent fallback for local development with hardening
+    if (!token && !explicitLogout && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
         try {
             console.log('[DEV AUTH RESTORED] Attempting dev token hydration...');
             const devResp = await fetch(`${API_BASE_URL}${ENDPOINTS.USERS.BASE}/dev-login`);
@@ -166,17 +255,22 @@ async function checkSession() {
             nameDisplay.innerText = user.data.full_name;
         }
         
-        // [ROLE NORMALIZATION ACTIVE] Robust multi-role matching
+        // --- SESSION HYDRATION FOR RBAC ---
+        localStorage.setItem('currentUser', JSON.stringify(user.data || {}));
+        console.log('[RBAC GRAPH VALIDATED] Local cached profile hydration succeeded.');
+
+        // --- APPLY FILTERS ---
+        applyRBACUIFilters();
+
+        // Retain existing fallback display for back-compat but now supported by filters
         const navUsers = document.getElementById('nav-btn-usuarios');
-        const allowedAdminRoles = ['ADMINISTRADOR', 'ADMIN', 'SUPERADMIN', 'SISTEMAS'];
-        const userRoles = (user.data?.roles || []).map(r => String(r.name || '').toUpperCase().trim());
-        
-        console.log(`[RBAC VALIDATION] User roles found: ${JSON.stringify(userRoles)}`);
-        
-        const isAdmin = userRoles.some(roleName => allowedAdminRoles.includes(roleName));
-        if (navUsers && isAdmin) {
-            console.log("[RBAC GRANTED] Displaying Administrative module options.");
-            navUsers.style.display = 'flex';
+        if (navUsers) {
+            const isAllowed = api.hasPermission('gestionar_usuarios');
+            if (isAllowed) {
+                navUsers.style.display = 'flex'; 
+            } else {
+                navUsers.style.display = 'none'; 
+            }
         }
 
         isAuthenticated = true;
@@ -190,7 +284,10 @@ async function checkSession() {
 function setupGlobalDelegation() {
     const executeAction = (e, type) => {
         const target = e.target.closest('[data-action]');
-        if (!target) return;
+        // --- PROTECTED EVENT DELEGATION SHIELD ---
+        if (!target || target.hidden || target.disabled || target.classList.contains('hidden')) {
+            return;
+        }
         
         const actionString = target.getAttribute('data-action');
         if (!actionString) return;

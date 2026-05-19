@@ -4,7 +4,7 @@ from .teacher import Teacher, MatchReview, TeacherNameOverride
 from .schedule import Grade, Building, Subject, ClassGroup, Lesson, Card, ScheduleSession, Observation
 from .config import BreakConfig, LunchConfig
 from .reports import RptPlanilla
-from .infrastructure import XmlUpload, XmlUploadLog, XmlChangeLog, AuditLog
+from .infrastructure import XmlUpload, XmlUploadLog, XmlChangeLog, AuditLog, RecessRule
 
 __all__ = [
     "Base",
@@ -31,4 +31,5 @@ __all__ = [
     "XmlUploadLog",
     "XmlChangeLog",
     "AuditLog",
+    "RecessRule",
 ]

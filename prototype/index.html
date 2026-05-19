@@ -97,7 +97,31 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="index.css">
+    <script>
+        // 🚀 Version Guard to prevent stale cache persistence
+        const CURRENT_VERSION = '1.0.5'; // Increment for forced re-validation
+        const storedVersion = localStorage.getItem('app_version');
+        
+        // 🔒 GLOBAL API INJECTION - Guarantees correct origin regardless of config.js cache
+        let detectedOrigin = window.location.origin;
+        
+        // heuristic: if served by Live Server (5500), point to default FastAPI (8000)
+        if (window.location.port === '5500' || window.location.port === '5501') {
+            detectedOrigin = `${window.location.protocol}//${window.location.hostname}:8000`;
+            console.warn(`[SYS] Development Server detected (Live Server). Redirecting API to: ${detectedOrigin}`);
+        }
+
+        window.VONEX_API_URL = detectedOrigin;
+        window.__OBS_DEV = true; // FORCE VERBOSE TRACING
+        console.log(`[SYS] API_BASE_URL locked to: ${window.VONEX_API_URL}`);
+
+        if (storedVersion !== CURRENT_VERSION) {
+            console.log(`[VERSION UPGRADE] ${storedVersion} -> ${CURRENT_VERSION}. Clearing cache...`);
+            localStorage.clear();
+            localStorage.setItem('app_version', CURRENT_VERSION);
+        }
+    </script>
+    <link rel="stylesheet" href="index.css?v=1.0.3">
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex overflow-hidden">
@@ -151,27 +175,27 @@
                     <i class="fa-solid fa-calendar-days text-indigo-400"></i>
                     Gestión Horarios
                 </h1>
-                <p class="text-slate-400 text-xs mt-2 uppercase tracking-wider font-semibold">Microservice Admin</p>
+                <p class="text-slate-400 text-xs mt-2 uppercase tracking-wider font-semibold">ACADEMIA VONEX</p>
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-2">
-                <button data-action="nav('upload')"
+                <button data-action="nav('upload')" data-perm="subir_xml"
                     class="nav-btn w-full flex items-center gap-3 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-left transition-all font-medium shadow-md shadow-indigo-900/50">
                     <i class="fa-solid fa-file-arrow-up w-5"></i> Subir XML
                 </button>
-                <button data-action="nav('schedule')"
+                <button data-action="nav('schedule')" data-perm="ver_horarios"
                     class="nav-btn w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white">
                     <i class="fa-solid fa-table-cells w-5"></i> Ver Horarios
                 </button>
-                <button data-action="nav('observations')"
+                <button data-action="nav('observations')" data-perm="ver_observaciones"
                     class="nav-btn w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white">
                     <i class="fa-solid fa-triangle-exclamation w-5"></i> Observaciones
                 </button>
-                <button data-action="nav('rpt-planilla')"
+                <button data-action="nav('rpt-planilla')" data-perm="ver_rpt"
                     class="nav-btn w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white">
                     <i class="fa-solid fa-table-list w-5"></i> RPT PLANILLAS
                 </button>
-                <button data-action="nav('docentes')"
+                <button data-action="nav('docentes')" data-perm="ver_docentes"
                     class="nav-btn w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white">
                     <i class="fa-solid fa-chalkboard-user w-5"></i> Docentes
                 </button>
@@ -182,35 +206,12 @@
 
 
                     <!-- Módulo Usuarios -->
-                    <button id="nav-btn-usuarios" data-action="nav('usuarios-module')" style="display: none;"
+                    <button id="nav-btn-usuarios" data-action="nav('usuarios-module')" style="display: none;" data-perm="gestionar_usuarios"
                         class="nav-btn w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white mt-1">
                         <i class="fa-solid fa-user-shield w-5 text-center"></i> Control de Usuarios
                     </button>
 
-                    <!-- Menú Desplegable Configuración -->
-                    <div class="px-2">
-                        <button data-action="toggleConfigMenu"
-                            class="w-full flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-left transition-all text-slate-300 hover:text-white group">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-gears w-5"></i>
-                                <span>Configuración</span>
-                            </div>
-                            <i id="config-chevron"
-                                class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
-                        </button>
-
-                        <div id="config-submenu"
-                            class="hidden pl-8 pr-2 py-2 space-y-1 animate-in slide-in-from-top-1 duration-200">
-                            <button data-action="nav('recess-config')"
-                                class="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-800 rounded-lg text-left transition-all text-sm text-slate-400 hover:text-white">
-                                <i class="fa-solid fa-mug-hot w-4 text-center"></i> Recesos
-                            </button>
-                            <button data-action="nav('lunch-config')"
-                                class="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-800 rounded-lg text-left transition-all text-sm text-slate-400 hover:text-white">
-                                <i class="fa-solid fa-utensils w-4 text-center"></i> Almuerzos
-                            </button>
-                        </div>
-                    </div>
+                    <!-- Menú Desplegable Configuración (Desactivado temporalmente por Reglas Hardcoded) -->
                 </div>
             </nav>
 
@@ -235,106 +236,155 @@
         <main class="flex-1 overflow-y-auto p-10 relative bg-slate-50">
 
             <!-- Upload Section -->
-            <div id="upload" class="section active max-w-4xl mx-auto">
+            <div id="upload" class="section active w-full max-w-none px-4 mx-auto">
                 <div class="mb-8">
                     <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Procesar Archivo XML</h2>
-                    <p class="text-slate-500 mt-2">Sube la exportación de ASC Timetables para generar las sesiones de
-                        clases.</p>
+                    <p class="text-slate-500 mt-2">Sube la exportación de ASC Timetables para generar las sesiones de clases.</p>
                 </div>
 
-                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-                    <div class="grid grid-cols-2 gap-6 mb-8">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Fecha Inicio</label>
-                            <input type="date" id="start-date"
-                                class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Fecha Fin</label>
-                            <input type="date" id="end-date"
-                                class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm">
-                        </div>
-                    </div>
-
-                    <div id="drop-zone"
-                        class="border-2 border-dashed border-slate-300 rounded-2xl p-14 text-center hover:bg-indigo-50 hover:border-indigo-400 transition-all cursor-pointer group">
-                        <div
-                            class="w-20 h-20 bg-indigo-100 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
-                        </div>
-                        <h3 id="file-name-display" class="text-xl font-bold text-slate-700">Arrastra tu XML aquí</h3>
-                        <p class="text-slate-500 mt-2 text-sm">Sólo archivos provenientes de ASC Timetables</p>
-                        <input type="file" id="file-upload" class="hidden" accept=".xml">
-                    </div>
-
-                    <div class="mt-8 flex justify-end">
-                        <button id="upload-btn" data-action="simulateUpload()"
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-indigo-600/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            Vincular y Procesar
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Upload Progress -->
-                <div id="upload-progress"
-                    class="hidden mt-6 p-6 bg-white rounded-2xl shadow-sm border border-slate-200">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-circle-notch fa-spin text-indigo-500"></i> Normalizando datos...
-                        </h3>
-                        <span id="progress-status"
-                            class="text-xs font-bold text-indigo-600 bg-indigo-100 px-3 py-1 rounded-full">Procesando</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-3 mb-3 overflow-hidden">
-                        <div id="progress-bar-fill" class="bg-indigo-500 h-3 rounded-full"
-                            style="width: 0%; transition: width 0.5s ease;"></div>
-                    </div>
-                    <ul class="text-sm text-slate-500 space-y-1">
-                        <li id="task-subjects"><i class="fa-regular fa-clock mr-2"></i> Extracción de Subjects</li>
-                        <li id="task-teachers"><i class="fa-regular fa-clock mr-2"></i> Extracción de Docentes</li>
-                        <li id="task-lessons" class="opacity-50"><i class="fa-regular fa-clock mr-2"></i> Generando
-                            Lesson
-                            Cards...</li>
-                    </ul>
-                </div>
-
-                <!-- Conflict Alert -->
-                <div id="conflict-alert"
-                    class="hidden mt-6 bg-amber-50 border border-amber-200 p-6 rounded-2xl shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
-                    <div class="flex items-start gap-4 pl-2">
-                        <div
-                            class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 text-amber-600">
-                            <i class="fa-solid fa-triangle-exclamation text-lg"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-amber-900 text-lg">Conflictos detectados en el Horario (2)</h3>
-                            <p class="text-amber-700 text-sm mt-1">El ScheduleBuilderService detectó colisiones lógicas.
-                                ¿Deseas sobrescribirlas?</p>
-
-                            <div class="mt-4 space-y-2">
-                                <div
-                                    class="bg-white/60 p-3 rounded-lg border border-amber-200 text-sm text-amber-900 flex gap-3 shadow-sm">
-                                    <i class="fa-solid fa-user-xmark mt-1 text-rose-500"></i>
-                                    <div>El docente <b>Juan Pérez</b> está asignado a <b>Aula 101</b> y <b>Aula 102</b>
-                                        simultáneamente el Lunes a las 08:00.</div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <!-- Left Column: Upload Form and Notifications -->
+                    <div class="space-y-6">
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                            <div class="grid grid-cols-2 gap-6 mb-8">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Fecha Inicio</label>
+                                    <input type="date" id="start-date"
+                                        class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm">
                                 </div>
-                                <div
-                                    class="bg-white/60 p-3 rounded-lg border border-amber-200 text-sm text-amber-900 flex gap-3 shadow-sm">
-                                    <i class="fa-solid fa-building-circle-exclamation mt-1 text-rose-500"></i>
-                                    <div><b>Aula 205</b> tiene asignado <b>Física(F+20)</b> y <b>Química</b> en el mismo
-                                        bloque del Miércoles.</div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Fecha Fin</label>
+                                    <input type="date" id="end-date"
+                                        class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm">
                                 </div>
                             </div>
 
-                            <div class="mt-6 flex gap-3">
-                                <button id="overwrite-btn"
-                                    class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-md shadow-amber-500/20"
-                                    data-action="simulateUpload(true)">Aplicar Sobrescritura Force</button>
-                                <button
-                                    class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-5 py-2.5 rounded-lg text-sm font-bold transition-all"
-                                    data-action="resetUpload()">Cancelar Proceso</button>
+                            <div id="drop-zone"
+                                class="border-2 border-dashed border-slate-300 rounded-2xl p-14 text-center hover:bg-indigo-50 hover:border-indigo-400 transition-all cursor-pointer group">
+                                <div
+                                    class="w-20 h-20 bg-indigo-100 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+                                </div>
+                                <h3 id="file-name-display" class="text-xl font-bold text-slate-700">Arrastra tu XML aquí</h3>
+                                <p class="text-slate-500 mt-2 text-sm">Sólo archivos provenientes de ASC Timetables</p>
+                                <input type="file" id="file-upload" class="hidden" accept=".xml">
+                            </div>
+
+                            <div class="mt-8 flex justify-end">
+                                <button id="upload-btn" data-action="simulateUpload()"
+                                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-indigo-600/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    Vincular y Procesar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Upload Progress -->
+                        <div id="upload-progress"
+                            class="hidden p-6 bg-white rounded-2xl shadow-sm border border-slate-200">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-notch fa-spin text-indigo-500"></i> Normalizando datos...
+                                </h3>
+                                <span id="progress-status"
+                                    class="text-xs font-bold text-indigo-600 bg-indigo-100 px-3 py-1 rounded-full">Procesando</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-3 mb-3 overflow-hidden">
+                                <div id="progress-bar-fill" class="bg-indigo-500 h-3 rounded-full"
+                                    style="width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <ul class="text-sm text-slate-500 space-y-1">
+                                <li id="task-subjects"><i class="fa-regular fa-clock mr-2"></i> Extracción de Subjects</li>
+                                <li id="task-teachers"><i class="fa-regular fa-clock mr-2"></i> Extracción de Docentes</li>
+                                <li id="task-lessons" class="opacity-50"><i class="fa-regular fa-clock mr-2"></i> Generando Lesson Cards...</li>
+                            </ul>
+                        </div>
+
+                        <!-- Conflict Alert -->
+                        <div id="conflict-alert"
+                            class="hidden bg-amber-50 border border-amber-200 p-6 rounded-2xl shadow-sm relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                            <div class="flex items-start gap-4 pl-2">
+                                <div
+                                    class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 text-amber-600">
+                                    <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-amber-900 text-lg">Conflictos detectados en el Horario (2)</h3>
+                                    <p class="text-amber-700 text-sm mt-1">El ScheduleBuilderService detectó colisiones lógicas. ¿Deseas sobrescribirlas?</p>
+
+                                    <div class="mt-4 space-y-2">
+                                        <div
+                                            class="bg-white/60 p-3 rounded-lg border border-amber-200 text-sm text-amber-900 flex gap-3 shadow-sm">
+                                            <i class="fa-solid fa-user-xmark mt-1 text-rose-500"></i>
+                                            <div>El docente <b>Juan Pérez</b> está asignado a <b>Aula 101</b> y <b>Aula 102</b> simultáneamente el Lunes a las 08:00.</div>
+                                        </div>
+                                        <div
+                                            class="bg-white/60 p-3 rounded-lg border border-amber-200 text-sm text-amber-900 flex gap-3 shadow-sm">
+                                            <i class="fa-solid fa-building-circle-exclamation mt-1 text-rose-500"></i>
+                                            <div><b>Aula 205</b> tiene asignado <b>Física(F+20)</b> y <b>Química</b> en el mismo bloque del Miércoles.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-6 flex gap-3">
+                                        <button id="overwrite-btn"
+                                            class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-md shadow-amber-500/20"
+                                            data-action="simulateUpload(true)">Aplicar Sobrescritura Force</button>
+                                        <button
+                                            class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-5 py-2.5 rounded-lg text-sm font-bold transition-all"
+                                            data-action="resetUpload()">Cancelar Proceso</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Upload History -->
+                    <div class="p-6 bg-white rounded-2xl shadow-sm border-2 border-indigo-200">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i> Historial de Subidas XML
+                            </h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-indigo-50/50">
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100">
+                                            Fecha / Proceso</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100">
+                                            Rango Planilla</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100 text-center">
+                                            Registros</th>
+                                        <th
+                                            class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100 text-center">
+                                            Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="upload-history-body" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Datos dinámicos -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Pagination Controls -->
+                        <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+                            <div class="text-xs text-slate-500 font-medium">
+                                Mostrando <span id="history-total" class="font-bold text-indigo-600">0</span> registros
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button id="prev-page-btn" data-action="changeHistoryPage(-1)" disabled
+                                    class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                                    <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                                </button>
+                                <span id="page-indicator"
+                                    class="text-xs font-bold text-slate-700 px-3 py-1.5 bg-slate-50 rounded-lg">Pagina 1 de 1</span>
+                                <button id="next-page-btn" data-action="changeHistoryPage(1)" disabled
+                                    class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                                    Siguiente <i class="fa-solid fa-chevron-right ml-1"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -351,73 +401,20 @@
                                 <i class="fa-solid fa-arrows-rotate text-2xl"></i>
                             </div>
                             <h3 class="text-xl font-bold text-slate-900 mb-2">¿Sobrescribir datos existentes?</h3>
-                            <p id="overwrite-modal-msg" class="text-slate-500 text-sm mb-6">Ya existen registros para
-                                las
-                                fechas seleccionadas en la tabla rpt_planilla. ¿Deseas reemplazarlos?</p>
+                            <p id="overwrite-modal-msg" class="text-slate-500 text-sm mb-6">Ya existen registros para las fechas seleccionadas en la tabla rpt_planilla. ¿Deseas reemplazarlos?</p>
                             <div class="flex gap-3">
                                 <button data-action="confirmOverwrite()"
-                                    class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-amber-500/30 transition-all">Sí,
-                                    Sobrescribir</button>
+                                    class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-amber-500/30 transition-all">Sí, Sobrescribir</button>
                                 <button data-action="closeOverwriteModal()"
                                     class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all">Cancelar</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Historial de Subidas -->
-                <div class="mt-10 p-6 bg-white rounded-2xl shadow-sm border-2 border-indigo-200">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i> Historial de Subidas XML
-                        </h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-indigo-50/50">
-                                    <th
-                                        class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100">
-                                        Fecha / Proceso</th>
-                                    <th
-                                        class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100">
-                                        Rango Planilla</th>
-                                    <th
-                                        class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100 text-center">
-                                        Registros</th>
-                                    <th
-                                        class="px-4 py-3 text-xs font-black text-indigo-700 uppercase tracking-tighter border-b border-indigo-100 text-center">
-                                        Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="upload-history-body" class="divide-y divide-slate-100 text-sm">
-                                <!-- Datos dinámicos -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Pagination Controls -->
-                    <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
-                        <div class="text-xs text-slate-500 font-medium">
-                            Mostrando <span id="history-total" class="font-bold text-indigo-600">0</span> registros
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button id="prev-page-btn" data-action="changeHistoryPage(-1)" disabled
-                                class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                                <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
-                            </button>
-                            <span id="page-indicator"
-                                class="text-xs font-bold text-slate-700 px-3 py-1.5 bg-slate-50 rounded-lg">Pagina 1 de
-                                1</span>
-                            <button id="next-page-btn" data-action="changeHistoryPage(1)" disabled
-                                class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                                Siguiente <i class="fa-solid fa-chevron-right ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Schedule Section -->
-            <div id="schedule" class="section max-w-6xl mx-auto">
+            <div id="schedule" class="section w-full max-w-none px-4 mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Visor de Horarios</h2>
@@ -551,7 +548,7 @@
             </div>
 
             <!-- Hours Section -->
-            <div id="hours" class="section max-w-5xl mx-auto">
+            <div id="hours" class="section w-full max-w-none px-4 mx-auto">
                 <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Conteo de Horas</h2>
                 <p class="text-slate-500 mb-8">Auditoría automática de tiempos totales y modificaciones de bloque.</p>
 
@@ -624,7 +621,7 @@
                 </div>
             </div>
 
-            <div id="observations" class="section max-w-7xl mx-auto">
+            <div id="observations" class="section w-full max-w-none px-4 mx-auto">
                 <div class="mb-8">
                     <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Gestión de Incidencias y
                         Observaciones
@@ -635,7 +632,7 @@
 
                 <!-- Tabs Navigation -->
                 <div class="flex border-b border-slate-200 mb-8 overflow-x-auto">
-                    <button data-action="toggleObsTab('register')" id="tab-btn-register"
+                    <button data-action="toggleObsTab('register')" id="tab-btn-register" data-perm="crear_observaciones"
                         class="px-8 py-4 text-sm font-black border-b-2 border-indigo-600 text-indigo-600 transition-all uppercase tracking-widest">
                         Registrar Incidencia
                     </button>
@@ -646,17 +643,24 @@
                 </div>
 
                 <!-- Tab 1: Registrar Incidencia -->
-                <div id="obs-tab-register" class="space-y-8">
+                <div id="obs-tab-register" class="space-y-8" data-perm="crear_observaciones">
                     <div
                         class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap lg:flex-nowrap gap-5 items-end">
                         <div class="w-full lg:w-1/3">
                             <label
                                 class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Seleccionar
                                 Docente</label>
-                            <select id="obs-filter-docente"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm">
-                                <option value="">Cargando docentes...</option>
-                            </select>
+                            <!-- Searchable combobox — hidden select preservado para JS -->
+                            <select id="obs-filter-docente" class="hidden"></select>
+                            <div class="relative" id="obs-docente-combobox">
+                                <input id="obs-docente-search" type="text" autocomplete="off"
+                                    placeholder="Buscar docente..."
+                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm"
+                                    data-action="filterDocenteCombobox('obs')">
+                                <div id="obs-docente-dropdown"
+                                    class="hidden absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-64 overflow-y-auto">
+                                </div>
+                            </div>
                         </div>
                         <div class="w-full lg:w-1/4">
                             <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Fecha
@@ -778,12 +782,33 @@
                         </div>
                         <div>
                             <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Docente</label>
+                            <!-- Searchable combobox — hidden select preservado para loadRptPlanilla -->
+                            <select id="rpt-filter-docente" class="hidden">
+                                <option value="Todos">Todos los Docentes</option>
+                            </select>
                             <div class="flex gap-1 w-full min-w-0 items-center">
-                                <button data-action="navRptTeacher(-1)" class="px-2 py-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-400 shrink-0"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                                <select id="rpt-filter-docente" class="flex-1 min-w-0 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm truncate" style="text-overflow: ellipsis;">
-                                    <option value="Todos">Todos los Docentes</option>
-                                </select>
-                                <button data-action="navRptTeacher(1)" class="px-2 py-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-400 shrink-0"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                                <button id="rpt-nav-prev" data-action="navRptTeacher(-1)"
+                                    title="Docente anterior"
+                                    class="px-2 py-2.5 bg-white border border-slate-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-300 text-slate-400 hover:text-indigo-600 shrink-0 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                                </button>
+                                <div class="relative flex-1 min-w-0" id="rpt-docente-combobox">
+                                    <input id="rpt-docente-search" type="text" autocomplete="off"
+                                        placeholder="Buscar docente..."
+                                        class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 text-sm"
+                                        data-action="filterDocenteCombobox('rpt')">
+                                    <div id="rpt-docente-dropdown"
+                                        class="hidden absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-64 overflow-y-auto">
+                                    </div>
+                                </div>
+                                <button id="rpt-nav-next" data-action="navRptTeacher(1)"
+                                    title="Siguiente docente"
+                                    class="px-2 py-2.5 bg-white border border-slate-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-300 text-slate-400 hover:text-indigo-600 shrink-0 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                            <div id="rpt-teacher-indicator" class="text-[10px] text-slate-400 font-mono mt-1 text-right hidden">
+                                <span id="rpt-teacher-pos">1</span> / <span id="rpt-teacher-total">1</span>
                             </div>
                         </div>
                         <div>
@@ -907,7 +932,7 @@
             <!-- ═══════════════════════════════════════════════════
              DOCENTES SECTION
              ═══════════════════════════════════════════════════ -->
-            <div id="docentes" class="section max-w-7xl mx-auto">
+            <div id="docentes" class="section w-full max-w-none px-4 mx-auto">
                 <div class="mb-8">
                     <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Gestión de Docentes</h2>
                     <p class="text-slate-500 mt-2">Carga Excel, maestra de docentes y docentes sin asignar del XML.</p>
@@ -958,6 +983,35 @@
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Importar
                         </button>
                     </div>
+                    
+                    <!-- CRITICAL SUPERADMIN RESET ZONE -->
+                    <div id="superadmin-admin-actions" class="hidden mt-6 bg-slate-900 border border-rose-950/40 rounded-2xl p-6 shadow-xl relative overflow-hidden backdrop-blur-md">
+                        <!-- Neon warning bar -->
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-500 via-amber-500 to-rose-600"></div>
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-rose-500/10 border border-rose-500/20 text-rose-500 rounded-xl flex items-center justify-center shrink-0 shadow-inner animate-pulse">
+                                <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-white font-extrabold text-base tracking-wide flex items-center gap-2">
+                                    Zona de Administración Crítica <span class="bg-rose-500/20 text-rose-300 text-[10px] font-black uppercase px-2 py-0.5 rounded border border-rose-500/30 tracking-widest">Superadmin Only</span>
+                                </h4>
+                                <p class="text-slate-400 text-xs mt-1.5 leading-relaxed">
+                                    Esta acción realiza un <strong>Reset Operativo Controlado</strong>. Se eliminarán permanentemente los docentes importados por Excel, observaciones, planilla consolidada (RPT), sesiones de horario y el archivo XML histórico de marzo. <strong>Esta acción es destructiva e irreversible.</strong>
+                                </p>
+                                
+                                <div class="mt-4 flex flex-wrap gap-3 items-center">
+                                    <button data-action="startBulkDeleteExcelFlow()" 
+                                        class="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-black py-2.5 px-5 rounded-xl border border-rose-500/30 transition-all flex items-center gap-2 shadow-lg shadow-rose-950/50 hover:scale-[1.02] active:scale-[0.98]">
+                                        <i class="fa-solid fa-trash-can"></i> Restablecer Base de Datos (Reset)
+                                    </button>
+                                    <span id="bulk-delete-status-msg" class="text-[11px] text-slate-400 font-medium italic"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Resultado importación -->
                     <div id="doc-import-result"
                         class="hidden mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 w-full">
@@ -1029,25 +1083,10 @@
                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500"
                                 onkeydown="if(event.key==='Enter') Handlers.applyFilters()">
                         </div>
-                        <div>
-                            <label
-                                class="block text-xs font-black text-slate-500 mb-1 uppercase tracking-tighter">Estado
-                                (Manual)</label>
-                            <select id="doc-status-filter" data-action="applyFilters()"
-                                class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500">
-                                <option value="all">Todos</option>
-                                <option value="acts">Solo Activos</option>
-                                <option value="inacts">Solo Inactivos</option>
-                            </select>
-                        </div>
+
                         <button id="btn-doc-filtrar" data-action="applyFilters()"
                             class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-all">
                             <i class="fa-solid fa-filter mr-1"></i> Filtrar
-                        </button>
-                        <button id="btn-merge-docentes" data-action="openMergeModal()" disabled
-                            title="Selecciona exactamente 2 docentes para fusionar"
-                            class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-all disabled:opacity-30 disabled:cursor-not-allowed">
-                            <i class="fa-solid fa-code-merge mr-1"></i> Fusionar (0)
                         </button>
                         <button data-action="openTeacherModal()"
                             class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-all">
@@ -1065,7 +1104,7 @@
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-slate-50 border-b border-slate-200">
                                     <tr>
-                                        <th class="px-4 py-3 w-10">
+                                        <th class="px-4 py-3 w-10 hidden">
                                             <input type="checkbox" disabled class="rounded border-slate-300">
                                         </th>
                                         <th
@@ -1322,6 +1361,82 @@
                 </div>
             </div>
 
+            <!-- Modal: Doble Confirmación Reset Administrativo -->
+            <div id="bulk-delete-confirm-modal"
+                class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+                <div class="bg-slate-900 border border-rose-900/40 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden relative">
+                    <!-- Top accent line -->
+                    <div class="h-1 bg-gradient-to-r from-rose-500 via-amber-500 to-rose-600"></div>
+                    
+                    <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                        <h3 class="text-xl font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-500 animate-pulse"></i>
+                            Confirmación de Seguridad
+                        </h3>
+                        <button data-action="closeBulkDeleteModal()"
+                            class="text-slate-400 hover:text-white transition-colors">
+                            <i class="fa-solid fa-xmark text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Paso 1: Resumen y Peligros -->
+                    <div id="bulk-delete-step-1" class="p-6 space-y-4">
+                        <div class="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+                            <h4 class="text-rose-400 font-bold text-sm uppercase tracking-wider mb-2">Impacto del Reset Operativo</h4>
+                            <ul class="text-slate-300 text-xs space-y-2 list-disc list-inside">
+                                <li>Eliminación permanente de todos los docentes creados desde Excel (<span class="font-bold text-rose-400">EXCEL_%</span>).</li>
+                                <li>Eliminación de observaciones y bitácoras asociadas.</li>
+                                <li>Eliminación de todas las sesiones de horarios cargadas.</li>
+                                <li>Eliminación de planillas de pago RPT consolidadas.</li>
+                                <li>Eliminación física del archivo XML importado históricamente.</li>
+                            </ul>
+                        </div>
+                        <p class="text-slate-400 text-xs leading-relaxed">
+                            Esta acción es destructiva y no se puede deshacer. ¿Deseas continuar a la confirmación final de seguridad?
+                        </p>
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button data-action="closeBulkDeleteModal()"
+                                class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2.5 px-5 rounded-xl border border-slate-700 transition-all">
+                                Cancelar
+                            </button>
+                            <button data-action="goToBulkDeleteStep2()"
+                                class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all">
+                                Sí, continuar <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Paso 2: Validación de Frase -->
+                    <div id="bulk-delete-step-2" class="p-6 space-y-4 hidden">
+                        <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                            <h4 class="text-amber-400 font-bold text-sm uppercase tracking-wider mb-1">Confirmación Requerida</h4>
+                            <p class="text-slate-300 text-xs leading-relaxed">
+                                Para confirmar que realmente deseas ejecutar el Reset Operativo Controlado, por favor escribe la palabra <strong class="text-white select-all">RESTABLECER</strong> a continuación:
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <input type="text" id="bulk-delete-confirm-input" 
+                                placeholder="Escribe RESTABLECER aquí..." 
+                                class="w-full px-4 py-3 bg-slate-950 border border-slate-800 text-white placeholder-slate-600 rounded-xl text-sm focus:outline-none focus:border-rose-500 font-mono tracking-widest text-center uppercase"
+                                data-action="onBulkDeleteInputChange()">
+                        </div>
+                        
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button data-action="goToBulkDeleteStep1()"
+                                class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2.5 px-5 rounded-xl border border-slate-700 transition-all flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-left"></i> Atrás
+                            </button>
+                            <button id="btn-confirm-bulk-delete" disabled
+                                data-action="confirmBulkDelete()"
+                                class="bg-slate-800 text-slate-500 text-xs font-black py-2.5 px-5 rounded-xl transition-all cursor-not-allowed flex items-center gap-2">
+                                <i class="fa-solid fa-skull-crossbones"></i> Confirmar Reset Operativo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Modal: Editar / Crear Docente Maestra -->
             <div id="teacher-modal"
                 class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -1475,7 +1590,7 @@
             </div>
 
             <!-- Recess Configuration Section -->
-            <div id="recess-config" class="section max-w-7xl mx-auto">
+            <div id="recess-config" class="section w-full max-w-none px-4 mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Configuración de Recesos</h2>
@@ -1515,7 +1630,7 @@
             </div>
 
             <!-- Lunch Configuration Section -->
-            <div id="lunch-config" class="section max-w-7xl mx-auto">
+            <div id="lunch-config" class="section w-full max-w-none px-4 mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Configuración de Almuerzos
@@ -1698,11 +1813,17 @@
                                 <!-- Existing Teacher Search -->
                                 <div id="obs-replacement-search-container" class="mb-4">
                                     <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Buscar Docente Reemplazante (Maestra)</label>
-                                    <div class="relative">
-                                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
-                                        <input type="search" id="obs-form-replacement-search" list="teachers-datalist" 
+                                    <!-- Hidden select para mantener compatibilidad o almacenar el ID directamente -->
+                                    <select id="obs-form-replacement-id" class="hidden"></select>
+                                    <div class="relative" id="obs-repl-combobox">
+                                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 z-10"></i>
+                                        <input type="text" id="obs-form-replacement-search" autocomplete="off"
                                                placeholder="Escriba apellidos para buscar..." 
-                                               class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:outline-none focus:ring-indigo-500 font-medium text-slate-700 text-sm shadow-sm transition-all focus:bg-white">
+                                               class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:outline-none focus:ring-indigo-500 font-medium text-slate-700 text-sm shadow-sm transition-all focus:bg-white"
+                                               data-action="filterDocenteCombobox('obs_repl')">
+                                        <div id="obs-form-replacement-dropdown"
+                                             class="hidden absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-64 overflow-y-auto">
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1770,7 +1891,7 @@
             <!-- =================================================================
              MÓDULO DE USUARIOS
         ================================================================== -->
-            <div id="usuarios-module" class="section max-w-7xl mx-auto">
+            <div id="usuarios-module" class="section w-full max-w-none px-4 mx-auto">
                 <div class="mb-8">
                     <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Administración de Seguridad</h2>
                     <p class="text-slate-50 mt-2 text-slate-500">Gestión de usuarios, roles y matriz de permisos RBAC.</p>
@@ -1778,11 +1899,11 @@
 
                 <!-- Sub-tabs Usuarios -->
                 <div class="flex border-b border-slate-200 mb-8 overflow-x-auto">
-                    <button data-action="toggleUsuariosTab('list')" id="usr-tab-btn-list"
+                    <button data-action="toggleUsuariosTab('list')" id="usr-tab-btn-list" data-perm="gestionar_usuarios"
                         class="usr-tab-btn px-8 py-4 text-sm font-black border-b-2 border-indigo-600 text-indigo-600 transition-all uppercase tracking-widest whitespace-nowrap">
                         <i class="fa-solid fa-users-gear mr-2"></i>Lista de Usuarios
                     </button>
-                    <button data-action="toggleUsuariosTab('rbac')" id="usr-tab-btn-rbac"
+                    <button data-action="toggleUsuariosTab('rbac')" id="usr-tab-btn-rbac" data-perm="gestionar_permisos"
                         class="usr-tab-btn px-8 py-4 text-sm font-black border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all uppercase tracking-widest whitespace-nowrap">
                         <i class="fa-solid fa-shield-halved mr-2"></i>Permisos por Rol
                     </button>
@@ -1826,9 +1947,14 @@
                                 <h3 class="text-lg font-bold text-slate-800">Matriz de Permisos</h3>
                                 <p class="text-xs text-slate-500 font-medium">Asigna permisos granulares a cada rol del sistema.</p>
                             </div>
-                            <button data-action="saveRolePermissions()" id="btn-save-rbac" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-xl shadow-md transition-all">
-                                <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar Matriz
-                            </button>
+                            <div class="flex gap-3">
+                                <button data-action="openRoleModal()" data-perm="crear_roles" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-xl shadow-md transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-plus"></i>Nuevo Rol
+                                </button>
+                                <button data-action="saveRolePermissions()" id="btn-save-rbac" data-perm="gestionar_permisos" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-xl shadow-md transition-all">
+                                    <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar Matriz
+                                </button>
+                            </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left border-collapse">
@@ -1886,6 +2012,25 @@
                     </div>
                 </div>
 
+                <!-- Modal Nuevo Rol -->
+                <div id="role-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in duration-200">
+                        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 class="text-xl font-black text-slate-800 tracking-tight">Crear Nuevo Rol</h3>
+                            <button data-action="closeRoleModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <div>
+                                <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-tighter">Nombre del Rol</label>
+                                <input type="text" id="role-new-name" placeholder="Ej: COORDINACIÓN" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-slate-700 transition-all uppercase">
+                            </div>
+                            <button data-action="saveNewRole()" id="btn-save-new-role" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-circle-check"></i>Crear Rol
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Modal: Reporte XML -->
                 <div id="report-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
                     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in duration-200">
@@ -1919,13 +2064,13 @@
             </div>
 
         </main>
-        <script type="module" src="js/ui_utils.js"></script>
-        <script type="module" src="js/upload.js"></script>
-        <script type="module" src="js/docentes_mgmt.js"></script>
-        <script type="module" src="js/reportes.js"></script>
-        <script type="module" src="js/observaciones.js"></script>
-        <script type="module" src="js/config_mgmt.js"></script>
-        <script type="module" src="js/usuarios.js"></script>
-        <script type="module" src="js/main.js"></script>
+        <script type="module" src="js/ui_utils.js?v=1.0.5"></script>
+        <script type="module" src="js/upload.js?v=1.0.5"></script>
+        <script type="module" src="js/docentes_mgmt.js?v=1.0.5"></script>
+        <script type="module" src="js/reportes.js?v=1.0.5"></script>
+        <script type="module" src="js/observaciones.js?v=1.0.5"></script>
+        <script type="module" src="js/config_mgmt.js?v=1.0.5"></script>
+        <script type="module" src="js/usuarios.js?v=1.0.5"></script>
+        <script type="module" src="js/main.js?v=1.0.5"></script>
     </body>
 </html>

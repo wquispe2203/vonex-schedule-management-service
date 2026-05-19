@@ -1,9 +1,7 @@
 // Configuration Module - Environment Aware
 const isLocal = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
 
-export const API_BASE_URL = isLocal
-    ? 'http://127.0.0.1:8000'
-    : window.location.origin;
+export const API_BASE_URL = window.VONEX_API_URL || window.location.origin;
 
 export const ENDPOINTS = {
     AUTH: {
@@ -20,7 +18,8 @@ export const ENDPOINTS = {
         SIN_ASIGNAR: "/api/docentes/sinasignar",
         CONFLICTOS: "/api/docentes/conflictos",
         RESOLVE_CONFLICT: "/api/docentes/resolve-conflict",
-        ALL: "/api/docentes/all"
+        ALL: "/api/docentes/all",
+        BULK_DELETE_EXCEL: "/api/docentes/bulk-delete-excel"
     },
     MDM: {
         REVIEWS: "/api/mdm/reviews",

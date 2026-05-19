@@ -1,0 +1,27 @@
+{
+  "fase_a": {
+    "total": 190,
+    "with_dni": 186,
+    "without_dni": 4,
+    "activo": 186,
+    "incompleto": 4,
+    "duplicates_norm": 0,
+    "duplicates_dni": 0
+  },
+  "fase_b": {
+    "upload": {
+      "id": "8bc2c3a5-fa43-4cb2-8971-ebd07ccb5b84",
+      "filename": "historical_xml_import_202603.xml",
+      "storage_path": "storage/xml_uploads/historical_xml_import_202603.xml",
+      "exists": true
+    },
+    "extracted_count": 139,
+    "api_response_status": 200,
+    "api_payload_size": 138
+  },
+  "fase_c": {
+    "matched": 138,
+    "sin_asignar": 0,
+    "conflictos": 1
+  }
+}

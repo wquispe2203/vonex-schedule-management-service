@@ -23,18 +23,22 @@ def create_user(db: Session, data: Dict[str, Any]) -> User:
 
     hashed_pw = get_password_hash(password)
     
+    import logging
+    logger = logging.getLogger("uvicorn")
+    logger.info(f"[USERS CREATE DB INSERT] Inserting user into DB: {username}")
+
     new_user = User(
         username=username,
         password_hash=hashed_pw,
         nombres=data.get("nombres"),
         apellidos=data.get("apellidos"),
-        area=data.get("area"),
         is_active=True
     )
     
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+    logger.info(f"[USERS CREATE DB INSERT SUCCESS] User created with UUID: {new_user.id}")
     return new_user
 
 def authenticate_user(db: Session, username: str, password: str) -> Dict[str, Any]:
@@ -89,22 +93,46 @@ def get_users(db: Session):
     return db.query(User).options(joinedload(User.roles)).all()
 
 def update_user(db: Session, user_id: UUID, data: Dict[str, Any]):
+    import logging
+    logger = logging.getLogger("uvicorn")
+    
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
+        logger.warning(f"[USERS UPDATE ORM] User not found on lookup. ID: {user_id}")
         raise ValueError("Usuario no encontrado")
-        
+
+    # Regla de validación estricta de Username y Dominio
+    username = data.get("username")
+    if username is not None:
+        username = username.strip().lower()
+        if not username.endswith(DOMAIN_REQUIRED):
+            raise ValueError(f"El usuario debe registrarse con un email de la institución ({DOMAIN_REQUIRED}).")
+            
+        existing = db.query(User).filter(User.username == username, User.id != user_id).first()
+        if existing:
+            raise ValueError("El correo ingresado ya está en uso por otra cuenta.")
+        data["username"] = username
+
+    logger.info(f"[USERS UPDATE ORM] Updating ORM fields for user_id={user_id}. Payload attributes: {list(data.keys())}")
     for k, v in data.items():
         if hasattr(user, k):
             setattr(user, k, v)
+            
+    logger.info(f"[USERS UPDATE COMMIT] Triggering database commit for user_id={user_id}")
     db.commit()
+    logger.info(f"[USERS UPDATE COMMIT] Executing user object refresh")
     db.refresh(user)
     return user
 
 def delete_user(db: Session, user_id: UUID):
+    import logging
+    logger = logging.getLogger("uvicorn")
+    
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise ValueError("Usuario no encontrado")
-    # Soft delete por seguridad, o real?
+    
+    logger.info(f"[RBAC DELETE AUTHORIZED] Desactivando el acceso del usuario '{user.username}' con ID: {user_id}")
     user.is_active = False
     db.commit()
     return user
@@ -150,6 +178,48 @@ def assign_permissions_to_role(db: Session, role_id: UUID, permission_ids: List[
     db.commit()
     db.refresh(role)
     return role
+
+def update_role(db: Session, role_id: UUID, new_name: str):
+    from app.models import Role
+    role = db.query(Role).filter(Role.id == role_id).first()
+    if not role:
+        raise ValueError("Rol no encontrado")
+        
+    PROTECTED_ROLES = ["SUPERADMIN", "SISTEMAS"]
+    if role.is_protected or role.name.upper() in PROTECTED_ROLES:
+        import logging
+        logger = logging.getLogger("uvicorn")
+        logger.warning(f"[PROTECTED ROLE BLOCKED] Attempted to RENAME protected role: {role.name}")
+        raise ValueError(f"No está permitido editar el nombre de un rol estructural protegido: {role.name}")
+        
+    n = new_name.strip().upper()
+    existing = db.query(Role).filter(Role.name == n, Role.id != role_id).first()
+    if existing:
+        raise ValueError("Ya existe otro rol registrado con ese nombre.")
+        
+    role.name = n
+    db.commit()
+    db.refresh(role)
+    return role
+
+def delete_role(db: Session, role_id: UUID):
+    from app.models import Role
+    import logging
+    logger = logging.getLogger("uvicorn")
+    
+    role = db.query(Role).filter(Role.id == role_id).first()
+    if not role:
+        raise ValueError("Rol no encontrado")
+        
+    PROTECTED_ROLES = ["SUPERADMIN", "SISTEMAS"]
+    if role.is_protected or role.name.upper() in PROTECTED_ROLES:
+        logger.warning(f"[PROTECTED ROLE BLOCKED] Attempted to DELETE protected role: {role.name}")
+        raise ValueError(f"No está permitido eliminar un rol estructural protegido: {role.name}")
+        
+    logger.info(f"[RBAC DELETE AUTHORIZED] Procediendo a la eliminación física del rol '{role.name}' con ID: {role_id}")
+    db.delete(role)
+    db.commit()
+    return True
 
 # --- CRUD PERMISOS ---
 def get_permissions(db: Session):

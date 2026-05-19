@@ -26,6 +26,7 @@ class Role(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
     legacy_id = Column(Integer, nullable=True)
     name = Column(String(50), unique=True, index=True, nullable=False)
+    is_protected = Column(Boolean, default=False, server_default='false')
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     users = relationship("User", secondary=user_roles, back_populates="roles")
     permissions = relationship("Permission", secondary=role_permissions, back_populates="roles")

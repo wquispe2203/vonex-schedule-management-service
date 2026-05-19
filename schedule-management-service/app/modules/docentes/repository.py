@@ -101,20 +101,23 @@ def fetch_all_teachers_paginated(
         # Filtro Global MDM v4: Excluir docentes ya fusionados
         q = q.filter(Teacher.merged_into_id.is_(None))
         
-        # Filtro base por "actividad" (legacy logic)
+        # Filtro base por "actividad" (legacy logic) o "razon_social"
         if filter_mode == "active":
             q = q.filter(Teacher.id.in_(_active_subquery(db)))
         elif filter_mode == "inactive":
             q = q.filter(Teacher.id.notin_(_active_subquery(db)))
+        elif filter_mode and filter_mode != "all":
+            term = f"%{filter_mode.strip().upper()}%"
+            q = q.filter(func.upper(Teacher.razon_social).like(term))
             
         # Filtro por status (Gobernanza v5)
         if status_filter in ["INCOMPLETO", "CONFLICTO", "INVALIDO"]:
             q = q.filter(Teacher.status == status_filter)
         elif status_filter == "ACTIVO":
-            q = q.filter(Teacher.status == "ACTIVO", Teacher.dni.isnot(None))
+            q = q.filter(Teacher.status == "ACTIVO", Teacher.dni.isnot(None), Teacher.dni != "")
         else:
-            # Por defecto (None, "all", etc.), mostrar solo ACTIVO y con DNI no nulo (v5.5 estricto)
-            q = q.filter(Teacher.status == "ACTIVO", Teacher.dni.isnot(None))
+            # Por defecto (None, "all", etc.), mostrar solo ACTIVO y con DNI no nulo/vacío (v5.5 restaurado)
+            q = q.filter(Teacher.status == "ACTIVO", Teacher.dni.isnot(None), Teacher.dni != "")
             
         if search:
             term = f"%{search.strip().upper()}%"

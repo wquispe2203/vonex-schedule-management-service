@@ -317,8 +317,6 @@ def get_active_teachers_for_rpt(db: Session) -> List[Dict[str, Any]]:
         
         db_teachers = db.query(Teacher).filter(
             Teacher.status == "ACTIVO",
-            Teacher.dni.isnot(None),
-            Teacher.dni != "",
             Teacher.merged_into_id.is_(None)
         ).all()
         
@@ -422,6 +420,9 @@ def get_active_teachers_for_rpt(db: Session) -> List[Dict[str, Any]]:
                         break
                         
             if matched_xml_ids:
+                if not teacher.dni:
+                    logger.info(f"[TEACHER NULL DNI ACCEPTED] Teacher ID {teacher.id} allowed without DNI.")
+                
                 # Accumulate hours from all matching XML teacher IDs (if any)
                 total_hours = sum(xml_teacher_hours.get(xt_id, 0.0) for xt_id in matched_xml_ids)
                 result.append({
@@ -433,6 +434,7 @@ def get_active_teachers_for_rpt(db: Session) -> List[Dict[str, Any]]:
                 
         # Sort by name alphabetically
         result.sort(key=lambda x: x["name"])
+        logger.info(f"[API PAYLOAD NORMALIZED] successfully returning {len(result)} teacher hours items.")
         return result
         
     except Exception as e:
@@ -743,9 +745,115 @@ def import_excel(db: Session, file_bytes: bytes) -> Dict[str, Any]:
         raise RuntimeError(f"Error importando Excel: {str(e)}")
 
 
+def bulk_delete_excel_teachers(db: Session, executor_email: str) -> Dict[str, Any]:
+    """
+    Realiza el Reset Operativo Controlado de manera transaccional:
+    1. Trunca la tabla observations.
+    2. Elimina rpt_planilla y schedule_sessions vinculados al XML histórico.
+    3. Elimina lecciones huérfanas en cascada.
+    4. Elimina selectivamente docentes importados desde Excel.
+    5. Elimina el registro del XML de la BD y su archivo físico de almacenamiento.
+    """
+    import uuid
+    from datetime import datetime, timezone
+    from sqlalchemy import text
+    import os
+
+    trace_id = str(uuid.uuid4())
+    logger.info("[CLEANUP START] Iniciando Reset Operativo Controlado. Trace ID: %s | Ejecutor: %s", trace_id, executor_email)
+
+    try:
+        # Buscamos el XML histórico para obtener su ID y ruta
+        xml_filename = "historical_xml_import_202603.xml"
+        xml_row = db.execute(
+            text("SELECT id, storage_path FROM xml_uploads WHERE filename = :filename"),
+            {"filename": xml_filename}
+        ).fetchone()
+
+        xml_id = str(xml_row[0]) if xml_row else "8bc2c3a5-fa43-4cb2-8971-ebd07ccb5b84"
+        physical_path = xml_row[1] if xml_row else "storage/xml_uploads/historical_xml_import_202603.xml"
+
+        # 1. Eliminar observaciones
+        deleted_obs = db.execute(text("DELETE FROM observations")).rowcount
+
+        # 2. Eliminar rpt_planilla
+        deleted_rpt = db.execute(
+            text("DELETE FROM rpt_planilla WHERE xml_upload_id = :xml_id"),
+            {"xml_id": xml_id}
+        ).rowcount
+
+        # 3. Eliminar schedule_sessions
+        deleted_sessions = db.execute(
+            text("DELETE FROM schedule_sessions WHERE xml_upload_id = :xml_id"),
+            {"xml_id": xml_id}
+        ).rowcount
+
+        # 4. Eliminar lecciones huérfanas
+        deleted_lessons = db.execute(
+            text("DELETE FROM lessons WHERE id NOT IN (SELECT DISTINCT lesson_id FROM schedule_sessions)")
+        ).rowcount
+
+        # 5. Eliminar docentes importados desde Excel
+        deleted_teachers = db.execute(
+            text("DELETE FROM teachers WHERE source_id LIKE 'EXCEL_%' AND source = 'manual'")
+        ).rowcount
+
+        # 6. Eliminar xml_upload
+        deleted_uploads = db.execute(
+            text("DELETE FROM xml_uploads WHERE id = :xml_id"),
+            {"xml_id": xml_id}
+        ).rowcount
+
+        # 7. Eliminar archivo físico en storage si existe
+        file_removed = False
+        if physical_path and os.path.exists(physical_path):
+            try:
+                os.remove(physical_path)
+                file_removed = True
+                logger.info("[CLEANUP] Archivo físico XML eliminado de storage: %s", physical_path)
+            except Exception as fe:
+                logger.error("[CLEANUP ERROR] No se pudo eliminar archivo físico: %s. Error: %s", physical_path, str(fe))
+
+        db.commit()
+
+        utc_now = datetime.now(timezone.utc).isoformat()
+        logger.info(
+            "[SUPERADMIN OPERATION SUCCESS] | User: %s | Action: BULK_DELETE_EXCEL_TEACHERS | "
+            "Timestamp: %s | Deleted Count: %d | Trace ID: %s",
+            executor_email,
+            utc_now,
+            deleted_teachers,
+            trace_id
+        )
+
+        return {
+            "success": True,
+            "data": {
+                "trace_id": trace_id,
+                "timestamp": utc_now,
+                "deleted_counts": {
+                    "teachers": deleted_teachers,
+                    "observations": deleted_obs,
+                    "rpt_planilla": deleted_rpt,
+                    "schedule_sessions": deleted_sessions,
+                    "lessons": deleted_lessons,
+                    "xml_uploads": deleted_uploads,
+                    "physical_file_removed": file_removed
+                }
+            },
+            "error": None
+        }
+
+    except Exception as e:
+        db.rollback()
+        logger.error("[CLEANUP ERROR] Error durante Reset Operativo Controlado. Trace ID: %s. Detalle: %s", trace_id, str(e), exc_info=True)
+        raise RuntimeError(f"Error durante Reset Operativo: {str(e)}")
+
+
 # ════════════════════════════════════════════════════════
 #  LÓGICA DE CRUCE (DB vs ÚLTIMO XML)
 # ════════════════════════════════════════════════════════
+
 
 from lxml import etree
 import difflib

@@ -25,9 +25,13 @@ def fetch_rpt_records(
     print(f"[RPT RANGE QUERY]\nstart_date: {fecha_inicio}\nend_date: {fecha_fin}")
     logger.info(f"[RPT RANGE QUERY] start_date={fecha_inicio} end_date={fecha_fin}")
 
+    u_ids = getattr(db, "_rpt_active_u_ids", None)
     if xml_upload_id:
         query = query.filter(RptPlanilla.xml_upload_id == xml_upload_id)
-        active_uploads = db.query(XmlUpload).filter(XmlUpload.id == xml_upload_id).all()
+        u_ids_str = [xml_upload_id]
+    elif u_ids is not None:
+        query = query.filter(RptPlanilla.xml_upload_id.in_(u_ids))
+        u_ids_str = [str(uid) for uid in u_ids]
     else:
         active_uploads = (
             db.query(XmlUpload)
@@ -39,11 +43,10 @@ def fetch_rpt_records(
             .order_by(XmlUpload.created_at.desc())
             .all()
         )
+        u_ids_str = [str(u.id) for u in active_uploads]
         if active_uploads:
-            u_ids = [u.id for u in active_uploads]
-            query = query.filter(RptPlanilla.xml_upload_id.in_(u_ids))
+            query = query.filter(RptPlanilla.xml_upload_id.in_([u.id for u in active_uploads]))
 
-    u_ids_str = [str(u.id) for u in active_uploads]
     print(f"[RPT ACTIVE UPLOADS]\nupload_ids: {u_ids_str}")
     logger.info(f"[RPT ACTIVE UPLOADS] upload_ids={u_ids_str}")
 
@@ -57,14 +60,15 @@ def fetch_rpt_records(
     logger.info(f"[RPT RECORDS] total_rows: {len(records)}")
     return records
 
-def fetch_context_data(db: Session, fecha_init: date, fecha_end: date, xml_upload_id: Optional[str] = None):
+def fetch_context_data(db: Session, fecha_init: date, fecha_end: date, xml_upload_id: Optional[str] = None, pre_fetched_u_ids: Optional[List[str]] = None):
     """
     Obtiene Sessions y Observations en bloques optimizados (Anti N+1) filtrados por upload activo.
     """
     from app.models import XmlUpload
     
-    u_ids = []
-    if xml_upload_id:
+    if pre_fetched_u_ids is not None:
+        u_ids = pre_fetched_u_ids
+    elif xml_upload_id:
         u_ids = [xml_upload_id]
     else:
         active_uploads = (

@@ -1,0 +1,12 @@
+{
+  "sin_asignar_endpoint": {
+    "status_code": 200,
+    "success": true,
+    "total": 0
+  },
+  "conflictos_endpoint": {
+    "status_code": 200,
+    "success": true,
+    "total": 0
+  }
+}

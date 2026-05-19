@@ -1,0 +1,556 @@
+{
+    "snapshot_time": "20260514_173632Z",
+    "files": [
+        {
+            "path": "20260313_175826_asctt2012.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "20260313_175835_asctt2012.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "20260313_175949_asctt2012.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "20260316_113052_02-0803.xml",
+            "checksum": "b97b238d4ea1a8f3c9b1d6de3bd5577a2d03cf7114f9312180645aa53bc3df12",
+            "valid": true
+        },
+        {
+            "path": "20260316_114125_02-0803.xml",
+            "checksum": "b97b238d4ea1a8f3c9b1d6de3bd5577a2d03cf7114f9312180645aa53bc3df12",
+            "valid": true
+        },
+        {
+            "path": "20260316_114703_02-0803.xml",
+            "checksum": "b97b238d4ea1a8f3c9b1d6de3bd5577a2d03cf7114f9312180645aa53bc3df12",
+            "valid": true
+        },
+        {
+            "path": "20260316_114811_02-0803.xml",
+            "checksum": "b97b238d4ea1a8f3c9b1d6de3bd5577a2d03cf7114f9312180645aa53bc3df12",
+            "valid": true
+        },
+        {
+            "path": "20260316_115655_02-0803.xml",
+            "checksum": "b97b238d4ea1a8f3c9b1d6de3bd5577a2d03cf7114f9312180645aa53bc3df12",
+            "valid": true
+        },
+        {
+            "path": "20260316_121726_02-0803.xml",
+            "checksum": "b97b238d4ea1a8f3c9b1d6de3bd5577a2d03cf7114f9312180645aa53bc3df12",
+            "valid": true
+        },
+        {
+            "path": "20260316_121921_02-0803.xml",
+            "checksum": "b97b238d4ea1a8f3c9b1d6de3bd5577a2d03cf7114f9312180645aa53bc3df12",
+            "valid": true
+        },
+        {
+            "path": "20260316_121938_02-0803.xml",
+            "checksum": "b97b238d4ea1a8f3c9b1d6de3bd5577a2d03cf7114f9312180645aa53bc3df12",
+            "valid": true
+        },
+        {
+            "path": "20260316_161228_02-0803.xml",
+            "checksum": "b97b238d4ea1a8f3c9b1d6de3bd5577a2d03cf7114f9312180645aa53bc3df12",
+            "valid": true
+        },
+        {
+            "path": "20260316_161745_asctt2012.xml",
+            "checksum": "441a8ebef7e8fb37af3f6320f1c2c6570d3f486c8ccc6287316e60338c34c99f",
+            "valid": true
+        },
+        {
+            "path": "20260316_174237_asctt2012.xml",
+            "checksum": "441a8ebef7e8fb37af3f6320f1c2c6570d3f486c8ccc6287316e60338c34c99f",
+            "valid": true
+        },
+        {
+            "path": "20260316_174947_asctt2012.xml",
+            "checksum": "441a8ebef7e8fb37af3f6320f1c2c6570d3f486c8ccc6287316e60338c34c99f",
+            "valid": true
+        },
+        {
+            "path": "20260316_175008_asctt2012.xml",
+            "checksum": "441a8ebef7e8fb37af3f6320f1c2c6570d3f486c8ccc6287316e60338c34c99f",
+            "valid": true
+        },
+        {
+            "path": "20260316_175653_asctt2012 (1).xml",
+            "checksum": "01c1f8417e7bc64edbacd1eb99e72417ab05a1fa34f82fcb8658a1f915becb2d",
+            "valid": true
+        },
+        {
+            "path": "20260316_180654_asctt2012 (2).xml",
+            "checksum": "cd27387adf330cfffe0ae313bbeaad1f8caefce0c9adf050eeee21c8df0b19f8",
+            "valid": true
+        },
+        {
+            "path": "20260317_104125_prueba1603.xml",
+            "checksum": "87a675b2bb1006272faed4a7dfbc3596514346a0cb6eead1efb122f7ec1d3781",
+            "valid": true
+        },
+        {
+            "path": "20260317_112520_asctt2012.xml",
+            "checksum": "ff87339f1d4464ad74a4605e4c356cc2ce0cbfaac353f4c5d74f414453b73224",
+            "valid": true
+        },
+        {
+            "path": "20260317_115421_asctt2012.xml",
+            "checksum": "ff87339f1d4464ad74a4605e4c356cc2ce0cbfaac353f4c5d74f414453b73224",
+            "valid": true
+        },
+        {
+            "path": "20260317_121110_asctt2012 (1).xml",
+            "checksum": "ce1867e14fc1268ed7be9bbd646e8154edd6d878cfd53206089978f55f8130cc",
+            "valid": true
+        },
+        {
+            "path": "20260317_122527_asctt2012 (2).xml",
+            "checksum": "7b908aa8fa6d4565f34358bbf92ccf97b5b06477defe4a1b26631e5bade604ae",
+            "valid": true
+        },
+        {
+            "path": "20260317_135215_asctt2012 (2).xml",
+            "checksum": "7b908aa8fa6d4565f34358bbf92ccf97b5b06477defe4a1b26631e5bade604ae",
+            "valid": true
+        },
+        {
+            "path": "20260317_141230_asctt2012 (2).xml",
+            "checksum": "7b908aa8fa6d4565f34358bbf92ccf97b5b06477defe4a1b26631e5bade604ae",
+            "valid": true
+        },
+        {
+            "path": "20260317_144356_asctt2012 (2).xml",
+            "checksum": "7b908aa8fa6d4565f34358bbf92ccf97b5b06477defe4a1b26631e5bade604ae",
+            "valid": true
+        },
+        {
+            "path": "20260317_144623_0903-1503.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "20260317_151050_0903-1503.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "20260317_151102_1603-2203.xml",
+            "checksum": "7b908aa8fa6d4565f34358bbf92ccf97b5b06477defe4a1b26631e5bade604ae",
+            "valid": true
+        },
+        {
+            "path": "20260317_160205_0903-1503.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "20260317_160423_0903-1503.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "20260317_160516_1603-2203.xml",
+            "checksum": "7b908aa8fa6d4565f34358bbf92ccf97b5b06477defe4a1b26631e5bade604ae",
+            "valid": true
+        },
+        {
+            "path": "20260317_161152_0903-1503.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "20260317_161205_1603-2203.xml",
+            "checksum": "7b908aa8fa6d4565f34358bbf92ccf97b5b06477defe4a1b26631e5bade604ae",
+            "valid": true
+        },
+        {
+            "path": "20260317_161627_1603-2203.xml",
+            "checksum": "7b908aa8fa6d4565f34358bbf92ccf97b5b06477defe4a1b26631e5bade604ae",
+            "valid": true
+        },
+        {
+            "path": "20260318_153619_1603-2203.xml",
+            "checksum": "7b908aa8fa6d4565f34358bbf92ccf97b5b06477defe4a1b26631e5bade604ae",
+            "valid": true
+        },
+        {
+            "path": "20260318_170315_1603-2203.xml",
+            "checksum": "7b908aa8fa6d4565f34358bbf92ccf97b5b06477defe4a1b26631e5bade604ae",
+            "valid": true
+        },
+        {
+            "path": "20260319_094712_ACADLIMA_0903-1503.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "20260319_095248_ACADLIMA_0903-1503.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "20260319_101950_ACADLIMA_0903-1503.xml",
+            "checksum": "b2a933e9dc77f4c8a33c891b528c5a66922ae6f2ecf989f6d10c43011244b543",
+            "valid": true
+        },
+        {
+            "path": "20260319_102825_ACADLIMA_0903-1503.xml",
+            "checksum": "e9266411f2722e396e090e5717ba7875d79cf0d09e44f253c3bdfdbe59870a69",
+            "valid": true
+        },
+        {
+            "path": "20260319_103728_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260319_120134_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260319_120257_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260319_122326_test.xml",
+            "checksum": "a9687c4cfb38cdb3c0daa2382b7d3e062959ce0a60bf46c4518ccc482e186c70",
+            "valid": true
+        },
+        {
+            "path": "20260319_124115_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260319_124135_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260319_125155_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260319_125212_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260319_125654_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260319_125707_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260319_133548_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260319_133604_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260319_134205_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260319_134217_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260319_134900_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260319_134915_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260319_135730_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260319_135742_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260319_141813_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260319_141826_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260319_170002_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260319_170014_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260325_143036_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260325_143049_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260325_145451_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260325_145502_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260326_152714_ACADLIMA_1603-2003.xml",
+            "checksum": "09765bb0f1d96efcf78ff6a4cc8a28dca31c62294a66fcaea396f10c1c7579c9",
+            "valid": true
+        },
+        {
+            "path": "20260421_150832_test_mdm.xml",
+            "checksum": "5e06529a5d2e29e7b90f18b51a166f255716860d02a7579c85536494fb2bae9e",
+            "valid": true
+        },
+        {
+            "path": "20260421_150926_test_mdm.xml",
+            "checksum": "292662d735ccecc4b0293d993b35ddd4efd32dfcf916d53194b68cb8694d00a0",
+            "valid": true
+        },
+        {
+            "path": "20260421_172241_20260421_150926_test_mdm.xml",
+            "checksum": "292662d735ccecc4b0293d993b35ddd4efd32dfcf916d53194b68cb8694d00a0",
+            "valid": true
+        },
+        {
+            "path": "20260421_172333_complex_mdm_test.xml",
+            "checksum": "15b31d149b02f63f7d237f2769a81545cf3002f16795560b9e1e9a92e04eb7de",
+            "valid": true
+        },
+        {
+            "path": "20260421_172413_complex_mdm_test.xml",
+            "checksum": "15b31d149b02f63f7d237f2769a81545cf3002f16795560b9e1e9a92e04eb7de",
+            "valid": true
+        },
+        {
+            "path": "20260421_172504_complex_mdm_test.xml",
+            "checksum": "28a4b33feb3ce45963281610e8bcaf617dad160f04c020fae87fcf48294b305f",
+            "valid": true
+        },
+        {
+            "path": "20260421_172610_complex_mdm_test.xml",
+            "checksum": "28a4b33feb3ce45963281610e8bcaf617dad160f04c020fae87fcf48294b305f",
+            "valid": true
+        },
+        {
+            "path": "20260421_172645_complex_mdm_test.xml",
+            "checksum": "28a4b33feb3ce45963281610e8bcaf617dad160f04c020fae87fcf48294b305f",
+            "valid": true
+        },
+        {
+            "path": "20260421_172717_complex_mdm_test.xml",
+            "checksum": "3bd24a94af7d18792e4a4bb96d6ca14e7162c5109d2faa60ea4e9f955d8e0f9e",
+            "valid": true
+        },
+        {
+            "path": "20260421_172809_complex_mdm_test.xml",
+            "checksum": "3bd24a94af7d18792e4a4bb96d6ca14e7162c5109d2faa60ea4e9f955d8e0f9e",
+            "valid": true
+        },
+        {
+            "path": "20260421_172945_complex_mdm_test.xml",
+            "checksum": "3bd24a94af7d18792e4a4bb96d6ca14e7162c5109d2faa60ea4e9f955d8e0f9e",
+            "valid": true
+        },
+        {
+            "path": "20260421_173013_complex_mdm_test.xml",
+            "checksum": "3bd24a94af7d18792e4a4bb96d6ca14e7162c5109d2faa60ea4e9f955d8e0f9e",
+            "valid": true
+        },
+        {
+            "path": "20260421_173043_complex_mdm_test.xml",
+            "checksum": "3bd24a94af7d18792e4a4bb96d6ca14e7162c5109d2faa60ea4e9f955d8e0f9e",
+            "valid": true
+        },
+        {
+            "path": "20260421_173145_complex_mdm_test.xml",
+            "checksum": "3bd24a94af7d18792e4a4bb96d6ca14e7162c5109d2faa60ea4e9f955d8e0f9e",
+            "valid": true
+        },
+        {
+            "path": "20260421_173244_complex_mdm_test_v2.xml",
+            "checksum": "e3f0d57a772786ed48a3207d56c6a880d8e56f4da3eaf1c300c52107124ca74c",
+            "valid": true
+        },
+        {
+            "path": "20260421_173401_complex_mdm_test_v2.xml",
+            "checksum": "e3f0d57a772786ed48a3207d56c6a880d8e56f4da3eaf1c300c52107124ca74c",
+            "valid": true
+        },
+        {
+            "path": "20260421_173505_complex_mdm_test_v2.xml",
+            "checksum": "e3f0d57a772786ed48a3207d56c6a880d8e56f4da3eaf1c300c52107124ca74c",
+            "valid": true
+        },
+        {
+            "path": "20260421_173630_complex_mdm_test_v2.xml",
+            "checksum": "e3f0d57a772786ed48a3207d56c6a880d8e56f4da3eaf1c300c52107124ca74c",
+            "valid": true
+        },
+        {
+            "path": "20260421_211418_complex_mdm_test_v2.xml",
+            "checksum": "e3f0d57a772786ed48a3207d56c6a880d8e56f4da3eaf1c300c52107124ca74c",
+            "valid": true
+        },
+        {
+            "path": "20260421_212950_complex_mdm_test_v2.xml",
+            "checksum": "e3f0d57a772786ed48a3207d56c6a880d8e56f4da3eaf1c300c52107124ca74c",
+            "valid": true
+        },
+        {
+            "path": "20260428_094316_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260428_100723_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260428_101851_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260428_104057_test_mdm.xml",
+            "checksum": "292662d735ccecc4b0293d993b35ddd4efd32dfcf916d53194b68cb8694d00a0",
+            "valid": true
+        },
+        {
+            "path": "20260428_104133_test_mdm.xml",
+            "checksum": "292662d735ccecc4b0293d993b35ddd4efd32dfcf916d53194b68cb8694d00a0",
+            "valid": true
+        },
+        {
+            "path": "20260428_104215_test_mdm.xml",
+            "checksum": "292662d735ccecc4b0293d993b35ddd4efd32dfcf916d53194b68cb8694d00a0",
+            "valid": true
+        },
+        {
+            "path": "20260428_104244_test_mdm.xml",
+            "checksum": "292662d735ccecc4b0293d993b35ddd4efd32dfcf916d53194b68cb8694d00a0",
+            "valid": true
+        },
+        {
+            "path": "20260428_104556_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260428_110332_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260428_161251_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260428_162144_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260428_163516_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260428_170200_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260428_172518_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260428_172643_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260507_112929_ACADLIMA_0903-1503.xml",
+            "checksum": "c5ce583d09bbd59da56efdefe4ddd2c71956d577f616d0028118cb27fa65803a",
+            "valid": true
+        },
+        {
+            "path": "20260507_112946_ACADLIMA_0203-0803.xml",
+            "checksum": "98071bd95a3da4f1688b82bdf0e839a54ea6f146f87160dee4ac85f1a0ebcd01",
+            "valid": true
+        },
+        {
+            "path": "20260512_180902_test_mdm.xml",
+            "checksum": "292662d735ccecc4b0293d993b35ddd4efd32dfcf916d53194b68cb8694d00a0",
+            "valid": true
+        },
+        {
+            "path": "asctt2012.xml",
+            "checksum": "deb7f9d8d30b59a56a4c63c3a2ce8d4489141afceb504f151ea2ac2feafb3058",
+            "valid": true
+        },
+        {
+            "path": "complex_mdm_test.xml",
+            "checksum": "3bd24a94af7d18792e4a4bb96d6ca14e7162c5109d2faa60ea4e9f955d8e0f9e",
+            "valid": true
+        },
+        {
+            "path": "complex_mdm_test_v2.xml",
+            "checksum": "e3f0d57a772786ed48a3207d56c6a880d8e56f4da3eaf1c300c52107124ca74c",
+            "valid": true
+        },
+        {
+            "path": "test.xml",
+            "checksum": "a9687c4cfb38cdb3c0daa2382b7d3e062959ce0a60bf46c4518ccc482e186c70",
+            "valid": true
+        }
+    ],
+    "errors": []
+}

@@ -13,7 +13,12 @@ let usuariosInitPromise = null;
 /**
  * [USERS MODULE INIT] Punto de entrada inicial del ciclo de vida del módulo.
  */
-export async function initUsuarios() {
+export async function initUsuarios(force = false) {
+    if (force) {
+        console.log('[USERS FORCE REFRESH] Reseteando usuariosInitPromise para forzar recarga reactiva.');
+        usuariosInitPromise = null;
+    }
+
     if (usuariosInitPromise) {
         console.log('[PROMISE LOCK REUSED] initUsuarios');
         return usuariosInitPromise;
@@ -40,7 +45,7 @@ export async function initUsuarios() {
             await loadRoles();
 
             // 2. Realizar el fetch de usuarios del backend
-            console.log("[USERS FETCH] Consultando cuentas de usuario a la API...");
+            console.log("[USERS REFETCH] Consultando cuentas de usuario activas a la API...");
             const response = await api.authFetch(ENDPOINTS.USERS.BASE);
             
             // Extraer lista con helper centralizado
@@ -49,6 +54,7 @@ export async function initUsuarios() {
 
             // 3. Renderizar en el DOM
             renderUsuarios(users);
+            console.log("[USERS TABLE UPDATED] Tabla de usuarios dibujada exitosamente en la SPA.");
             
             success = true;
             console.log("[PROMISE LOCK RELEASED] initUsuarios successfully initialized");
@@ -112,7 +118,7 @@ export function renderUsuarios(users) {
                 <button data-action="editUsuario('${u.id}')" class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold px-3 py-1.5 rounded-lg text-xs">
                     <i class="fa-solid fa-pen"></i> Editar
                 </button>
-                ${u.is_active ? `<button data-action="deleteUsuario('${u.id}')" class="bg-rose-50 text-rose-700 hover:bg-rose-100 font-bold px-3 py-1.5 rounded-lg text-xs" title="Desactivar"><i class="fa-solid fa-ban"></i></button>` : ''}
+                ${u.is_active && api.hasPermission('eliminar_usuarios') ? `<button data-action="deleteUsuario('${u.id}')" class="bg-rose-50 text-rose-700 hover:bg-rose-100 font-bold px-3 py-1.5 rounded-lg text-xs" title="Desactivar"><i class="fa-solid fa-ban"></i></button>` : ''}
             </td>
         `;
         tbody.appendChild(row);
@@ -270,6 +276,8 @@ export async function saveUsuario(e) {
         payload.password = rawPwd;
     }
 
+    console.log("[USERS PAYLOAD VERIFIED] Structuring final payload for API transport:", payload);
+
     try {
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Procesando...';
@@ -315,7 +323,7 @@ export async function saveUsuario(e) {
         // Finalizar y recargar reactivamente
         closeUsuarioModal();
         // Recargar listado reactivamente
-        await initUsuarios();
+        await initUsuarios(true);
         
         alert("✅ Usuario guardado correctamente.");
     } catch (error) {
@@ -338,7 +346,7 @@ export async function deleteUsuario(id) {
         await api.authFetch(`${ENDPOINTS.USERS.BASE}/${id}`, { method: 'DELETE' });
         console.log("[USERS DELETE] Usuario desactivado en Backend correctamente.");
         // Recargar listado reactivamente
-        await initUsuarios();
+        await initUsuarios(true);
     } catch (error) {
         console.error("[USERS ERROR] No se pudo desactivar el usuario:", error);
         alert(`❌ Error al desactivar usuario: ${error.message}`);
@@ -399,8 +407,14 @@ async function loadRBACMatrix() {
             </th>`;
         
         globalRoles.forEach(r => {
+            const isStructural = ['SUPERADMIN', 'SISTEMAS'].includes(r.name.toUpperCase());
+            const canDelete = api.hasPermission('eliminar_roles') && !isStructural;
+            
             headerHTML += `<th class="px-4 py-4 text-center text-[10px] font-black text-slate-600 uppercase tracking-tighter w-36 border-l border-b border-slate-200">
-                ${r.name}
+                <div class="flex flex-col items-center gap-2">
+                    ${r.name}
+                    ${canDelete ? `<button data-action="deleteRole('${r.id}', '${r.name}')" class="text-slate-300 hover:text-rose-600 transition-colors" title="Eliminar Rol"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                </div>
             </th>`;
         });
         headerHTML += `</tr>`;
@@ -562,3 +576,113 @@ export async function confirmResetPassword() {
         }
     }
 }
+
+/**
+ * Abre el modal para la creación de un nuevo Rol de sistema.
+ */
+export function openRoleModal() {
+    const modal = document.getElementById('role-modal');
+    if (modal) modal.classList.remove('hidden');
+    const input = document.getElementById('role-new-name');
+    if (input) {
+        input.value = '';
+        input.focus();
+    }
+}
+
+/**
+ * Cierra el modal de nuevo Rol.
+ */
+export function closeRoleModal() {
+    const modal = document.getElementById('role-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+/**
+ * Envía la petición para crear un nuevo rol en la base de datos.
+ */
+export async function saveNewRole() {
+    const input = document.getElementById('role-new-name');
+    if (!input) return;
+    
+    const name = input.value.trim().toUpperCase();
+    if (!name) {
+        alert("Por favor, ingresa un nombre válido para el nuevo rol.");
+        return;
+    }
+    
+    const btn = document.getElementById('btn-save-new-role');
+    const origHtml = btn ? btn.innerHTML : '';
+    
+    try {
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Guardando...';
+        }
+        
+        console.log(`[USERS RBAC NEW ROLE] Iniciando registro de rol: ${name}`);
+        
+        const res = await api.authFetch('/api/roles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name })
+        });
+        
+        console.log("[USERS RBAC NEW ROLE] Servidor confirmó la creación del rol:", res);
+        alert(`✅ El rol "${name}" fue creado exitosamente.`);
+        closeRoleModal();
+        
+        // Refrescar la matriz para desplegar la nueva columna del rol
+        loadRBACMatrix();
+    } catch (error) {
+        console.error("[USERS ERROR] Falló el registro del rol:", error);
+        alert(`❌ Error al crear rol: ${error.message}`);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+        }
+    }
+}
+/**
+ * [USERS RBAC DELETE ROLE] Ejecuta la eliminación de un rol tras validar salvaguardas.
+ */
+export async function deleteRole(roleId, roleName) {
+    console.log(`[ROLE DELETE CASCADE CHECK] Initiating deletion workflow for: ${roleName}`);
+    
+    // 1. Safeguard: Structural Roles (Extra check despite UI gating)
+    const protectedNames = ['SUPERADMIN', 'SISTEMAS'];
+    if (protectedNames.includes(roleName.toUpperCase())) {
+        console.warn(`[ROLE DELETE BLOCKED] Attempt to delete structural role: ${roleName}`);
+        alert("❌ No se puede eliminar un rol estructural del sistema.");
+        return;
+    }
+
+    // 2. Safeguard: Active Users check
+    const usersWithRole = loadedUsers.filter(u => (u.roles || []).some(r => r.id === roleId));
+    if (usersWithRole.length > 0) {
+        console.warn(`[ROLE DELETE BLOCKED] Role "${roleName}" has ${usersWithRole.length} active users.`);
+        alert(`❌ El rol "${roleName}" tiene ${usersWithRole.length} usuarios asignados. Desasigne a los usuarios antes de eliminar el rol.`);
+        return;
+    }
+
+    if (!confirm(`¿Está seguro de eliminar permanentemente el rol "${roleName}"?\n\nEsta acción no se puede deshacer y eliminará todas sus asociaciones en la matriz RBAC.`)) {
+        return;
+    }
+
+    try {
+        console.log(`[ROLE DELETE SAFE] Proceeding with API deletion for role: ${roleId}`);
+        await api.authFetch(`/api/roles/${roleId}`, { method: 'DELETE' });
+        
+        console.log("[ROLE DELETE SUCCESS] Role purged from system.");
+        alert(`✅ Rol "${roleName}" eliminado correctamente.`);
+        
+        // Refrescar estado local y matriz
+        await loadRoles();
+        await loadRBACMatrix();
+    } catch (error) {
+        console.error("[USERS ERROR] Failed to delete role:", error);
+        alert(`❌ Error al eliminar rol: ${error.message}`);
+    }
+}
+

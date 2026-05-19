@@ -1,0 +1,4 @@
+{"timestamp": "2026-05-14T17:38:23.295934Z", "level": "INFO", "action": "[RESTORE XML START]", "message": "Initiating XML restore for xml_storage_snapshot_20260514_173632Z.zip (DRY_RUN=False)"}
+{"timestamp": "2026-05-14T17:38:23.296156Z", "level": "INFO", "action": "[RESTORE PROGRESS]", "message": "Validating ZIP integrity..."}
+{"timestamp": "2026-05-14T17:38:23.471097Z", "level": "INFO", "action": "[RESTORE PROGRESS]", "message": "Extracting to D:\\Desktop\\MOD HOR\\schedule-management-service\\ops\\restore\\xml_tmp..."}
+{"timestamp": "2026-05-14T17:38:23.716070Z", "level": "INFO", "action": "[RESTORE SUCCESS]", "message": "XML Snapshot extracted to D:\\Desktop\\MOD HOR\\schedule-management-service\\ops\\restore\\xml_tmp. Ready for manual verification."}

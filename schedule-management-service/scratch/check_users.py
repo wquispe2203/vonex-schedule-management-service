@@ -1,24 +1,12 @@
-import sys
 import os
-from sqlalchemy import text
-from sqlalchemy.orm import Session
+from sqlalchemy import create_engine, text
+from dotenv import load_dotenv
 
-# Ajustar el path para importar app
-sys.path.append(os.getcwd())
+load_dotenv()
+db_url = os.getenv("DATABASE_URL")
+engine = create_engine(db_url)
 
-from app.database import SessionLocal
-from app.models import User
-
-def list_users():
-    db = SessionLocal()
-    try:
-        users = db.query(User).all()
-        print(f"{'Username':<30} | {'ID (UUID)':<40} | {'Is Active':<10}")
-        print("-" * 85)
-        for u in users:
-            print(f"{u.username:<30} | {str(u.id):<40} | {u.is_active:<10}")
-    finally:
-        db.close()
-
-if __name__ == "__main__":
-    list_users()
+with engine.connect() as conn:
+    res = conn.execute(text("SELECT username, password_hash FROM users"))
+    for row in res:
+        print(f"USER: {row[0]} | HASH: {row[1]}")

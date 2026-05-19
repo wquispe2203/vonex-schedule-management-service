@@ -1,0 +1,19 @@
+{
+  "latest_completed_upload": "8bc2c3a5-fa43-4cb2-8971-ebd07ccb5b84",
+  "latest_filename": "historical_xml_import_202603.xml",
+  "database_teachers": {
+    "total": 190,
+    "active": 190,
+    "incomplete": 0,
+    "overrides": 0
+  },
+  "crossing_engine": {
+    "matched": 0,
+    "sin_asignar": 0,
+    "conflictos": 0
+  },
+  "service_layer": {
+    "sin_asignar_total": 0,
+    "conflictos_total": 0
+  }
+}

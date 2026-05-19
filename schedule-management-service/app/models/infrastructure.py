@@ -48,3 +48,12 @@ class AuditLog(Base):
     fecha = Column(DateTime(timezone=True), server_default=func.now())
 
 
+class RecessRule(Base):
+    __tablename__ = 'recess_rules'
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    name = Column(String(100), nullable=False)
+    start_time = Column(String(8), nullable=False) # Store as HH:MM:SS or HH:MM
+    end_time = Column(String(8), nullable=False)
+    deduction_value = Column(Integer, default=33) # Stored in cents (0.33 -> 33) to avoid float issues
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

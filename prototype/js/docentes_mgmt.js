@@ -50,6 +50,16 @@ export function initSubirDocentesView() {
     console.log('[INIT] Subir Docentes');
     resetUploadState();
     setupDocentesUploadHandlers();
+    
+    // Dynamically show/hide critical superadmin reset zone
+    const adminZone = document.getElementById('superadmin-admin-actions');
+    if (adminZone) {
+        if (api && typeof api.isSuperAdmin === 'function' && api.isSuperAdmin()) {
+            adminZone.classList.remove('hidden');
+        } else {
+            adminZone.classList.add('hidden');
+        }
+    }
 }
 
 export function safeRenderDocentes(actionFn) {
@@ -120,22 +130,26 @@ export async function loadDocentes(page = null) {
 
     try {
         const searchVal = document.getElementById('doc-search')?.value.trim() || '';
-        const statusVal = document.getElementById('doc-status-filter')?.value || 'all';
+        const razonSocialVal = document.getElementById('doc-status-filter')?.value || 'all';
         
         docentesState.search = searchVal;
-        docentesState.status = statusVal;
+        docentesState.status = razonSocialVal;
 
         const paramsObj = {
             page: docentesState.page,
             limit: docentesState.per_page,
-            status: 'all' // Force backend to return ACTIVO, INCOMPLETO, etc.
         };
-        if (docentesState.search) paramsObj.search = docentesState.search;
-        if (docentesState.status && docentesState.status !== 'all') {
-            paramsObj.filter = docentesState.status; // It expects filter=acts/inacts
+
+        // Razon Social filter: enviar como 'filter' param al backend
+        if (razonSocialVal && razonSocialVal !== 'all') {
+            paramsObj.filter = razonSocialVal;
         }
 
+        // Búsqueda de texto libre
+        if (searchVal) paramsObj.search = searchVal;
+
         const params = new URLSearchParams(paramsObj);
+        console.log('[DOCENTES] Params enviados:', paramsObj);
 
         const response = await api.authFetch(`${ENDPOINTS.DOCENTES.BASE}?${params}`);
 
@@ -251,7 +265,7 @@ function renderDocentesTable(rows) {
 
         tbody.insertAdjacentHTML('beforeend', `
             <tr class="hover:bg-slate-50 transition-colors" data-teacher-id="${t.id}">
-                <td class="px-4 py-3 w-10">
+                <td class="px-4 py-3 w-10 hidden">
                     <input type="checkbox" data-id="${t.id}" data-action="updateMergeSelection" class="merge-checkbox rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
                 </td>
                 <td class="px-4 py-3 font-bold text-slate-800">
@@ -297,7 +311,7 @@ export function prevPage() {
 export function applyFilters() {
     currentRequestId++; // Invalida cualquier request en vuelo
     docentesState.page = 1;
-    loadDocentes();
+    loadDocentes(1);
 }
 
 export function changeSinAsignarPage(offset) {
@@ -592,9 +606,13 @@ export async function saveTeacher() {
     }
 
     // STEP 2 — DNI REQUIRED (FRONTEND)
-    if (!body.dni || body.dni.trim() === "") {
-        alert("El DNI es obligatorio");
+    const isManualCreation = !id; // New records don't have an ID yet
+    if (isManualCreation && (!body.dni || body.dni.trim() === "")) {
+        alert("El DNI es obligatorio para nuevos docentes manuales");
         return;
+    } else if (!body.dni || body.dni.trim() === "") {
+        console.log("[NULL DNI FLOW ENABLED] Permitiendo guardar docente existente sin DNI (origen XML)");
+        console.log("[XML TEACHER ACCEPTED] Docente aceptado sin DNI");
     }
 
     // STEP 3 — LOADING STATE (BUTTON LOCK)
@@ -787,7 +805,10 @@ export async function uploadDocentesExcel() {
         }
 
         // Refrescar la vista Maestra
-        if (typeof loadDocentes === 'function') loadDocentes(1);
+        // Invalidar requests anteriores para evitar paginación corrupta
+        currentRequestId++;
+        docentesState.page = 1;
+        loadDocentes(1);
 
     } catch (e) {
         console.error("[IMPORT] Error critico:", e);
@@ -928,21 +949,17 @@ function renderImportTable() {
     
     tbody.innerHTML = '';
     pageItems.forEach(row => {
-        const actionBadge = row.action === 'inserted' 
+        const actionBadge = row.estado === 'INSERTADO' 
             ? '<span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded border border-emerald-200">NUEVO</span>'
             : '<span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-0.5 rounded border border-amber-200">UPDATE</span>';
-            
-        const statusBadge = row.status === 'ACTIVO'
-            ? '<span class="bg-indigo-100 text-indigo-700 text-[10px] font-black px-2 py-0.5 rounded border border-indigo-200">ACTIVO</span>'
-            : `<span class="bg-rose-100 text-rose-700 text-[10px] font-black px-2 py-0.5 rounded border border-rose-200">${row.status}</span>`;
 
         tbody.insertAdjacentHTML('beforeend', `
             <tr class="hover:bg-slate-50 transition-colors">
-                <td class="px-3 py-2 text-slate-400 font-mono text-[10px]">${row.row}</td>
+                <td class="px-3 py-2 text-slate-400 font-mono text-[10px]">${row.fila}</td>
                 <td class="px-3 py-2 font-bold text-slate-700 uppercase">${row.apellidos}</td>
                 <td class="px-3 py-2 text-slate-600 uppercase">${row.nombres}</td>
                 <td class="px-3 py-2 font-mono text-xs text-slate-500">${row.dni || '—'}</td>
-                <td class="px-3 py-2 text-center">${statusBadge}</td>
+                <td class="px-3 py-2 text-slate-600 uppercase text-[11px] font-semibold">${row.razon_social || '—'}</td>
                 <td class="px-3 py-2 text-center">${actionBadge}</td>
             </tr>
         `);
@@ -1158,3 +1175,146 @@ function showUndoToast(overrideId, xmlName) {
 
 window.changeSinAsignarPage = changeSinAsignarPage;
 window.vincularTeacherClick = vincularTeacherClick;
+
+// ==========================================
+// SUPERADMIN CONTROLLED RESET FLOW
+// ==========================================
+
+export function startBulkDeleteExcelFlow() {
+    console.log("[SUPERADMIN RESET] Opening security double confirmation modal.");
+    const modal = document.getElementById('bulk-delete-confirm-modal');
+    if (!modal) return;
+
+    modal.classList.remove('hidden');
+    goToBulkDeleteStep1();
+
+    // Clear input & disable btn
+    const input = document.getElementById('bulk-delete-confirm-input');
+    if (input) input.value = '';
+
+    const btn = document.getElementById('btn-confirm-bulk-delete');
+    if (btn) {
+        btn.disabled = true;
+        btn.className = 'bg-slate-800 text-slate-500 text-xs font-black py-2.5 px-5 rounded-xl transition-all cursor-not-allowed flex items-center gap-2';
+    }
+}
+window.startBulkDeleteExcelFlow = startBulkDeleteExcelFlow;
+
+export function closeBulkDeleteModal() {
+    const modal = document.getElementById('bulk-delete-confirm-modal');
+    if (modal) modal.classList.add('hidden');
+}
+window.closeBulkDeleteModal = closeBulkDeleteModal;
+
+export function goToBulkDeleteStep1() {
+    const step1 = document.getElementById('bulk-delete-step-1');
+    const step2 = document.getElementById('bulk-delete-step-2');
+    if (step1) step1.classList.remove('hidden');
+    if (step2) step2.classList.add('hidden');
+}
+window.goToBulkDeleteStep1 = goToBulkDeleteStep1;
+
+export function goToBulkDeleteStep2() {
+    const step1 = document.getElementById('bulk-delete-step-1');
+    const step2 = document.getElementById('bulk-delete-step-2');
+    if (step1) step1.classList.add('hidden');
+    if (step2) step2.classList.remove('hidden');
+
+    const input = document.getElementById('bulk-delete-confirm-input');
+    if (input) {
+        setTimeout(() => input.focus(), 150);
+    }
+}
+window.goToBulkDeleteStep2 = goToBulkDeleteStep2;
+
+export function onBulkDeleteInputChange() {
+    const input = document.getElementById('bulk-delete-confirm-input');
+    const btn = document.getElementById('btn-confirm-bulk-delete');
+    if (!input || !btn) return;
+
+    const val = input.value.trim().toUpperCase();
+    if (val === 'RESTABLECER') {
+        btn.disabled = false;
+        btn.className = 'bg-rose-600 hover:bg-rose-500 text-white text-xs font-black py-2.5 px-5 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-rose-950/50 hover:scale-[1.02] active:scale-[0.98]';
+    } else {
+        btn.disabled = true;
+        btn.className = 'bg-slate-800 text-slate-500 text-xs font-black py-2.5 px-5 rounded-xl transition-all cursor-not-allowed flex items-center gap-2';
+    }
+}
+window.onBulkDeleteInputChange = onBulkDeleteInputChange;
+
+export async function confirmBulkDelete() {
+    const input = document.getElementById('bulk-delete-confirm-input');
+    if (!input || input.value.trim().toUpperCase() !== 'RESTABLECER') {
+        return;
+    }
+
+    const btn = document.getElementById('btn-confirm-bulk-delete');
+    const statusMsg = document.getElementById('bulk-delete-status-msg');
+    if (!btn) return;
+
+    const origText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Ejecutando Reset...';
+
+    if (statusMsg) {
+        statusMsg.textContent = 'Procesando Reset Operativo Controlado...';
+        statusMsg.className = 'text-[11px] text-amber-400 font-bold italic animate-pulse';
+    }
+
+    try {
+        console.log("[SUPERADMIN RESET] Sending API Request to /api/docentes/bulk-delete-excel");
+        const response = await api.authFetch(`${ENDPOINTS.DOCENTES.BASE}/bulk-delete-excel`, {
+            method: 'POST'
+        });
+
+        console.log("[SUPERADMIN RESET] Response:", response);
+
+        if (!response || !response.success) {
+            throw new Error(response?.detail || response?.error || "Error al ejecutar el reset operativo.");
+        }
+
+        // Show elegant success alert detailing deleted counts
+        const data = response.data || {};
+        const counts = data.deleted_counts || {};
+        
+        let details = `Reset Operativo Controlado Completado Exitosamente.\n\n` +
+                      `• Docentes Excel eliminados: ${counts.teachers || 0}\n` +
+                      `• Sesiones históricas eliminadas: ${counts.schedule_sessions || 0}\n` +
+                      `• Planilla RPT limpia: ${counts.rpt_planilla || 0}\n` +
+                      `• Observaciones eliminadas: ${counts.observations || 0}\n` +
+                      `• Lecciones huérfanas purgadas: ${counts.lessons || 0}\n` +
+                      `• Registro XML eliminado: ${counts.xml_uploads || 0}\n` +
+                      `• Archivo físico del XML eliminado: ${counts.physical_file_removed ? "SÍ" : "NO"}`;
+
+        alert(details);
+
+        if (statusMsg) {
+            statusMsg.textContent = 'Restablecimiento base de datos completado.';
+            statusMsg.className = 'text-[11px] text-emerald-400 font-bold';
+            setTimeout(() => {
+                statusMsg.textContent = '';
+            }, 5000);
+        }
+
+        closeBulkDeleteModal();
+
+        // Safe UI Flow Sync: Reload tables
+        if (typeof loadSinAsignar === 'function') await loadSinAsignar(1);
+        if (typeof loadDocentes === 'function') await loadDocentes(1);
+        if (typeof loadConflictos === 'function') await loadConflictos();
+
+    } catch (err) {
+        console.error("[SUPERADMIN RESET ERROR]", err);
+        alert(err.message || "Error al ejecutar el reset operativo");
+        if (statusMsg) {
+            statusMsg.textContent = 'Error al ejecutar el reset operativo.';
+            statusMsg.className = 'text-[11px] text-rose-500 font-bold';
+        }
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+    }
+}
+window.confirmBulkDelete = confirmBulkDelete;
+

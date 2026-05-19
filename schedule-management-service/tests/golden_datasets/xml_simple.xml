@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<timetable>
+<teachers>
+    <teacher id="T_GOLDEN_1" firstname="DOCENTE" lastname="GOLDEN 1" short="G1"/>
+</teachers>
+<subjects>
+    <subject id="S1" name="MATEMATICA" short="MAT"/>
+</subjects>
+<classrooms>
+    <classroom id="C1" name="AULA 101" short="101"/>
+</classrooms>
+<classes>
+    <class id="CL1" name="SEC1A" short="1A"/>
+</classes>
+<lessons>
+    <lesson id="L1" classids="CL1" subjectid="S1" periodspercard="2" periodsperweek="2" teacherids="T_GOLDEN_1"/>
+</lessons>
+<cards>
+    <card lessonid="L1" classroomids="C1" period="1" days="10000" weeks=""/>
+    <card lessonid="L1" classroomids="C1" period="2" days="10000" weeks=""/>
+</cards>
+<periods>
+    <period name="1" short="1" period="1" starttime="08:00" endtime="08:50"/>
+    <period name="2" short="2" period="2" starttime="08:50" endtime="09:40"/>
+</periods>
+</timetable>

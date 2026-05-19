@@ -1,6 +1,10 @@
 import api from './api.js';
 import { ENDPOINTS, API_BASE_URL } from './config.js';
 import { getCalculatedTime, cleanCycleName, getCourseColor, extractList } from './ui_utils.js';
+import { populateObsCombobox, populateObsReplCombobox, clearComboboxSelection, setupComboboxKeyboard, filterDocenteCombobox as _filterDocenteCombobox } from './searchable_combobox.js';
+
+// Re-export para el sistema de Handlers (data-action)
+export function filterDocenteCombobox(context) { _filterDocenteCombobox(context); }
 
 // State
 let currentSessionForObs = null;
@@ -36,6 +40,14 @@ export async function initObservaciones() {
             }
 
             await loadObsTeacherList();
+            setupComboboxKeyboard();
+            
+            // [RBAC VIEW PROTECTION] If lacking creation rights, default to logs immediately
+            if (!api.hasPermission('crear_observaciones')) {
+                console.log("[RBAC VIEW ADJUSTMENT] Relocating unauthorized agent to observation auditing logs.");
+                toggleObsTab('logs');
+            }
+
             success = true;
             console.log("[PROMISE LOCK RELEASED] initObservaciones successfully initialized");
             console.log("[OBS MODULE READY] Lifecycle bootstrapped completely.");
@@ -76,48 +88,52 @@ export function toggleObsTab(tabName) {
 }
 
 export async function loadObsTeacherList() {
-    const select = document.getElementById('obs-filter-docente');
-    const datalist = document.getElementById('teachers-datalist');
-    if (!select) return;
+    const hiddenSelect = document.getElementById('obs-filter-docente');
+    if (!hiddenSelect) return;
     
     console.log("[OBS FETCH] Querying active instructional staff via HORARIOS API...");
     
     try {
+        console.log("[DROPDOWN LOAD START] Loading observations teacher dropdown...");
         const response = await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/teachers`);
-        
         console.log("[OBS RESPONSE] Data received:", response);
 
-        // ✅ USO DE HELPER CENTRALIZADO
         const teachers = extractList(response);
-        console.log(`[OBS REPLACEMENT TEACHERS] Scanning system for validated instructional personnel. Total Candidates: ${teachers.length}`);
-
-        select.innerHTML = '<option value="">Selecciona un docente...</option>';
-        if (datalist) datalist.innerHTML = '';
+        console.log(`[OBS REPLACEMENT TEACHERS] Total Candidates: ${teachers.length}`);
 
         if (Array.isArray(teachers) && teachers.length > 0) {
-            teachers.forEach(t => {
-                const fullName = `${t.last_name || ''}, ${t.first_name || ''}`.trim() || `Docente ${t.id}`;
-                const opt = document.createElement('option');
-                opt.value = t.id;
-                opt.textContent = fullName;
-                select.appendChild(opt);
+            // Poblar comboboxes searchable (también sincronizan sus respectivos hidden selects)
+            populateObsCombobox(teachers);
+            populateObsReplCombobox(teachers);
+            
+            // Poblar el datalist original para restaurar autocompletado en slots de desglose
+            const datalist = document.getElementById('teachers-datalist');
+            if (datalist) {
+                datalist.innerHTML = '';
+                teachers.forEach(t => {
+                    const option = document.createElement('option');
+                    const fullName = `${t.last_name || ''}, ${t.first_name || ''}`.trim();
+                    option.value = fullName;
+                    option.setAttribute('data-id', t.id);
+                    datalist.appendChild(option);
+                });
+                console.log(`[DATALIST POPULATED] Populated ${teachers.length} candidates for segmented slots.`);
+            }
 
-                if (datalist) {
-                    const dOpt = document.createElement('option');
-                    dOpt.value = fullName;
-                    dOpt.setAttribute('data-id', t.id);
-                    datalist.appendChild(dOpt);
-                }
-            });
-            console.log(`[OBS REPLACEMENT FILTERED] Successfully resolved and hydrated replacement datalists with ${teachers.length} verified entities.`);
-            console.log(`[OBS FILTER RESULT] Found and injected ${teachers.length} potential candidates.`);
+            console.log(`[DROPDOWN POPULATED] Loaded ${teachers.length} options for observations.`);
         } else {
-            console.warn("[OBS EMPTY STATE] No actionable instructional personnel identified in scope.");
-            select.innerHTML = '<option value="">No hay docentes activos</option>';
+            console.warn("[DROPDOWN EMPTY] No active instructional staff found.");
+            const inputEl = document.getElementById('obs-docente-search');
+            if (inputEl) inputEl.placeholder = 'No hay docentes cargados. Suba un XML.';
+            const replInputEl = document.getElementById('obs-form-replacement-search');
+            if (replInputEl) replInputEl.placeholder = 'No hay docentes cargados.';
         }
     } catch (e) {
-        console.error("[OBS ERROR] Failed loading teachers for obs:", e);
-        select.innerHTML = '<option value="">Error al cargar docentes</option>';
+        console.error("[DROPDOWN API ERROR] Failed loading teachers for obs:", e);
+        const inputEl = document.getElementById('obs-docente-search');
+        if (inputEl) inputEl.placeholder = 'Error al cargar docentes';
+        const replInputEl = document.getElementById('obs-form-replacement-search');
+        if (replInputEl) replInputEl.placeholder = 'Error al cargar docentes';
     }
 }
 
@@ -214,9 +230,9 @@ export function openRegisterObsModal(session, rowElement) {
     document.getElementById('obs-form-discount').value = 'SIMPLE';
     
     // Clear replacement elements
+    clearComboboxSelection('obs_repl');
     const searchInput = document.getElementById('obs-form-replacement-search');
     if (searchInput) {
-        searchInput.value = '';
         searchInput.disabled = false;
     }
     const isNewCheck = document.getElementById('obs-form-replacement-is-new');
@@ -224,6 +240,12 @@ export function openRegisterObsModal(session, rowElement) {
     
     const infoBox = document.getElementById('obs-replacement-external-info');
     if (infoBox) infoBox.classList.add('hidden');
+    
+    const extNameInput = document.getElementById('obs-form-replacement-external-name');
+    if (extNameInput) {
+        extNameInput.classList.add('hidden');
+        extNameInput.value = '';
+    }
 
     document.getElementById('obs-form-description').value = '';
 
@@ -329,6 +351,14 @@ export function toggleNewTeacherMode() {
 
 function getTeacherIdFromSearch(searchValue) {
     if (!searchValue) return null;
+    
+    // Primero, intentar obtener el ID del hidden select asociado a nuestro nuevo combobox
+    const hiddenSelect = document.getElementById('obs-form-replacement-id');
+    if (hiddenSelect && hiddenSelect.value) {
+        return hiddenSelect.value;
+    }
+    
+    // Fallback al datalist original
     const dl = document.getElementById('teachers-datalist');
     if (!dl) return null;
     const option = Array.from(dl.options).find(o => o.value === searchValue);
@@ -514,6 +544,10 @@ export function closeObsRegisterModal() {
 }
 
 export async function deleteObservation(obsId) {
+    if (!api.hasPermission('crear_observaciones')) {
+        console.warn("[ACTION ACCESS DENIED] Unauthorized attempt to execute deleteObservation.");
+        return;
+    }
     if (!confirm("¿Eliminar esta incidencia?")) return;
     try {
         const data = await api.authFetch(`${ENDPOINTS.HORARIOS.BASE}/observations/${obsId}`, { method: 'DELETE' });
@@ -544,6 +578,11 @@ export async function loadObsLogs() {
             let typeBadge = 'bg-rose-100 text-rose-700';
             if (log.type === 'REEMPLAZO') typeBadge = 'bg-amber-100 text-amber-700';
             
+            const canDelete = api.hasPermission('crear_observaciones');
+            const deleteBtnHtml = canDelete 
+                ? `<button data-action="deleteObservation('${log.id}')" class="text-slate-300 hover:text-rose-600 p-1 transition-colors" title="Eliminar"><i class="fa-solid fa-trash text-sm"></i></button>`
+                : `<span class="text-[10px] text-slate-400 italic"><i class="fa-solid fa-lock"></i></span>`;
+
             tbody.insertAdjacentHTML('beforeend', `
                 <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
                     <td class="px-4 py-3 text-xs font-medium text-slate-600">${log.date_record || '---'}</td>
@@ -553,7 +592,7 @@ export async function loadObsLogs() {
                     <td class="px-4 py-3 font-bold text-indigo-600">${log.class_date || 'N/A'}</td>
                     <td class="px-4 py-3 text-xs text-slate-500">${log.description || '---'}</td>
                     <td class="px-4 py-3 text-right">
-                        <button data-action="deleteObservation('${log.id}')" class="text-slate-300 hover:text-rose-600 p-1 transition-colors" title="Eliminar"><i class="fa-solid fa-trash text-sm"></i></button>
+                        ${deleteBtnHtml}
                     </td>
                 </tr>
             `);

@@ -49,6 +49,7 @@ class RoleCreate(RoleBase):
 
 class RoleResponse(RoleBase):
     id: UUID
+    is_protected: bool = False
     created_at: Optional[datetime] = None
     permissions: List[PermissionResponse] = []
 

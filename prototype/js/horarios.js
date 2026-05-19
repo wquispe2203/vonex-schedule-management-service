@@ -49,7 +49,7 @@ export async function fillTargetSelect() {
             endpoint = ENDPOINTS.HORARIOS.CLASSES;
         }
 
-        console.log(`[HORARIOS INIT] Loading filter for type: ${type}`);
+        console.log(`[DROPDOWN LOAD START] Loading target dropdown for: ${type}`);
         const response = await api.authFetch(endpoint);
         const items = extractList(response);
         console.log(`[HORARIOS LOADED] Total items retrieved: ${items.length}`);
@@ -109,14 +109,13 @@ export async function fillTargetSelect() {
                 select.appendChild(opt);
             });
             
-            if (type === 'teacher') {
-                console.log(`[TEACHER PAYLOAD NORMALIZED] Successfully mapped and sanitized ${normalizedCount} teacher records for drop-down injection.`);
-            }
+            console.log(`[DROPDOWN POPULATED] Loaded ${type === 'teacher' ? normalizedCount : items.length} options for type ${type}.`);
         } else {
-            select.innerHTML = `<option value="">No se encontraron datos para ${type}</option>`;
+            console.warn(`[DROPDOWN EMPTY] No records found in DB for type: ${type}`);
+            select.innerHTML = `<option value="">No hay ${type === 'teacher' ? 'docentes cargados' : 'aulas cargadas'}. Suba un archivo XML.</option>`;
         }
     } catch (e) {
-        console.error("[HORARIOS ERROR] Failed loading target items:", e);
+        console.error("[DROPDOWN API ERROR] Failed loading target items:", e);
         select.innerHTML = '<option value="">Error al cargar</option>';
     }
 }

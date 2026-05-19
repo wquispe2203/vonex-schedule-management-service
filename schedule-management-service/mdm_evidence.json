@@ -1,413 +1,263 @@
 [
   {
     "event": "teacher_matching",
-    "xml_name": "Sannchez, Marya",
-    "normalized_name": "sannchez marya",
-    "candidate": "sanchez maria",
-    "score": 88.88888888888889,
-    "decision": "MATCH_DUDOSO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.198590+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Perrez, Josee",
-    "normalized_name": "perrez josee",
-    "candidate": "perez josue",
-    "score": 86.95652173913044,
-    "decision": "MATCH_DUDOSO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.219932+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Gommez, Anna",
-    "normalized_name": "gommez anna",
-    "candidate": "gomez ana",
-    "score": 90.0,
-    "decision": "MATCH_AUTOMATICO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.230225+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Peres Garcia, Jose Luis",
-    "normalized_name": "peres garcia jose luis",
-    "candidate": "perez garcia jose luis",
-    "score": 95.45454545454545,
-    "decision": "MATCH_AUTOMATICO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.239636+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Sanches G., Maria",
-    "normalized_name": "sanches g. maria",
-    "candidate": "sanchez maria",
-    "score": 82.75862068965517,
-    "decision": "MATCH_DUDOSO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.247491+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Gomes M., Annia",
-    "normalized_name": "gomes m. annia",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.258328+00:00"
+    "request_id": "895f348c-5cd7-4f27-9d2a-b1abe945f30f",
+    "timestamp": "2026-05-14T20:57:59.839157+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "Ruizz, Carlos",
-    "normalized_name": "ruizz carlos",
-    "candidate": "ruiz carlos",
-    "score": 95.65217391304348,
-    "decision": "MATCH_AUTOMATICO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.268490+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Perez G., Luis",
-    "normalized_name": "perez g. luis",
-    "candidate": "perez josue",
-    "score": 58.33333333333333,
-    "decision": "MATCH_DUDOSO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.277663+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Maria, M. Sanchez",
-    "normalized_name": "maria m. sanchez",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.341944+00:00"
+    "request_id": "50a0842b-ef8f-408b-9365-6b3a243cbc7a",
+    "timestamp": "2026-05-14T20:58:00.580703+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "Gomez, J. P.",
-    "normalized_name": "gomez j. p.",
-    "candidate": "gomez ana",
-    "score": 60.0,
-    "decision": "MATCH_DUDOSO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.352654+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Sanchez, Maria Cecilia",
-    "normalized_name": "sanchez maria cecilia",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.363125+00:00"
+    "request_id": "6b496ee9-9f95-4dd2-b54e-859a2620daad",
+    "timestamp": "2026-05-14T20:58:04.959318+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "Perrrez, Josue",
-    "normalized_name": "perrrez josue",
-    "candidate": "perez josue",
-    "score": 91.66666666666666,
-    "decision": "MATCH_AUTOMATICO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.372831+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Gomez de la R., Ana",
-    "normalized_name": "gomez de la r. ana",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.380940+00:00"
+    "request_id": "41cf1b90-91af-47b2-8c1b-b9f61cefb7e0",
+    "timestamp": "2026-05-14T20:58:05.196604+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "Sanccez, Mario",
-    "normalized_name": "sanccez mario",
-    "candidate": "sanchez maria",
-    "score": 84.61538461538461,
-    "decision": "MATCH_DUDOSO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.392010+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Perez-Garcia, Jose",
-    "normalized_name": "perez-garcia jose",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.401401+00:00"
+    "request_id": "d1c7fb7e-3565-4db3-a923-a1b6ef1813ee",
+    "timestamp": "2026-05-14T20:58:05.888007+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "Gomez, Luisa",
-    "normalized_name": "gomez luisa",
-    "candidate": "gomez ana",
-    "score": 70.0,
-    "decision": "MATCH_DUDOSO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.413545+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Carlos, C. Ruiz",
-    "normalized_name": "carlos c. ruiz",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.426247+00:00"
+    "request_id": "6691a969-ed84-4cb4-8fe6-5b1f7e5a3ec5",
+    "timestamp": "2026-05-14T20:58:07.628053+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "Sanzhez, Maria",
-    "normalized_name": "sanzhez maria",
-    "candidate": "sanchez maria",
-    "score": 92.3076923076923,
-    "decision": "MATCH_AUTOMATICO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.436391+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Perz, Jose",
-    "normalized_name": "perz jose",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.446170+00:00"
+    "request_id": "49ab2f67-8ef9-4bee-813d-545ebdd461c7",
+    "timestamp": "2026-05-14T20:58:08.750618+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "Gomez, Analia",
-    "normalized_name": "gomez analia",
-    "candidate": "gomez ana",
-    "score": 85.71428571428572,
-    "decision": "MATCH_DUDOSO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.457523+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Gommez, Anna",
-    "normalized_name": "gommez anna",
-    "candidate": "gomez ana",
-    "score": 90.0,
-    "decision": "MATCH_AUTOMATICO",
-    "request_id": "aac73ad5-37cd-4cdb-a49e-a0a88f1b3016",
-    "timestamp": "2026-04-22T02:29:50.539285+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "FLORES DE LA GALA, FRANCISCO",
-    "normalized_name": "flores de la gala francisco",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:14.764264+00:00"
+    "request_id": "22450166-2afe-4efc-96b1-edaf7726b779",
+    "timestamp": "2026-05-14T20:58:12.906149+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "PELAEZ REYES, MARIA DEL CARMEN",
-    "normalized_name": "pelaez reyes maria del carmen",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:14.772085+00:00"
+    "request_id": "c3920901-efa7-4988-836e-b60e3f98c74e",
+    "timestamp": "2026-05-14T20:58:13.075540+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "SANCHEZ BARRIGA, JUAN",
-    "normalized_name": "sanchez barriga juan",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:14.779148+00:00"
+    "request_id": "e431be09-e26c-4a7c-bed6-96996eebe8bf",
+    "timestamp": "2026-05-14T20:58:15.651737+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "GARCIA RODRIGUEZ, ALBERTO",
-    "normalized_name": "garcia rodriguez alberto",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:14.786268+00:00"
+    "request_id": "f77cb4e4-b997-423c-93cd-83a51c7dea58",
+    "timestamp": "2026-05-14T20:58:19.138736+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "DE LA FLOR, LUIS",
-    "normalized_name": "de la flor luis",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:14.793080+00:00"
+    "request_id": "00ab4f16-3575-4148-a5ee-439a304fa910",
+    "timestamp": "2026-05-14T20:58:19.469385+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "NUÑEZ MUÑOZ, IÑIGO",
-    "normalized_name": "nuñez muñoz iñigo",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:14.799999+00:00"
+    "request_id": "5be6a257-236d-47f4-8a40-933d64a9a687",
+    "timestamp": "2026-05-14T20:58:21.316930+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "PEREZ GOMEZ, RAUL",
-    "normalized_name": "perez gomez raul",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:14.806654+00:00"
+    "request_id": "a0c7689b-26ac-4527-be93-762505864c02",
+    "timestamp": "2026-05-14T20:58:23.764147+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "GONZALEZ LOPEZ, JAVIER",
-    "normalized_name": "gonzalez lopez javier",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:14.814395+00:00"
+    "request_id": "2309049d-94bb-4f33-b5e2-d45d1357a2fc",
+    "timestamp": "2026-05-14T20:58:24.149415+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "FLORES DE LA GALA, FRANCISCO",
-    "normalized_name": "flores de la gala francisco",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.303812+00:00"
+    "request_id": "e3076a24-9ce3-4993-9759-0a5e9b07d3ae",
+    "timestamp": "2026-05-14T21:02:46.332012+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "PELAEZ REYES, MARIA DEL CARMEN",
-    "normalized_name": "pelaez reyes maria del carmen",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.312758+00:00"
+    "request_id": "69974537-14cd-428f-8ff3-3adf8c8c1781",
+    "timestamp": "2026-05-14T21:02:46.919047+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "SANCHEZ BARRIGA, JUAN",
-    "normalized_name": "sanchez barriga juan",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.320501+00:00"
+    "request_id": "ef285368-c689-4fcf-8dec-e86f32203667",
+    "timestamp": "2026-05-14T21:02:47.682337+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "GARCIA RODRIGUEZ, ALBERTO",
-    "normalized_name": "garcia rodriguez alberto",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.329821+00:00"
+    "request_id": "997dd20a-9e18-4c2d-acec-b3396910081e",
+    "timestamp": "2026-05-14T21:02:48.766287+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "DE LA FLOR, LUIS",
-    "normalized_name": "de la flor luis",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.337251+00:00"
+    "request_id": "c32ca7b0-e750-4fa9-9869-d7c87ced7859",
+    "timestamp": "2026-05-14T21:02:49.533270+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "NUÑEZ MUÑOZ, IÑIGO",
-    "normalized_name": "nuñez muñoz iñigo",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.346084+00:00"
+    "request_id": "616ed160-3e4d-41a6-97ab-5bbde7c79387",
+    "timestamp": "2026-05-14T21:02:53.617354+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "PEREZ GOMEZ, RAUL",
-    "normalized_name": "perez gomez raul",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.353403+00:00"
+    "request_id": "9d84f9e0-c532-48eb-bfdc-48f7620f9097",
+    "timestamp": "2026-05-14T21:02:54.161399+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "GONZALEZ LOPEZ, JAVIER",
-    "normalized_name": "gonzalez lopez javier",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.362212+00:00"
+    "request_id": "c6190f80-fe4e-49a2-9813-749f46954b2b",
+    "timestamp": "2026-05-14T21:03:55.513796+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "MARTINEZ, ANA",
-    "normalized_name": "martinez ana",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.397880+00:00"
+    "request_id": "116aafb0-3169-421d-9fef-abfe566fa263",
+    "timestamp": "2026-05-14T21:04:05.783660+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "DIAZ SANCHEZ, CARLOS",
-    "normalized_name": "diaz sanchez carlos",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.404723+00:00"
+    "request_id": "d187bd84-4696-4019-8950-d9a789b351cb",
+    "timestamp": "2026-05-14T21:04:05.867320+00:00"
   },
   {
     "event": "teacher_matching",
-    "xml_name": "VILLAVICENCIO, PEDRO",
-    "normalized_name": "villavicencio pedro",
+    "xml_name": "TEST, LOAD",
+    "normalized_name": "test load",
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.411872+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "MALAGA, JULIO",
-    "normalized_name": "malaga julio",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-22T02:54:29.419540+00:00"
+    "request_id": "9ba7212f-7b64-492b-b091-b31ff7af1737",
+    "timestamp": "2026-05-14T21:08:57.642475+00:00"
   },
   {
     "event": "teacher_matching",
@@ -416,18 +266,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:18.988384+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "TRUJILLO POMIANO, JOSE ANTONIO",
-    "normalized_name": "trujillo pomiano jose antonio",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.016225+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.111533+00:00"
   },
   {
     "event": "teacher_matching",
@@ -436,8 +276,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.230131+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.306549+00:00"
   },
   {
     "event": "teacher_matching",
@@ -446,8 +286,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.240832+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.315934+00:00"
   },
   {
     "event": "teacher_matching",
@@ -456,8 +296,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.258266+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.329396+00:00"
   },
   {
     "event": "teacher_matching",
@@ -466,8 +306,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.273951+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.342188+00:00"
   },
   {
     "event": "teacher_matching",
@@ -476,8 +316,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.301215+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.360047+00:00"
   },
   {
     "event": "teacher_matching",
@@ -486,8 +326,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.311444+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.369187+00:00"
   },
   {
     "event": "teacher_matching",
@@ -496,8 +336,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.326546+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.381898+00:00"
   },
   {
     "event": "teacher_matching",
@@ -506,8 +346,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.336719+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.391646+00:00"
   },
   {
     "event": "teacher_matching",
@@ -516,8 +356,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.345960+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.400319+00:00"
   },
   {
     "event": "teacher_matching",
@@ -526,8 +366,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.368585+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.416119+00:00"
   },
   {
     "event": "teacher_matching",
@@ -536,8 +376,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.393980+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.433938+00:00"
   },
   {
     "event": "teacher_matching",
@@ -546,8 +386,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.403030+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.443221+00:00"
   },
   {
     "event": "teacher_matching",
@@ -556,8 +396,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.424893+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.459948+00:00"
   },
   {
     "event": "teacher_matching",
@@ -566,8 +406,8 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.453255+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.480397+00:00"
   },
   {
     "event": "teacher_matching",
@@ -576,397 +416,7 @@
     "candidate": null,
     "score": 0,
     "decision": "NO_MATCH",
-    "request_id": "58e86121-cfeb-4820-bad0-da9ff2fece84",
-    "timestamp": "2026-04-23T22:12:19.465438+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Sannchez, Marya",
-    "normalized_name": "sannchez marya",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.578339+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Perrez, Josee",
-    "normalized_name": "perrez josee",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.604871+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Gommez, Anna",
-    "normalized_name": "gommez anna",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.616216+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Peres Garcia, Jose Luis",
-    "normalized_name": "peres garcia jose luis",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.805460+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Sanches G., Maria",
-    "normalized_name": "sanches g. maria",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.816093+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Gomes M., Annia",
-    "normalized_name": "gomes maria annia",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.825487+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Ruizz, Carlos",
-    "normalized_name": "ruizz carlos",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.836005+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Perez G., Luis",
-    "normalized_name": "perez g. luis",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.846783+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Maria, M. Sanchez",
-    "normalized_name": "maria maria sanchez",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.857208+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Gomez, J. P.",
-    "normalized_name": "gomez jose pedro",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.870570+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Sanchez, Maria Cecilia",
-    "normalized_name": "sanchez maria cecilia",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.885697+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Perrrez, Josue",
-    "normalized_name": "perrrez josue",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.903589+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Gomez de la R., Ana",
-    "normalized_name": "gomez de la ricardo ana",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.917400+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Sanccez, Mario",
-    "normalized_name": "sanccez mario",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.929408+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Perez-Garcia, Jose",
-    "normalized_name": "perez-garcia jose",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.939002+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Gomez, Luisa",
-    "normalized_name": "gomez luisa",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.948980+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Carlos, C. Ruiz",
-    "normalized_name": "carlos carlos ruiz",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.959378+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Sanzhez, Maria",
-    "normalized_name": "sanzhez maria",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.969634+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Perz, Jose",
-    "normalized_name": "perz jose",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.979906+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "Gomez, Analia",
-    "normalized_name": "gomez analia",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-24T15:36:11.989071+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "OBISPO IPARRAGUIRRE, CARLOS ADINO",
-    "normalized_name": "obispo iparraguirre carlos adino",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.414394+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "TRUJILLO POMIANO, JOSE ANTONIO",
-    "normalized_name": "trujillo pomiano jose antonio",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.441565+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "ESPINOZA VIDAL, JOSUE MARCELINO",
-    "normalized_name": "espinoza vidal josue marcelino",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.647554+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "QUISPE CANGALAYA, ARMANDO MIGUEL",
-    "normalized_name": "quispe cangalaya armando miguel",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.658999+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "GUADALUPE HALANOCCA, JULIO CESAR",
-    "normalized_name": "guadalupe halanocca julio cesar",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.677582+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "TRUJILLO COTRINA, JONEL EVER",
-    "normalized_name": "trujillo cotrina jonel ever",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.700702+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "OCAMPO ZELA, GUILLERMO",
-    "normalized_name": "ocampo zela guillermo",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.739230+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "MALLQUI PAYANO, ANDREE ALEXANDER",
-    "normalized_name": "mallqui payano andree alexander",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.750799+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "LAMA AYLAS, MANUEL CRISTIAN",
-    "normalized_name": "lama aylas manuel cristian",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.768555+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "PARIONA SALOME, ROLANDO ",
-    "normalized_name": "pariona salome rolando",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.780191+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "LUNA SOLIS, NELSER ELOY ",
-    "normalized_name": "luna solis nelser eloy",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.790516+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "CUADROS VELASQUEZ, RUDY RUBEN",
-    "normalized_name": "cuadros velasquez rudy ruben",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.812789+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "LE1, PROFESOR",
-    "normalized_name": "le1 profesor",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.845929+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "ALDANA SOLIS, MYRANDA NADINNE",
-    "normalized_name": "aldana solis myranda nadinne",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.856613+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "HUAMAN VILLAVICENCIO, EDUARDO DANIEL",
-    "normalized_name": "huaman villavicencio eduardo daniel",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.880959+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "HURTADO HARO, ERNESTO ALONSO",
-    "normalized_name": "hurtado haro ernesto alonso",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.910994+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "RUIZ FLORES, LUIS ENRIQUE",
-    "normalized_name": "ruiz flores luis enrique",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "9e981ecd-6789-4c50-a80b-1bd1706550a2",
-    "timestamp": "2026-04-28T14:43:13.924341+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "RAPREY RAYO, EDWIN JUNIOR",
-    "normalized_name": "raprey rayo edwin junior",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-28T21:26:23.677233+00:00"
-  },
-  {
-    "event": "teacher_matching",
-    "xml_name": "TORRES SALVADOR, JIMMY HERALD",
-    "normalized_name": "torres salvador jimmy herald",
-    "candidate": null,
-    "score": 0,
-    "decision": "NO_MATCH",
-    "request_id": "n/a",
-    "timestamp": "2026-04-28T21:26:23.958830+00:00"
+    "request_id": "51c3eb79-fd3e-47e8-9243-0b8eb49fd38e",
+    "timestamp": "2026-05-19T15:55:54.491514+00:00"
   }
 ]

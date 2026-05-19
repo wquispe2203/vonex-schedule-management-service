@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<timetable>
+<teachers>
+    <teacher id="T1" firstname="Maria" lastname="Sanchez" short="T1"/> <!-- No tilde -->
+    <teacher id="T2" firstname="Jose Luis" lastname="Perez" short="T2"/> <!-- Partial last name -->
+    <teacher id="T3" firstname="Ana" lastname="Gomes" short="T3"/> <!-- Typo Gomez -> Gomes -->
+    <teacher id="T4" firstname="Ana Maria" lastname="Gomez" short="T4"/> <!-- Extra name -->
+    <teacher id="T5" firstname="Jose" lastname="Perez Garcia" short="T5"/> <!-- Match with Jose Luis Perez Garcia? -->
+    <teacher id="T6" firstname="M." lastname="Sanchez" short="T6"/> <!-- Initial -->
+    <teacher id="T7" firstname="Carlos" lastname="Ruiz" short="T7"/> <!-- New teacher -->
+    <teacher id="T8" firstname="Josue" lastname="Perez" short="T8"/> <!-- Collision risk -->
+    <teacher id="T9" firstname="Maria" lastname="Sanches" short="T9"/> <!-- Typo Sanchez -> Sanches -->
+    <teacher id="T10" firstname="J. Luis" lastname="Perez G." short="T10"/> <!-- Heavy abbreviations -->
+</teachers>
+<subjects>
+    <subject id="S1" name="Matemáticas" short="MAT"/>
+</subjects>
+<classrooms>
+    <classroom id="C1" name="Aula 101" short="101"/>
+</classrooms>
+<classes>
+    <class id="CL1" name="QA_TEST_CLASS" short="QA"/>
+</classes>
+<lessons>
+    <lesson id="L1" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T1"/>
+    <lesson id="L2" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T2"/>
+    <lesson id="L3" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T3"/>
+    <lesson id="L4" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T4"/>
+    <lesson id="L5" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T5"/>
+    <lesson id="L6" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T6"/>
+    <lesson id="L7" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T7"/>
+    <lesson id="L8" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T8"/>
+    <lesson id="L9" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T9"/>
+    <lesson id="L10" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T10"/>
+</lessons>
+<cards>
+    <card lessonid="L1" classroomids="C1" period="1" days="10000" weeks=""/>
+    <card lessonid="L2" classroomids="C1" period="2" days="10000" weeks=""/>
+    <card lessonid="L3" classroomids="C1" period="3" days="10000" weeks=""/>
+    <card lessonid="L4" classroomids="C1" period="4" days="10000" weeks=""/>
+    <card lessonid="L5" classroomids="C1" period="5" days="10000" weeks=""/>
+    <card lessonid="L6" classroomids="C1" period="6" days="10000" weeks=""/>
+    <card lessonid="L7" classroomids="C1" period="7" days="10000" weeks=""/>
+    <card lessonid="L8" classroomids="C1" period="8" days="10000" weeks=""/>
+    <card lessonid="L9" classroomids="C1" period="9" days="10000" weeks=""/>
+    <card lessonid="L10" classroomids="C1" period="10" days="10000" weeks=""/>
+</cards>
+<periods>
+    <period name="1" short="1" period="1" starttime="08:00" endtime="08:50"/>
+    <period name="2" short="2" period="2" starttime="08:50" endtime="09:40"/>
+    <period name="3" short="3" period="3" starttime="09:40" endtime="10:30"/>
+    <period name="4" short="4" period="4" starttime="10:30" endtime="11:20"/>
+    <period name="5" short="5" period="5" starttime="11:20" endtime="12:10"/>
+    <period name="6" short="6" period="6" starttime="12:10" endtime="13:00"/>
+    <period name="7" short="7" period="7" starttime="13:00" endtime="13:50"/>
+    <period name="8" short="8" period="8" starttime="13:50" endtime="14:40"/>
+    <period name="9" short="9" period="9" starttime="14:40" endtime="15:30"/>
+    <period name="10" short="10" period="10" starttime="15:30" endtime="16:20"/>
+</periods>
+</timetable>

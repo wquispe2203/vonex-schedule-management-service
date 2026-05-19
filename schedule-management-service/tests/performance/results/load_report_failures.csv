@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences
+POST,/api/schedule/upload,CatchResponseError('Status: 500'),15

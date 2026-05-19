@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<timetable>
+<teachers>
+    <teacher id="T1" firstname="Marya" lastname="Sannchez" short="T1"/>
+    <teacher id="T2" firstname="Josee" lastname="Perrez" short="T2"/>
+    <teacher id="T3" firstname="Anna" lastname="Gommez" short="T3"/>
+    <teacher id="T4" firstname="Jose Luis" lastname="Peres Garcia" short="T4"/>
+    <teacher id="T5" firstname="Maria" lastname="Sanches G." short="T5"/>
+    <teacher id="T6" firstname="Annia" lastname="Gomes M." short="T6"/>
+    <teacher id="T7" firstname="Carlos" lastname="Ruizz" short="T7"/>
+    <teacher id="T8" firstname="Luis" lastname="Perez G." short="T8"/>
+    <teacher id="T9" firstname="M. Sanchez" lastname="Maria" short="T9"/>
+    <teacher id="T10" firstname="J. P." lastname="Gomez" short="T10"/>
+    <teacher id="T11" firstname="Maria Cecilia" lastname="Sanchez" short="T11"/>
+    <teacher id="T12" firstname="Josue" lastname="Perrrez" short="T12"/>
+    <teacher id="T13" firstname="Ana" lastname="Gomez de la R." short="T13"/>
+    <teacher id="T14" firstname="Mario" lastname="Sanccez" short="T14"/>
+    <teacher id="T15" firstname="Jose" lastname="Perez-Garcia" short="T15"/>
+    <teacher id="T16" firstname="Luisa" lastname="Gomez" short="T16"/>
+    <teacher id="T17" firstname="C. Ruiz" lastname="Carlos" short="T17"/>
+    <teacher id="T18" firstname="Maria" lastname="Sanzhez" short="T18"/>
+    <teacher id="T19" firstname="Jose" lastname="Perz" short="T19"/>
+    <teacher id="T20" firstname="Analia" lastname="Gomez" short="T20"/>
+</teachers>
+<subjects><subject id="S1" name="X" short="X"/></subjects>
+<classrooms><classroom id="C1" name="X" short="X"/></classrooms>
+<classes><class id="CL1" name="X" short="X"/></classes>
+<lessons>
+    <lesson id="L1" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T1"/>
+    <lesson id="L2" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T2"/>
+    <lesson id="L3" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T3"/>
+    <lesson id="L4" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T4"/>
+    <lesson id="L5" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T5"/>
+    <lesson id="L6" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T6"/>
+    <lesson id="L7" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T7"/>
+    <lesson id="L8" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T8"/>
+    <lesson id="L9" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T9"/>
+    <lesson id="L10" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T10"/>
+    <lesson id="11" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T11"/>
+    <lesson id="12" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T12"/>
+    <lesson id="13" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T13"/>
+    <lesson id="14" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T14"/>
+    <lesson id="15" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T15"/>
+    <lesson id="16" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T16"/>
+    <lesson id="17" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T17"/>
+    <lesson id="18" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T18"/>
+    <lesson id="19" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T19"/>
+    <lesson id="20" classids="CL1" subjectid="S1" periodspercard="1" periodsperweek="1" teacherids="T20"/>
+</lessons>
+<cards>
+    <card lessonid="L1" classroomids="C1" period="1" days="1" weeks=""/>
+    <card lessonid="L2" classroomids="C1" period="2" days="1" weeks=""/>
+    <card lessonid="L3" classroomids="C1" period="3" days="1" weeks=""/>
+    <card lessonid="L4" classroomids="C1" period="4" days="1" weeks=""/>
+    <card lessonid="L5" classroomids="C1" period="5" days="1" weeks=""/>
+    <card lessonid="L6" classroomids="C1" period="6" days="1" weeks=""/>
+    <card lessonid="L7" classroomids="C1" period="7" days="1" weeks=""/>
+    <card lessonid="L8" classroomids="C1" period="8" days="1" weeks=""/>
+    <card lessonid="L9" classroomids="C1" period="9" days="1" weeks=""/>
+    <card lessonid="L10" classroomids="C1" period="10" days="1" weeks=""/>
+    <card lessonid="11" classroomids="C1" period="11" days="1" weeks=""/>
+    <card lessonid="12" classroomids="C1" period="12" days="1" weeks=""/>
+    <card lessonid="13" classroomids="C1" period="13" days="1" weeks=""/>
+    <card lessonid="14" classroomids="C1" period="14" days="1" weeks=""/>
+    <card lessonid="15" classroomids="C1" period="15" days="1" weeks=""/>
+    <card lessonid="16" classroomids="C1" period="16" days="1" weeks=""/>
+    <card lessonid="17" classroomids="C1" period="17" days="1" weeks=""/>
+    <card lessonid="18" classroomids="C1" period="18" days="1" weeks=""/>
+    <card lessonid="19" classroomids="C1" period="19" days="1" weeks=""/>
+    <card lessonid="20" classroomids="C1" period="20" days="1" weeks=""/>
+</cards>
+<periods>
+    <period name="1" short="1" period="1" starttime="08:00" endtime="08:50"/>
+    <period name="2" short="2" period="2" starttime="08:50" endtime="09:40"/>
+    <period name="3" short="3" period="3" starttime="09:40" endtime="10:30"/>
+    <period name="4" short="4" period="4" starttime="10:30" endtime="11:20"/>
+    <period name="5" short="5" period="5" starttime="11:20" endtime="12:10"/>
+    <period name="6" short="6" period="6" starttime="12:10" endtime="13:00"/>
+    <period name="7" short="7" period="7" starttime="13:00" endtime="13:50"/>
+    <period name="8" short="8" period="8" starttime="13:50" endtime="14:40"/>
+    <period name="9" short="9" period="9" starttime="14:40" endtime="15:30"/>
+    <period name="10" short="10" period="10" starttime="15:30" endtime="16:20"/>
+    <period name="11" short="11" period="11" starttime="16:20" endtime="17:10"/>
+    <period name="12" short="12" period="12" starttime="17:10" endtime="18:00"/>
+    <period name="13" short="13" period="13" starttime="18:00" endtime="18:50"/>
+    <period name="14" short="14" period="14" starttime="18:50" endtime="19:40"/>
+    <period name="15" short="15" period="15" starttime="19:40" endtime="20:30"/>
+    <period name="16" short="16" period="16" starttime="20:30" endtime="21:20"/>
+    <period name="17" short="17" period="17" starttime="21:20" endtime="22:10"/>
+    <period name="18" short="18" period="18" starttime="22:10" endtime="23:00"/>
+    <period name="19" short="19" period="19" starttime="23:00" endtime="23:50"/>
+    <period name="20" short="20" period="20" starttime="23:50" endtime="00:40"/>
+</periods>
+</timetable>

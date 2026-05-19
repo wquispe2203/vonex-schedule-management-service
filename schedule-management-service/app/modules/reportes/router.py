@@ -22,7 +22,7 @@ def list_rpt_planilla(
     aula: Optional[str] = Query(None),
     xml_upload_id: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
-    limit: int = Query(50, ge=1, le=100),
+    limit: int = Query(50, ge=1, le=10000),
     db: Session = Depends(get_db),
     _ = Depends(require_permission("ver_rpt"))
 ):
@@ -36,7 +36,7 @@ from app.modules.docentes.service import get_active_teachers_for_rpt
 from app.modules.docentes.schemas import TeacherHoursItem
 
 @router.get("/docentes", response_model=StandardResponse[PaginatedResponseData[TeacherHoursItem]])
-def get_docentes(db: Session = Depends(get_db), _ = Depends(require_permission("ver_docentes"))):
+def get_docentes(db: Session = Depends(get_db), _ = Depends(require_permission("ver_rpt"))):
     docentes = get_active_teachers_for_rpt(db)
     return {
         "success": True,

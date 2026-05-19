@@ -49,6 +49,9 @@ async function handleLogin(e) {
         // El wrapper ya validó res.ok y parseó el JSON
         api.setToken(data.access_token);
         
+        console.log("[LOGIN SUCCESS] User successfully authenticated.");
+        sessionStorage.removeItem('explicit_logout');
+        
         // Logged in! Reload to let main.js handle the bootstrap
         window.location.reload();
 
@@ -63,6 +66,12 @@ async function handleLogin(e) {
 }
 
 export function logout() {
+    console.log("[LOGOUT START] Purging local session context...");
+    sessionStorage.setItem('explicit_logout', 'true');
+    console.log("[SESSION PURGE] Removing authentication credentials...");
     api.clearToken();
+    localStorage.removeItem('currentUser');
+    console.log("[LOGOUT SUCCESS] Token and user profile successfully removed.");
+    console.log("[SESSION DESTROYED] All transient auth caches have been destroyed.");
     window.location.reload();
 }

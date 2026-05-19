@@ -8,7 +8,7 @@ T = TypeVar("T")
 class TeacherHoursItem(BaseModel):
     teacher_id: UUID
     name: str
-    dni: str
+    dni: Optional[str] = None
     total_hours: float
 
     model_config = ConfigDict(from_attributes=True)

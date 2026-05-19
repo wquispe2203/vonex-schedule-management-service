@@ -1,0 +1,87 @@
+name: Backend Quality & Regression Gates
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test_and_validate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: C@rden4s2k24
+          POSTGRES_DB: schedule_test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-benchmark locust httpx jose passlib
+
+    - name: Initialize Test Database
+      env:
+        DATABASE_URL: postgresql://postgres:C@rden4s2k24@localhost:5432/schedule_test_db
+      run: |
+        python scripts/setup_test_db.py
+
+    - name: Run Backend Quality Suite (Pytest)
+      env:
+        TESTING: "True"
+        DATABASE_URL: postgresql://postgres:C@rden4s2k24@localhost:5432/schedule_test_db
+      run: |
+        export PYTHONPATH=.
+        pytest -v tests/unit/ tests/integration/
+
+    - name: Run Regression Parity Gates
+      env:
+        TESTING: "True"
+        DATABASE_URL: postgresql://postgres:C@rden4s2k24@localhost:5432/schedule_test_db
+      run: |
+        export PYTHONPATH=.
+        pytest -m regression -v tests/regression/
+
+    - name: Run Security Gates
+      env:
+        TESTING: "True"
+        DATABASE_URL: postgresql://postgres:C@rden4s2k24@localhost:5432/schedule_test_db
+      run: |
+        export PYTHONPATH=.
+        pytest -v tests/security/
+
+    - name: Run Performance Benchmarks
+      env:
+        TESTING: "True"
+      run: |
+        export PYTHONPATH=.
+        pytest tests/performance/test_benchmarks.py --benchmark-only --benchmark-json tests/performance/results/benchmarks.json
+
+    - name: Check Performance Quality Gates (Locust)
+      env:
+        TESTING: "True"
+        ENVIRONMENT: "development"
+      run: |
+        # In CI, we would start the server in background
+        export PYTHONPATH=.
+        python main.py & 
+        sleep 5
+        python tests/performance/performance_gate.py

@@ -2,6 +2,10 @@
 import api from './api.js';
 import { ENDPOINTS, API_BASE_URL } from './config.js';
 import { extractList, extractPagination } from './ui_utils.js';
+import { populateRptCombobox, navRptTeacher as _navRptTeacher, setupComboboxKeyboard, filterDocenteCombobox as _filterDocenteCombobox, registerRptTeacherChangeCallback } from './searchable_combobox.js';
+
+// Re-export para el sistema de Handlers (data-action)
+export function filterDocenteCombobox(context) { _filterDocenteCombobox(context); }
 
 let rptCurrentPage = 1;
 let isLoadingRpt = false;
@@ -21,6 +25,9 @@ export async function initRPT() {
         try {
             await loadRptFilters();
             setupRptEvents();
+            setupComboboxKeyboard();
+            // Registrar callback para auto-reload al seleccionar docente
+            registerRptTeacherChangeCallback(() => loadRptPlanilla(1));
 
             // Set default dates if empty to prevent unnecessary alerts on load
             const inicio = document.getElementById('rpt-fecha-inicio');
@@ -241,19 +248,10 @@ export function changeRptPage(delta) {
 }
 
 /**
- * Navegación secuencial de docentes (vía flechas en UI)
+ * Navegación secuencial de docentes — delegada al módulo combobox.
  */
 export function navRptTeacher(delta) {
-    const select = document.getElementById('rpt-filter-docente');
-    if (!select || select.options.length <= 1) return;
-    
-    let nextIndex = select.selectedIndex + delta;
-    if (nextIndex < 0) nextIndex = select.options.length - 1;
-    if (nextIndex >= select.options.length) nextIndex = 0;
-    
-    select.selectedIndex = nextIndex;
-    // Trigger auto-filter
-    loadRptPlanilla(1);
+    _navRptTeacher(delta);
 }
 
 export async function exportToExcel() {
@@ -318,6 +316,7 @@ export async function loadRptFilters() {
     const selectSede = document.getElementById('rpt-filter-sede');
 
     try {
+        console.log("[DROPDOWN LOAD START] Loading reports teachers and sedes dropdowns...");
         // Cargar Docentes
         const resDocentes = await api.authFetch(`${ENDPOINTS.REPORTES.BASE}/docentes`);
         
@@ -328,16 +327,13 @@ export async function loadRptFilters() {
         console.log("[RPT_FILTER_DOC] LIST:", listDocentes);
 
         if (resDocentes.success && listDocentes.length > 0) {
-            if (selectDocente) {
-                selectDocente.innerHTML = '<option value="Todos">Todos los Docentes</option>';
-                listDocentes.forEach(d => {
-                    const opt = document.createElement('option');
-                    const val = typeof d === 'object' && d !== null ? (d.name || '') : d;
-                    opt.value = val;
-                    opt.textContent = val;
-                    selectDocente.appendChild(opt);
-                });
-            }
+            // Poblar combobox searchable (también sincroniza hidden select)
+            populateRptCombobox(listDocentes);
+            console.log(`[DROPDOWN POPULATED] Loaded ${listDocentes.length} options for reports teachers.`);
+        } else {
+            console.warn("[DROPDOWN EMPTY] No reports teachers found.");
+            const inputEl = document.getElementById('rpt-docente-search');
+            if (inputEl) inputEl.placeholder = 'No hay cargas XML activas';
         }
 
         // Cargar Sedes
@@ -359,8 +355,14 @@ export async function loadRptFilters() {
                     selectSede.appendChild(opt);
                 });
             }
+            console.log(`[DROPDOWN POPULATED] Loaded ${listSedes.length} options for reports sedes.`);
+        } else {
+            console.warn("[DROPDOWN EMPTY] No reports sedes found.");
+            if (selectSede) {
+                selectSede.innerHTML = '<option value="Todas">Todas las Sedes</option>';
+            }
         }
     } catch (err) {
-        console.error("Error cargando select:", err);
+        console.error("[DROPDOWN API ERROR] Error loading select filters:", err);
     }
 }

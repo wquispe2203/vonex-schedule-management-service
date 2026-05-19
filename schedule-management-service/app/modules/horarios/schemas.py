@@ -45,7 +45,7 @@ class TeacherSessionResponse(BaseModel):
     observations: List[ObservationSubResponse]
 
 class ClassroomSessionResponse(BaseModel):
-    id: UUID
+    id: Optional[str] = None
     date: str
     start_time: str
     end_time: str
